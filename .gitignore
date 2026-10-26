@@ -12,3 +12,6 @@ build/
 *.keystore
 key.properties
 .env
+
+# Hasil kegagalan golden test
+test/**/failures/
