@@ -85,39 +85,42 @@ class ScenarioPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpace.block),
                 AppCard(
-                  child: Column(
-                    children: [
-                      toggle(
-                        'Offline',
-                        'Semua permintaan gagal tanpa jaringan',
-                        s.offline,
-                        (v) => ctl.update((x) => x.copyWith(offline: v)),
-                      ),
-                      toggle(
-                        'Token dicabut',
-                        'Permintaan berikutnya 401, kembali ke login',
-                        s.tokenRevoked,
-                        (v) => ctl.update((x) => x.copyWith(tokenRevoked: v)),
-                      ),
-                      toggle(
-                        'Foto wajib',
-                        '`requires_photo` dari /me',
-                        s.requiresPhoto,
-                        (v) {
-                          ctl.update((x) => x.copyWith(requiresPhoto: v));
-                          ref.read(sessionProvider.notifier).refresh();
-                        },
-                      ),
-                      toggle(
-                        'Perlu persetujuan',
-                        '`requires_approval` dari /me (status pending)',
-                        s.requiresApproval,
-                        (v) {
-                          ctl.update((x) => x.copyWith(requiresApproval: v));
-                          ref.read(sessionProvider.notifier).refresh();
-                        },
-                      ),
-                    ],
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Column(
+                      children: [
+                        toggle(
+                          'Offline',
+                          'Semua permintaan gagal tanpa jaringan',
+                          s.offline,
+                          (v) => ctl.update((x) => x.copyWith(offline: v)),
+                        ),
+                        toggle(
+                          'Token dicabut',
+                          'Permintaan berikutnya 401, kembali ke login',
+                          s.tokenRevoked,
+                          (v) => ctl.update((x) => x.copyWith(tokenRevoked: v)),
+                        ),
+                        toggle(
+                          'Foto wajib',
+                          '`requires_photo` dari /me',
+                          s.requiresPhoto,
+                          (v) {
+                            ctl.update((x) => x.copyWith(requiresPhoto: v));
+                            ref.read(sessionProvider.notifier).refresh();
+                          },
+                        ),
+                        toggle(
+                          'Perlu persetujuan',
+                          '`requires_approval` dari /me (status pending)',
+                          s.requiresApproval,
+                          (v) {
+                            ctl.update((x) => x.copyWith(requiresApproval: v));
+                            ref.read(sessionProvider.notifier).refresh();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
