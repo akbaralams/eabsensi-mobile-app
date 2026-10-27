@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/clock/clock.dart';
@@ -8,8 +10,10 @@ import '../../auth/presentation/session_controller.dart';
 import '../../events/domain/event_item.dart';
 import '../../events/presentation/event_providers.dart';
 import '../data/fake_location_service.dart';
+import '../data/real_camera_service.dart';
 import '../data/geolocator_location_service.dart';
 import '../data/mock_punch_repository.dart';
+import '../domain/camera.dart';
 import '../domain/location.dart';
 import '../domain/punch.dart';
 
@@ -24,6 +28,11 @@ final locationServiceProvider = Provider<LocationService>((ref) {
   }
   return const GeolocatorLocationService();
 });
+
+/// Kamera perangkat sungguhan; test meng-override dengan `FakeCameraService`.
+final cameraServiceProvider = Provider<CameraService>(
+  (ref) => const RealCameraService(),
+);
 
 /// Area kantor untuk tampilan peta; `null` bila kontrak belum menyediakannya.
 final officeAreaProvider = Provider<OfficeArea?>(
@@ -182,10 +191,22 @@ class PunchFlowController extends Notifier<PunchFlowState> {
           ref.invalidate(eventsTodayProvider);
           result = FlowResult(time: checkIn.checkedInAt, status: null);
       }
+      await _deletePhoto(state.photoPath);
       state = state.copyWith(submitting: false, result: result);
     } on Object catch (e) {
       state = state.copyWith(submitting: false, failure: e);
     }
+  }
+}
+
+/// Foto sementara dihapus setelah berhasil terkirim (jangan menimbun selfie).
+Future<void> _deletePhoto(String? path) async {
+  if (path == null || path.startsWith('mock://')) return;
+  try {
+    final file = File(path);
+    if (file.existsSync()) await file.delete();
+  } on Object {
+    // Gagal menghapus berkas sementara tidak boleh menggagalkan alur.
   }
 }
 

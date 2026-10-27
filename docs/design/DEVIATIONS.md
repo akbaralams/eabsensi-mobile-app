@@ -26,7 +26,7 @@ Kontrak API dan `CLAUDE.md` menang atas `docs/design/README.md`. Setiap perbedaa
 
 ## Karena teknis
 - **`phosphor_flutter` 2.1.0 (rilis terbaru) tidak bisa dikompilasi di Flutter 3.47**: kelasnya memperluas `IconData`, yang kini `final class`. Paket tetap dipakai untuk berkas font-nya; `lib/core/design/phosphor.dart` dibangkitkan oleh `tool/generate_phosphor_icons.py` (kode titik ikon yang dipakai saja). Jalankan ulang skrip itu bila menambah ikon. Ganti ke paket resmi bila rilis baru yang kompatibel muncul.
-- **Kamera**: pratinjau di langkah foto disimulasikan (gradien + bingkai oval + tombol shutter). Integrasi kamera nyata (paket `camera`) belum dibuat; foto dummy bernama `mock://selfie-...jpg` tidak diunggah ke mana pun.
+- **Kamera**: kamera depan nyata lewat paket `camera` (pratinjau di dalam bingkai oval, izin diminta saat layar foto dibuka, foto sementara dihapus setelah terkirim). Tidak ada deteksi wajah, jadi chip "Wajah terdeteksi" di desain diganti "Kamera siap". Izin ditolak atau kamera gagal -> pesan dan "Coba lagi". Layar dikunci potret. **Belum diuji di perangkat** (VM cloud tanpa kamera); test memakai `FakeCameraService`. Dalam mode dummy foto tidak diunggah ke mana pun.
 - **Peta**: `flutter_map` dengan tile OpenStreetMap; tile tidak dimuat di test. Tile OSM publik tidak untuk lalu lintas produksi besar; ganti penyedia tile sebelum rilis.
 - **Tab "Absensi"** di navigasi bawah adalah aksi (membuka Check In atau Check Out sesuai punch hari ini), bukan layar tab.
 - **Golden test** dibangkitkan di Linux; `test/flutter_test_config.dart` menoleransi selisih piksel sampai 0,5% agar render font di Windows tidak menggagalkan test. Bangkitkan ulang dengan `flutter test --update-goldens`.

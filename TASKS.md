@@ -44,7 +44,7 @@ Urutan wajib. Tiap task selesai bila kriteria "Selesai bila" terpenuhi dan sudah
 - **Selesai bila**: Beranda cocok dengan prototipe; menu nonaktif tidak bisa ditekan dan terbaca "nonaktif" oleh screen reader; mengganti data statis mengubah grid tanpa ubah kode UI; test widget untuk kedua mode nonaktif.
 
 ## [ ] Task 6. Punch (Check In / Check Out)
-- **Status (data dummy)**: alur lokasi -> foto -> hasil/galat selesai dengan test; kamera nyata belum (lihat DEVIATIONS). Belum diuji terhadap web v2.
+- **Status (data dummy)**: alur lokasi -> foto -> hasil/galat selesai dengan test; kamera nyata sudah terpasang tetapi belum diuji di perangkat (lihat DEVIATIONS). Belum diuji terhadap web v2.
 - Alur §3–§6: layar lokasi dengan peta + geofence + akurasi, kartu informasi, Konfirmasi/Batal → foto (bila `requires_photo`) → kirim multipart → layar hasil dengan **waktu dari server** dan status `approved`/`pending` → atau layar galat.
 - Lokasi dikirim bila izin diberikan (`latitude`, `longitude`, `accuracy`). Tanpa jaringan: layar galat offline, tanpa antrean.
 - Kartu absen dan Status Kehadiran di Beranda diperbarui dari data server.

@@ -3,7 +3,10 @@ import 'package:eabsensi/core/clock/clock.dart';
 import 'package:eabsensi/core/mock/mock_env.dart';
 import 'package:eabsensi/core/storage/preferences.dart';
 import 'package:eabsensi/features/auth/data/token_store.dart';
+import 'package:eabsensi/features/punch/data/fake_camera_service.dart';
+import 'package:eabsensi/features/punch/domain/camera.dart';
 import 'package:eabsensi/features/punch/presentation/location_map.dart';
+import 'package:eabsensi/features/punch/presentation/punch_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -32,6 +35,7 @@ Future<ProviderContainer> pumpApp(
   Size size = const Size(390, 844),
   double textScale = 1,
   Map<String, Object> prefs = const {},
+  CameraService camera = const FakeCameraService(),
   List<Override> overrides = const [],
 }) async {
   SharedPreferences.setMockInitialValues(prefs);
@@ -61,6 +65,7 @@ Future<ProviderContainer> pumpApp(
       clockProvider.overrideWithValue(() => clock),
       tickingClockProvider.overrideWith((ref) => Stream.value(clock)),
       mapTilesEnabledProvider.overrideWithValue(false),
+      cameraServiceProvider.overrideWithValue(camera),
       mockScenarioProvider.overrideWith(() => _FixedScenario(scenario)),
       mockEnvProvider.overrideWith(
         (ref) => MockEnv(
