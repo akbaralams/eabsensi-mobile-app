@@ -15,8 +15,10 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "id.eabsensi.app"
+        // APP_ID_SUFFIX / APP_LABEL (variabel lingkungan) membuat build kedua yang bisa
+        // dipasang berdampingan dengan build biasa, mis. APP_ID_SUFFIX=.baru APP_LABEL="eAbsensi Baru".
+        applicationId = "id.eabsensi.app" + (System.getenv("APP_ID_SUFFIX") ?: "")
+        manifestPlaceholders["appLabel"] = System.getenv("APP_LABEL") ?: "eAbsensi"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
