@@ -154,7 +154,7 @@ void main() {
     expect(find.textContaining('Konfirmasi'), findsNothing);
   });
 
-  testWidgets('tab Absensi membuka Check Out setelah ada punch masuk', (
+  testWidgets('tab Absensi: tujuan tersendiri dengan daftar punch hari ini', (
     tester,
   ) async {
     await pumpApp(
@@ -166,7 +166,11 @@ void main() {
     );
     await tester.tap(find.text('Absensi'));
     await settle(tester);
-    expect(find.text('Konfirmasi Check In'), findsOneWidget);
+    expect(find.text('Punch hari ini'), findsOneWidget);
+    expect(find.text('Belum ada punch hari ini.'), findsOneWidget);
+
+    await tester.tap(find.text('Check In').first);
+    await settle(tester);
     await tester.tap(find.text('Konfirmasi Check In'));
     await settle(tester);
     await tester.tap(find.text('Kembali ke Beranda'));
@@ -174,8 +178,36 @@ void main() {
 
     await tester.tap(find.text('Absensi'));
     await settle(tester);
+    expect(find.text('Belum ada punch hari ini.'), findsNothing);
+    expect(find.text('Tanpa foto'), findsOneWidget);
+    // Check Out menjadi aksi utama setelah ada punch masuk.
+    await tester.tap(find.text('Check Out').first);
+    await settle(tester);
     expect(find.text('Konfirmasi Check Out'), findsOneWidget);
   });
+
+  testWidgets(
+    'hasil menumpuk di atas Beranda: Back sistem kembali ke Beranda',
+    (tester) async {
+      await pumpApp(
+        tester,
+        scenario: const MockScenario(
+          requiresPhoto: false,
+          requiresApproval: false,
+        ),
+      );
+      await tester.tap(find.text('Check In').first);
+      await settle(tester);
+      await tester.tap(find.text('Konfirmasi Check In'));
+      await settle(tester);
+      expect(find.byKey(const Key('result-time')), findsOneWidget);
+
+      await tester.binding.handlePopRoute();
+      await settle(tester);
+      expect(find.byKey(const Key('result-time')), findsNothing);
+      expect(find.text('Selamat pagi,'), findsOneWidget);
+    },
+  );
 
   test('alur menandai fase lokasi dengan benar', () {
     final container = ProviderContainer();

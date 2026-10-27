@@ -89,16 +89,16 @@ class ProfilePage extends ConsumerWidget {
               ),
               _MenuRow(
                 icon: PhosphorIconsRegular.moon,
-                label: 'Mode Gelap',
+                label: 'Tampilan',
                 trailing: switch (mode) {
                   ThemeMode.system => 'Ikuti sistem',
                   ThemeMode.light => 'Terang',
                   ThemeMode.dark => 'Gelap',
                 },
-                last: !AppConfig.useMock,
+                last: !AppConfig.debugTools,
                 onTap: () => _pickTheme(context, ref, mode),
               ),
-              if (AppConfig.useMock) ...[
+              if (AppConfig.debugTools) ...[
                 _MenuRow(
                   icon: PhosphorIconsRegular.flask,
                   label: 'Skenario uji (data contoh)',
@@ -220,10 +220,16 @@ class _IdentityCard extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
-            child: Text(
-              _initials(profile.name),
-              style: AppType.title.copyWith(color: Colors.white),
-              semanticsLabel: '',
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Text(
+                  _initials(profile.name),
+                  style: AppType.title.copyWith(color: Colors.white),
+                  semanticsLabel: '',
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 14),

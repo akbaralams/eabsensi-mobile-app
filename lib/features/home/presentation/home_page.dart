@@ -21,9 +21,9 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(sessionProvider).value;
-    final now = ref
-        .watch(tickingClockProvider)
-        .maybeWhen(data: (d) => d, orElse: () => ref.read(clockProvider)());
+    // Jam yang berdetak hanya dibangun di TickingAttendanceCard/StatusCard,
+    // bukan seluruh halaman.
+    final now = ref.watch(clockProvider)();
     final punches = ref.watch(todayPunchesProvider);
     final summary = punches.maybeWhen(
       data: AttendanceSummary.from,
@@ -67,8 +67,7 @@ class HomePage extends ConsumerWidget {
           ],
           FadeSlideIn(
             delay: const Duration(milliseconds: 40),
-            child: AttendanceCard(
-              now: now,
+            child: TickingAttendanceCard(
               summary: summary,
               loading: punches.isLoading && !punches.hasValue,
               onCheckIn: () => context.push('/punch/in'),
@@ -78,7 +77,7 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: AppSpace.block),
           FadeSlideIn(
             delay: const Duration(milliseconds: 80),
-            child: _StatusCard(now: now, summary: summary),
+            child: StatusCard(summary: summary),
           ),
           const SizedBox(height: AppSpace.block),
           const FadeSlideIn(
@@ -134,7 +133,7 @@ class _Header extends StatelessWidget {
               ),
               Text(
                 name,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: AppType.header.copyWith(color: c.textPrimary),
               ),
@@ -202,15 +201,17 @@ class _LoadError extends StatelessWidget {
   }
 }
 
-class _StatusCard extends ConsumerWidget {
-  const _StatusCard({required this.now, required this.summary});
+class StatusCard extends ConsumerWidget {
+  const StatusCard({required this.summary, super.key});
 
-  final DateTime now;
   final AttendanceSummary summary;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final now = ref
+        .watch(tickingClockProvider)
+        .maybeWhen(data: (d) => d, orElse: () => ref.read(clockProvider)());
     final office = ref.watch(officeAreaProvider);
     final (label, variant) = switch (summary.phase) {
       DayPhase.none => ('Belum absen', StatusVariant.neutral),

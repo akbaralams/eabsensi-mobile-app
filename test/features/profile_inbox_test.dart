@@ -29,7 +29,7 @@ void main() {
       expect(find.text('Nomor pegawai 2010011004'), findsOneWidget);
       expect(find.text('Dinas Komunikasi dan Informatika'), findsOneWidget);
 
-      await tester.tap(find.text('Mode Gelap'));
+      await tester.tap(find.text('Tampilan'));
       await settle(tester);
       expect(find.text('Mode tampilan'), findsOneWidget);
       await tester.tap(find.text('Gelap'));

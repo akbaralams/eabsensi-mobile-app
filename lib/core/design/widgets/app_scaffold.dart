@@ -66,6 +66,7 @@ class AppScaffold extends StatelessWidget {
     this.bottomNavigationBar,
     this.safeTop = true,
     this.resizeToAvoidBottomInset = true,
+    this.constrainBody = true,
     super.key,
   });
 
@@ -73,6 +74,9 @@ class AppScaffold extends StatelessWidget {
   final Widget? bottomNavigationBar;
   final bool safeTop;
   final bool resizeToAvoidBottomInset;
+
+  /// Batasi lebar konten (tablet): konten ponsel tidak melar.
+  final bool constrainBody;
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +95,30 @@ class AppScaffold extends StatelessWidget {
           resizeToAvoidBottomInset: resizeToAvoidBottomInset,
           extendBody: true,
           bottomNavigationBar: bottomNavigationBar,
-          body: SafeArea(bottom: false, top: safeTop, child: body),
+          body: SafeArea(
+            bottom: false,
+            top: safeTop,
+            child: constrainBody ? ContentWidth(child: body) : body,
+          ),
         ),
       ),
     );
   }
+}
+
+/// Lebar konten maksimum di layar lebar; di ponsel tidak berpengaruh.
+class ContentWidth extends StatelessWidget {
+  const ContentWidth({required this.child, this.maxWidth = 640, super.key});
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.topCenter,
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: child,
+    ),
+  );
 }

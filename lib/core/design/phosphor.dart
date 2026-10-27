@@ -28,6 +28,12 @@ abstract final class PhosphorIconsRegular {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
+  static const arrowLeft = IconData(
+    0xe058,
+    fontFamily: 'PhosphorRegular',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
   static const bell = IconData(
     0xe0ce,
     fontFamily: 'PhosphorRegular',
@@ -303,6 +309,12 @@ abstract final class PhosphorIconsFill {
   );
   static const clockCountdown = IconData(
     0xed2c,
+    fontFamily: 'PhosphorFill',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
+  static const clockCounterClockwise = IconData(
+    0xe1a0,
     fontFamily: 'PhosphorFill',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,

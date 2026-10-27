@@ -277,7 +277,11 @@ void main() {
     await tester.tap(find.text('tampil'));
     await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('Pengajuan terkirim'), findsOneWidget);
-    await tester.pump(const Duration(seconds: 4));
+    // Timer Snackbar dibuat pada build setelah animasi masuk selesai, jadi
+    // waktu harus berjalan lewat beberapa frame.
+    for (var i = 0; i < 8; i++) {
+      await tester.pump(const Duration(seconds: 1));
+    }
     await tester.pumpAndSettle();
     expect(find.text('Pengajuan terkirim'), findsNothing);
   });

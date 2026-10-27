@@ -31,3 +31,19 @@ Kontrak API dan `CLAUDE.md` menang atas `docs/design/README.md`. Setiap perbedaa
 - **Tab "Absensi"** di navigasi bawah adalah aksi (membuka Check In atau Check Out sesuai punch hari ini), bukan layar tab.
 - **Golden test** dibangkitkan di Linux; `test/flutter_test_config.dart` menoleransi selisih piksel sampai 0,5% agar render font di Windows tidak menggagalkan test. Bangkitkan ulang dengan `flutter test --update-goldens`.
 - **Task 3 (client dari OpenAPI) belum dikerjakan**: model domain ditulis tangan dan repository dummy ada di `lib/features/*/data/mock_*`. `USE_MOCK=false` melempar `UnimplementedError` sampai client ada. `CLAUDE.md` mewajibkan model dibangkitkan dari OpenAPI; model tangan di `*/domain/` harus dipetakan dari model hasil generator.
+
+## Hasil audit Impeccable (lihat `AUDIT-IMPECCABLE.md`)
+Diubah dari spesifikasi desain karena aksesibilitas dan konvensi Android:
+- **Border field dan tombol outline (mode terang)** `#7A9A8D` (3,07:1 terhadap putih, WCAG 1.4.11) menggantikan `#D5E6DE` (1,30:1).
+- **Navigasi bawah** memakai `NavigationBar` Material 3 (tanpa blur) dan di layar >= 720 dp memakai `NavigationRail` dengan lebar konten dibatasi 640 dp. Tab "Absensi" menjadi tujuan tersendiri (status hari ini, tombol Check In/Out, daftar punch hari ini), bukan aksi. Tab dan judul memakai "Riwayat" menggantikan "Laporan".
+- **Toast** diganti Snackbar Material (bisa ditutup, bisa memuat "Urungkan").
+- **Header** memakai panah kembali (arrow-left) menggantikan chevron.
+- **Field login** punya label terlihat; placeholder hanya contoh isi.
+- **Layar hasil dan galat** menumpuk di atas Beranda sehingga Back sistem (dan predictive back) bekerja; tombol utama layar Galat adalah "Coba lagi".
+- **Satu animasi melayang** saja (orb layar hasil); logo dan lencana jam statis.
+- **Orientasi**: potret hanya di layar < 600 dp.
+- **Riwayat**: baris hari ini dari punch server, tile statistik menjadi filter, pemilih bulan (12 bulan), detail hari lewat bottom sheet, data bulan sebelumnya tetap tampil saat memuat. Tile Terlambat/Tidak Hadir disembunyikan bila repository tidak mengklasifikasikan (`supportsClassification == false`).
+- **Teks sistem besar**: baris dan tile Riwayat, kartu absen Beranda, dan segmented berganti ke tata letak bertumpuk di atas 1,3x.
+- **Menu debug** (galeri komponen, skenario uji) hanya di build debug atau `--dart-define=DEBUG_TOOLS=true`.
+
+Sengaja **tidak** diubah (keputusan desain, bukan cacat): tombol bergradien dan bayangan berwarna, ikon Phosphor, segmented berbentuk pil, skala tipe kustom (bukan peran tipe Material), dan tanpa Dynamic Color.

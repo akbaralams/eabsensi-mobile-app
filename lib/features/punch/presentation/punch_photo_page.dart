@@ -179,27 +179,29 @@ class _PunchPhotoPageState extends ConsumerState<PunchPhotoPage>
                         key: const Key('shutter'),
                         onTap: canShoot ? _shoot : null,
                         child: Container(
-                          width: 78,
-                          height: 78,
+                          width: 86,
+                          height: 86,
+                          padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Color(0xFF10B981), Color(0xFF0D9488)],
-                            ),
-                            border: Border.all(color: c.surface, width: 5),
-                            boxShadow: c.buttonShadow,
+                            border: Border.all(color: c.accent, width: 3),
                           ),
-                          child: _sending
-                              ? const Padding(
-                                  padding: EdgeInsets.all(22),
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : null,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: c.primaryGradient,
+                              boxShadow: c.buttonShadow,
+                            ),
+                            child: _sending
+                                ? const Padding(
+                                    padding: EdgeInsets.all(22),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : null,
+                          ),
                         ),
                       ),
                     ),
@@ -380,10 +382,7 @@ class _OvalMaskPainter extends CustomPainter {
       ..addRect(Offset.zero & size)
       ..addOval(oval);
     canvas
-      ..drawPath(
-        mask,
-        Paint()..color = const Color(0xFF064E3B).withValues(alpha: .3),
-      )
+      ..drawPath(mask, Paint()..color = AppColors.cameraMask)
       ..drawOval(
         oval,
         Paint()

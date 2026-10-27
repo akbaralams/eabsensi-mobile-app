@@ -42,10 +42,7 @@ class MenuTile extends StatelessWidget {
     final c = context.colors;
     final (bg, fg) = switch (tone) {
       MenuTone.mint => (c.mintTint, c.accent),
-      MenuTone.teal => (
-        c.tealTint,
-        c.isDark ? c.teal : const Color(0xFF0D9488),
-      ),
+      MenuTone.teal => (c.tealTint, c.tealIcon),
       MenuTone.amber => (c.amberTint, c.amberIcon),
     };
     final radius = BorderRadius.circular(AppRadius.tile);

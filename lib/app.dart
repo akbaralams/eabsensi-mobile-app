@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/design/adaptive_orientation.dart';
 import 'core/design/app_theme.dart';
 import 'core/design/theme_mode_controller.dart';
 import 'core/routing/router.dart';
@@ -18,6 +19,8 @@ class EabsensiApp extends ConsumerWidget {
       darkTheme: AppTheme.dark,
       themeMode: ref.watch(themeModeProvider),
       routerConfig: ref.watch(routerProvider),
+      builder: (context, child) =>
+          AdaptiveOrientation(child: child ?? const SizedBox.shrink()),
       locale: const Locale('id'),
       supportedLocales: const [Locale('id')],
       localizationsDelegates: const [

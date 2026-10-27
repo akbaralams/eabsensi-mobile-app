@@ -96,11 +96,7 @@ class _NotificationTile extends StatelessWidget {
     final c = context.colors;
     final (bg, fg, icon) = switch (item.tone) {
       MenuTone.mint => (c.mintTint, c.accent, PhosphorIconsFill.checkCircle),
-      MenuTone.teal => (
-        c.tealTint,
-        c.isDark ? c.teal : const Color(0xFF0D9488),
-        PhosphorIconsFill.bellRinging,
-      ),
+      MenuTone.teal => (c.tealTint, c.tealIcon, PhosphorIconsFill.bellRinging),
       MenuTone.amber => (
         c.amberTint,
         c.amberIcon,
@@ -151,11 +147,66 @@ class _NotificationTile extends StatelessWidget {
   }
 }
 
-class ApprovalsPage extends ConsumerWidget {
+class ApprovalsPage extends ConsumerStatefulWidget {
   const ApprovalsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ApprovalsPage> createState() => _ApprovalsPageState();
+}
+
+class _ApprovalsPageState extends ConsumerState<ApprovalsPage> {
+  /// Pengajuan yang sudah ditanggapi tetapi masih bisa diurungkan.
+  final Set<int> _hidden = {};
+
+  Future<void> _decide(ApprovalRequest request, {required bool approve}) async {
+    if (!approve) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Tolak pengajuan ${request.requester}?'),
+          content: Text(
+            '${request.kind}: ${request.detail}',
+            style: AppType.body.copyWith(color: context.colors.textSecondary),
+          ),
+          actions: [
+            TextButton(
+              autofocus: true,
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(
+                foregroundColor: context.colors.errorText,
+              ),
+              child: const Text('Tolak'),
+            ),
+          ],
+        ),
+      );
+      if (!(ok ?? false) || !mounted) return;
+    }
+    // Keputusan baru dikirim setelah Snackbar "Urungkan" selesai tanpa diketuk.
+    final repo = ref.read(inboxRepositoryProvider);
+    final container = ProviderScope.containerOf(context);
+    setState(() => _hidden.add(request.id));
+    final bar = AppToast.show(
+      context,
+      approve ? 'Pengajuan disetujui' : 'Pengajuan ditolak',
+      actionLabel: 'Urungkan',
+    );
+    final reason = await bar?.closed ?? SnackBarClosedReason.hide;
+    if (reason == SnackBarClosedReason.action) {
+      if (mounted) setState(() => _hidden.remove(request.id));
+      return;
+    }
+    await repo.decide(request.id, approve: approve);
+    container.invalidate(approvalsProvider);
+    if (mounted) setState(() => _hidden.remove(request.id));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final c = context.colors;
     final items = ref.watch(approvalsProvider);
     return AppScaffold(
@@ -182,23 +233,33 @@ class ApprovalsPage extends ConsumerWidget {
                     'Tidak dapat memuat persetujuan.',
                     style: AppType.body.copyWith(color: c.textMuted),
                   ),
-                  data: (list) => list.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Text(
-                            'Semua pengajuan sudah ditanggapi.',
-                            textAlign: TextAlign.center,
-                            style: AppType.body.copyWith(color: c.textMuted),
-                          ),
-                        )
-                      : Column(
-                          children: [
-                            for (final a in list) ...[
-                              _ApprovalCard(request: a),
-                              const SizedBox(height: AppSpace.block),
-                            ],
-                          ],
+                  data: (all) {
+                    final list = [
+                      for (final a in all)
+                        if (!_hidden.contains(a.id)) a,
+                    ];
+                    if (list.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Text(
+                          'Semua pengajuan sudah ditanggapi.',
+                          textAlign: TextAlign.center,
+                          style: AppType.body.copyWith(color: c.textMuted),
                         ),
+                      );
+                    }
+                    return Column(
+                      children: [
+                        for (final a in list) ...[
+                          _ApprovalCard(
+                            request: a,
+                            onDecide: (approve) => _decide(a, approve: approve),
+                          ),
+                          const SizedBox(height: AppSpace.block),
+                        ],
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -209,29 +270,14 @@ class ApprovalsPage extends ConsumerWidget {
   }
 }
 
-class _ApprovalCard extends ConsumerWidget {
-  const _ApprovalCard({required this.request});
+class _ApprovalCard extends StatelessWidget {
+  const _ApprovalCard({required this.request, required this.onDecide});
 
   final ApprovalRequest request;
-
-  Future<void> _decide(
-    BuildContext context,
-    WidgetRef ref, {
-    required bool approve,
-  }) async {
-    await ref
-        .read(inboxRepositoryProvider)
-        .decide(request.id, approve: approve);
-    ref.invalidate(approvalsProvider);
-    if (!context.mounted) return;
-    AppToast.show(
-      context,
-      approve ? 'Pengajuan disetujui' : 'Pengajuan ditolak',
-    );
-  }
+  final ValueChanged<bool> onDecide;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final c = context.colors;
     return AppCard(
       key: Key('approval-${request.id}'),
@@ -248,10 +294,16 @@ class _ApprovalCard extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  IdFormat.initials(request.requester),
-                  semanticsLabel: '',
-                  style: AppType.bodyBold.copyWith(color: Colors.white),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Text(
+                      IdFormat.initials(request.requester),
+                      semanticsLabel: '',
+                      style: AppType.bodyBold.copyWith(color: Colors.white),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -288,7 +340,7 @@ class _ApprovalCard extends ConsumerWidget {
                 child: PrimaryButton(
                   label: 'Setujui',
                   height: 46,
-                  onPressed: () => _decide(context, ref, approve: true),
+                  onPressed: () => onDecide(true),
                 ),
               ),
               const SizedBox(width: 10),
@@ -296,7 +348,7 @@ class _ApprovalCard extends ConsumerWidget {
                 child: OutlineButton(
                   label: 'Tolak',
                   height: 46,
-                  onPressed: () => _decide(context, ref, approve: false),
+                  onPressed: () => onDecide(false),
                 ),
               ),
             ],

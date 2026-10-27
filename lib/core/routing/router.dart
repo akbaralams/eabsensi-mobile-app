@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show ValueNotifier;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,6 +8,7 @@ import '../../features/auth/presentation/splash_page.dart';
 import '../../features/events/domain/event_item.dart';
 import '../../features/events/presentation/events_page.dart';
 import '../../features/history/presentation/history_page.dart';
+import '../../features/home/presentation/attendance_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/inbox/presentation/inbox_pages.dart';
 import '../../features/leaves/presentation/leaves_page.dart';
@@ -51,6 +52,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(path: '/home', builder: (_, _) => const HomePage()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/attendance',
+                builder: (_, _) => const AttendancePage(),
+              ),
             ],
           ),
           StatefulShellBranch(
@@ -104,7 +113,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const NotificationsPage(),
       ),
       GoRoute(path: '/approvals', builder: (_, _) => const ApprovalsPage()),
-      if (AppConfig.useMock || kDebugMode) ...[
+      if (AppConfig.debugTools) ...[
         GoRoute(path: '/debug/galeri', builder: (_, _) => const GalleryPage()),
         GoRoute(
           path: '/debug/skenario',

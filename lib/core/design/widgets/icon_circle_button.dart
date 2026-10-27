@@ -28,6 +28,7 @@ class IconCircleButton extends StatelessWidget {
     final c = context.colors;
     return Semantics(
       button: true,
+      enabled: onPressed != null,
       label: semanticLabel,
       child: SizedBox(
         width: AppSpace.minTouch,

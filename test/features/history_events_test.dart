@@ -20,7 +20,7 @@ void main() {
     testWidgets('navigasi bulan, tile dan baris per hari', (tester) async {
       final handle = tester.ensureSemantics();
       await pumpApp(tester);
-      await tester.tap(find.text('Laporan'));
+      await tester.tap(find.text('Riwayat'));
       await settle(tester);
 
       expect(find.text('Riwayat Absensi'), findsOneWidget);

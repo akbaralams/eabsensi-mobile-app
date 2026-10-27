@@ -36,7 +36,7 @@ class PageHeader extends StatelessWidget {
             width: AppSpace.minTouch,
             child: showBack
                 ? IconCircleButton(
-                    icon: PhosphorIconsRegular.caretLeft,
+                    icon: PhosphorIconsRegular.arrowLeft,
                     iconSize: 18,
                     semanticLabel: 'Kembali',
                     onPressed: onBack ?? () => Navigator.maybePop(context),

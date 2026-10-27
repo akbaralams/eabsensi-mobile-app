@@ -20,7 +20,7 @@ class SplashPage extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const LogoMark(size: 32, animate: true),
+              const LogoMark(size: 32),
               const SizedBox(height: 20),
               Text(
                 'eAbsensi',

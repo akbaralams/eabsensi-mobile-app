@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -82,7 +80,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   padding: const EdgeInsets.fromLTRB(24, 48, 24, 36),
                   child: Column(
                     children: [
-                      const LogoMark(size: 40, animate: true),
+                      const LogoMark(size: 40),
                       const SizedBox(height: 24),
                       Text(
                         'eAbsensi',
@@ -106,7 +104,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         AppTextField(
                           fieldKey: const Key('login-field'),
                           controller: _login,
-                          hint: 'NIP / Username',
+                          label: 'NIP / Username',
+                          hint: 'Masukkan NIP atau username',
                           icon: PhosphorIconsRegular.user,
                           errorText: _loginError,
                           keyboardType: TextInputType.emailAddress,
@@ -172,7 +171,8 @@ class _PasswordField extends StatelessWidget {
       fieldKey: const Key('password-field'),
       controller: controller,
       focusNode: focusNode,
-      hint: 'Password',
+      label: 'Password',
+      hint: 'Masukkan password',
       icon: PhosphorIconsRegular.lock,
       obscure: true,
       errorText: errorText,
@@ -235,25 +235,20 @@ class _Sheet extends StatelessWidget {
     const radius = BorderRadius.vertical(
       top: Radius.circular(AppRadius.sheetTop),
     );
-    return DecoratedBox(
-      decoration: BoxDecoration(borderRadius: radius, boxShadow: c.navShadow),
-      child: ClipRRect(
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: c.surface,
         borderRadius: radius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            width: double.infinity,
-            color: c.surface.withValues(alpha: .88),
-            padding: EdgeInsets.fromLTRB(
-              22,
-              20,
-              22,
-              28 + MediaQuery.paddingOf(context).bottom,
-            ),
-            child: child,
-          ),
-        ),
+        boxShadow: c.navShadow,
       ),
+      padding: EdgeInsets.fromLTRB(
+        22,
+        20,
+        22,
+        28 + MediaQuery.paddingOf(context).bottom,
+      ),
+      child: child,
     );
   }
 }

@@ -33,6 +33,8 @@ final class AppColors extends ThemeExtension<AppColors> {
     required this.onGradient,
     required this.mintTint,
     required this.tealTint,
+    required this.tealIcon,
+    required this.statHadir,
     required this.successTint,
     required this.successText,
     required this.amber,
@@ -84,6 +86,8 @@ final class AppColors extends ThemeExtension<AppColors> {
   // Tint
   final Color mintTint;
   final Color tealTint;
+  final Color tealIcon;
+  final Color statHadir;
   final Color successTint;
   final Color successText;
   final Color amber;
@@ -109,7 +113,7 @@ final class AppColors extends ThemeExtension<AppColors> {
     blobTeal: Color(0xFFCCFBF1),
     surface: Color(0xFFFFFFFF),
     surfaceAlt: Color(0xFFF0FDF4),
-    border: Color(0xFFD5E6DE),
+    border: Color(0xFF7A9A8D),
     divider: Color(0xFFE3EFE9),
     rowDivider: Color(0xFFF0F5F2),
     textPrimary: Color(0xFF053B2C),
@@ -126,6 +130,8 @@ final class AppColors extends ThemeExtension<AppColors> {
     onGradient: Color(0xFFFFFFFF),
     mintTint: Color(0xFFD1FAE5),
     tealTint: Color(0xFFCCFBF1),
+    tealIcon: Color(0xFF0D9488),
+    statHadir: Color(0xFFECFDF5),
     successTint: Color(0xFFD1FAE5),
     successText: Color(0xFF047857),
     amber: Color(0xFFF59E0B),
@@ -168,6 +174,8 @@ final class AppColors extends ThemeExtension<AppColors> {
     onGradient: Color(0xFFFFFFFF),
     mintTint: Color(0xFF064E3B),
     tealTint: Color(0xFF134E4A),
+    tealIcon: Color(0xFF14B8A6),
+    statHadir: Color(0xFF064E3B),
     successTint: Color(0xFF064E3B),
     successText: Color(0xFF6EE7B7),
     amber: Color(0xFFF59E0B),
@@ -204,6 +212,27 @@ final class AppColors extends ThemeExtension<AppColors> {
     end: Alignment.centerRight,
     colors: [mintTint, tealTint],
   );
+
+  /// Orb hasil absen (tidak berubah antar mode).
+  static const successOrbGradient = RadialGradient(
+    center: Alignment(-.3, -.3),
+    stops: [0, .35, 1],
+    colors: [Color(0xFFFFFFFF), Color(0xFF34D399), Color(0xFF059669)],
+  );
+  static const warningOrbGradient = RadialGradient(
+    center: Alignment(-.3, -.3),
+    stops: [0, .35, 1],
+    colors: [Color(0xFFFFFFFF), Color(0xFFFBBF24), Color(0xFFD97706)],
+  );
+  static const successOrbShadow = Color(0xFF059669);
+  static const warningOrbShadow = Color(0xFFD97706);
+
+  /// Penggelap area di luar bingkai oval kamera.
+  static const cameraMask = Color(0x4D064E3B);
+
+  /// Bayangan dan isi lencana jam di beranda.
+  static const badgeShadow = Color(0x4D0D9488);
+  static const badgeGlyph = Color(0xFF047857);
 
   /// Latar kamera / pemindai QR.
   static const cameraGradient = LinearGradient(

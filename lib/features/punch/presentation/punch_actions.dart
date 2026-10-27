@@ -9,5 +9,11 @@ Future<void> submitAndShowOutcome(BuildContext context, WidgetRef ref) async {
   await ref.read(punchFlowProvider.notifier).submit();
   if (!context.mounted) return;
   final state = ref.read(punchFlowProvider);
-  context.go(state.result != null ? '/punch/result' : '/punch/error');
+  // Hasil menumpuk di atas Beranda: Back sistem (termasuk predictive back)
+  // kembali ke Beranda secara wajar, tanpa PopScope yang menahan gestur.
+  final router = GoRouter.of(context);
+  router.go('/home');
+  await router.push<void>(
+    state.result != null ? '/punch/result' : '/punch/error',
+  );
 }

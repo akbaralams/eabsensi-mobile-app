@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/home/presentation/attendance_summary.dart';
-import '../../features/punch/presentation/punch_providers.dart';
 import '../design/design.dart';
 
-/// Kerangka navigasi bawah. Tab "Absensi" membuka alur Check In / Check Out
-/// sesuai status hari ini, bukan layar tab.
-class AppShell extends ConsumerWidget {
+/// Kerangka navigasi. Lima tujuan: Beranda, Absensi, Cuti/Izin, Riwayat, Profil.
+/// Ponsel: navigasi bawah. Layar >= 720 dp: navigation rail di kiri dan konten
+/// dibatasi lebarnya, bukan UI ponsel yang melar.
+class AppShell extends StatelessWidget {
   const AppShell({required this.shell, super.key});
 
   final StatefulNavigationShell shell;
-
-  // Urutan tab: Beranda, Absensi (aksi), Cuti/Izin, Laporan, Profil.
-  static const _branchOfTab = {0: 0, 2: 1, 3: 2, 4: 3};
-  static const _tabOfBranch = {0: 0, 1: 2, 2: 3, 3: 4};
 
   static const _items = [
     BottomNavItem(
@@ -34,9 +28,9 @@ class AppShell extends ConsumerWidget {
       activeIcon: PhosphorIconsFill.files,
     ),
     BottomNavItem(
-      label: 'Laporan',
-      icon: PhosphorIconsRegular.fileText,
-      activeIcon: PhosphorIconsFill.fileText,
+      label: 'Riwayat',
+      icon: PhosphorIconsRegular.clockCounterClockwise,
+      activeIcon: PhosphorIconsFill.clockCounterClockwise,
     ),
     BottomNavItem(
       label: 'Profil',
@@ -45,26 +39,55 @@ class AppShell extends ConsumerWidget {
     ),
   ];
 
+  void _go(int index) =>
+      shell.goBranch(index, initialLocation: index == shell.currentIndex);
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final wide = MediaQuery.sizeOf(context).width >= 720;
+    if (!wide) {
+      return AppScaffold(
+        bottomNavigationBar: BottomNav(
+          items: _items,
+          currentIndex: shell.currentIndex,
+          onTap: _go,
+        ),
+        body: shell,
+      );
+    }
+    final c = context.colors;
     return AppScaffold(
-      bottomNavigationBar: BottomNav(
-        items: _items,
-        currentIndex: _tabOfBranch[shell.currentIndex] ?? 0,
-        onTap: (tab) {
-          if (tab == 1) {
-            final punches = ref.read(todayPunchesProvider).value ?? const [];
-            final next = AttendanceSummary.from(punches).nextIsCheckOut
-                ? '/punch/out'
-                : '/punch/in';
-            context.push(next);
-            return;
-          }
-          final branch = _branchOfTab[tab]!;
-          shell.goBranch(branch, initialLocation: branch == shell.currentIndex);
-        },
+      constrainBody: false,
+      body: Row(
+        children: [
+          NavigationRail(
+            selectedIndex: shell.currentIndex,
+            onDestinationSelected: _go,
+            labelType: NavigationRailLabelType.all,
+            backgroundColor: c.surface,
+            indicatorColor: c.mintTint,
+            unselectedLabelTextStyle: AppType.micro.copyWith(
+              color: c.textMuted,
+            ),
+            selectedLabelTextStyle: AppType.microBold.copyWith(
+              color: c.accentText,
+            ),
+            destinations: [
+              for (final item in _items)
+                NavigationRailDestination(
+                  label: Text(item.label),
+                  icon: PhosphorIcon(item.icon, size: 23, color: c.textMuted),
+                  selectedIcon: PhosphorIcon(
+                    item.activeIcon,
+                    size: 23,
+                    color: c.accent,
+                  ),
+                ),
+            ],
+          ),
+          Expanded(child: ContentWidth(child: shell)),
+        ],
       ),
-      body: shell,
     );
   }
 }

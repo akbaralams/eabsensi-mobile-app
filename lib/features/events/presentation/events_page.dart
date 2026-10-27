@@ -72,7 +72,15 @@ class EventsPage extends ConsumerWidget {
                         : Column(
                             children: [
                               for (final e in list) ...[
-                                _EventCard(event: e),
+                                _EventCard(
+                                  event: e,
+                                  primary:
+                                      e ==
+                                      list.firstWhere(
+                                        (x) => !x.checkedIn,
+                                        orElse: () => e,
+                                      ),
+                                ),
                                 const SizedBox(height: AppSpace.block),
                               ],
                             ],
@@ -89,9 +97,12 @@ class EventsPage extends ConsumerWidget {
 }
 
 class _EventCard extends StatelessWidget {
-  const _EventCard({required this.event});
+  const _EventCard({required this.event, required this.primary});
 
   final EventItem event;
+
+  /// Hanya satu aksi utama per layar; event lain memakai tombol outline.
+  final bool primary;
 
   @override
   Widget build(BuildContext context) {
@@ -126,11 +137,17 @@ class _EventCard extends StatelessWidget {
           ),
           if (!event.checkedIn) ...[
             const SizedBox(height: 14),
-            PrimaryButton(
-              label: 'Check-in',
-              icon: PhosphorIconsBold.arrowRight,
-              onPressed: () => context.push('/punch/event', extra: event),
-            ),
+            if (primary)
+              PrimaryButton(
+                label: 'Check-in',
+                icon: PhosphorIconsBold.arrowRight,
+                onPressed: () => context.push('/punch/event', extra: event),
+              )
+            else
+              OutlineButton(
+                label: 'Check-in',
+                onPressed: () => context.push('/punch/event', extra: event),
+              ),
           ],
         ],
       ),

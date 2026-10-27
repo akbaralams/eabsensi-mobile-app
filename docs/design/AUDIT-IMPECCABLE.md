@@ -4,6 +4,33 @@ Playbook: `audit.native.md` + `android.md` dari skill Impeccable 4.8.0. Audit da
 
 **Batas bukti.** Belum ada yang diuji di perangkat atau dengan TalkBack. Bukti: (1) render widget test di Linux pada 360 dan 390 dp, teks 1,3x dan 2,0x, mode terang/gelap, tablet 800x1280; (2) ukuran dan semantik node diukur lewat test; (3) pembacaan kode. Yang hanya dari kode ditandai *[kode]*, dugaan ditandai *[dugaan]*.
 
+## Status perbaikan
+
+Semua temuan P1 dan P2 yang bisa dikerjakan di aplikasi ini sudah diperbaiki dan dijaga test (`test/features/audit_fixes_test.dart`: 360 dp x 2,0 dan 320 dp x 1,3 tanpa overflow di Beranda, Absensi, Cuti, Riwayat, Profil, dan Lokasi; tablet; Riwayat; persetujuan). Belum diuji di perangkat atau dengan TalkBack.
+
+| Temuan | Status |
+|---|---|
+| Riwayat: hari ini tidak muncul | Diperbaiki (baris hari ini dari punch server) |
+| Teks besar merusak Riwayat, Beranda, navigasi, segmented | Diperbaiki (tata letak bertumpuk, NavigationBar membatasi skala label) |
+| Angka Terlambat/Tidak Hadir tidak ada di kontrak | **Sebagian**: UI menyembunyikannya bila server tidak mengklasifikasikan. Endpoint rekap tetap harus diminta di repo API (`docs/usulan-kontrak-api.md`) |
+| Spinner mengganti konten saat ganti bulan | Diperbaiki (data lama diredupkan + bilah progres) |
+| Semantik: tombol bulan nonaktif, "jam -" | Diperbaiki |
+| Baris tidak bisa dibuka, tanpa pemilih/batas bulan, tanpa tarik-muat-ulang | Diperbaiki (detail hari, pemilih 12 bulan, RefreshIndicator) |
+| Tiga nama untuk satu layar | Diperbaiki ("Riwayat") |
+| Lebar tablet | Diperbaiki (NavigationRail, konten maks 640 dp, orientasi bebas >= 600 dp) |
+| Tile statistik | Menjadi filter |
+| Border field 1,30:1 | Diperbaiki (`#7A9A8D`, 3,07:1) |
+| Placeholder-only di login | Diperbaiki (label terlihat) |
+| Toast, navigasi, header non-Material | Diperbaiki (Snackbar, NavigationBar/Rail, panah kembali, tab Absensi jadi tujuan) |
+| Back sistem diblokir di Hasil/Galat | Diperbaiki (hasil menumpuk di atas Beranda) |
+| Blur navigasi/login, Beranda dibangun ulang tiap detik | Diperbaiki (tanpa blur; hanya kartu jam yang berdetak) |
+| Persetujuan satu ketukan | Diperbaiki (konfirmasi Tolak + Urungkan) |
+| Menu debug di APK release | Diperbaiki (`DEBUG_TOOLS`) |
+| 14 hex di luar token, animasi tersebar, hierarki tombol Galat/Event, cincin shutter | Diperbaiki |
+| Tombol gradien/bayangan berwarna, Phosphor, segmented pil, skala tipe, Dynamic Color | **Sengaja dipertahankan** (keputusan desain; lihat `DEVIATIONS.md`) |
+
+Yang di bawah ini adalah laporan awal sebelum perbaikan.
+
 ## Skor kesehatan
 
 | # | Dimensi | Skor | Temuan kunci |

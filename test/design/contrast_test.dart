@@ -10,7 +10,7 @@ List<(String, Color, Color)> _textPairs(AppColors c) {
   final errorOnSurface = over(c.errorTint, c.surface);
   final amberSoft = over(c.amberSoft, c.surface);
   final errorSoft = over(c.errorSoft, c.surface);
-  final tileHadir = c.isDark ? c.successTint : const Color(0xFFECFDF5);
+  final tileHadir = c.statHadir;
   return [
     ('textPrimary/surface', c.textPrimary, c.surface),
     ('textSecondary/surface', c.textSecondary, c.surface),
@@ -59,12 +59,9 @@ void main() {
       final pairs = <(String, Color, Color)>[
         ('ikon aksen/tint mint', c.accent, c.mintTint),
         ('ikon amber/tint amber', c.amberIcon, over(c.amberTint, c.surface)),
-        (
-          'ikon teal/tint teal',
-          c.isDark ? c.teal : const Color(0xFF0D9488),
-          c.tealTint,
-        ),
+        ('ikon teal/tint teal', c.tealIcon, c.tealTint),
         ('ikon muted/surface', c.textMuted, c.surface),
+        ('batas field/surface (WCAG 1.4.11)', c.border, c.surface),
         ('ikon aksen/surface', c.accent, c.surface),
       ];
       final failures = [

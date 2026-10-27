@@ -9,6 +9,9 @@ class MockHistoryRepository implements HistoryRepository {
   final MockEnv _env;
 
   @override
+  bool get supportsClassification => true;
+
+  @override
   Future<MonthHistory> month(int year, int month) async {
     await _env.network();
     final s = _env.scenario();

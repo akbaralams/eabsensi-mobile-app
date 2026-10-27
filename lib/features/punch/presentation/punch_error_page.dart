@@ -42,68 +42,62 @@ class PunchErrorPage extends ConsumerWidget {
       ),
     };
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) context.go('/home');
-      },
-      child: AppScaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpace.screenH),
-          child: Column(
-            children: [
-              const Spacer(),
-              AppCard(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: c.amberTint,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: PhosphorIcon(icon, size: 24, color: c.amberIcon),
-                      ),
+    return AppScaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpace.screenH),
+        child: Column(
+          children: [
+            const Spacer(),
+            AppCard(
+              child: Column(
+                children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: c.amberTint,
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(height: 14),
-                    Semantics(
-                      header: true,
-                      liveRegion: true,
-                      child: Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: AppType.title.copyWith(
-                          color: c.textPrimary,
-                          fontSize: 20,
-                        ),
-                      ),
+                    child: Center(
+                      child: PhosphorIcon(icon, size: 24, color: c.amberIcon),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      message,
-                      key: const Key('error-message'),
+                  ),
+                  const SizedBox(height: 14),
+                  Semantics(
+                    header: true,
+                    liveRegion: true,
+                    child: Text(
+                      title,
                       textAlign: TextAlign.center,
-                      style: AppType.body.copyWith(color: c.textSecondary),
+                      style: AppType.title.copyWith(
+                        color: c.textPrimary,
+                        fontSize: 20,
+                      ),
                     ),
-                    const SizedBox(height: 18),
-                    OutlineButton(
-                      label: 'Coba lagi',
-                      icon: PhosphorIconsRegular.arrowClockwise,
-                      onPressed: () => submitAndShowOutcome(context, ref),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    message,
+                    key: const Key('error-message'),
+                    textAlign: TextAlign.center,
+                    style: AppType.body.copyWith(color: c.textSecondary),
+                  ),
+                  const SizedBox(height: 18),
+                  PrimaryButton(
+                    label: 'Coba lagi',
+                    icon: PhosphorIconsRegular.arrowClockwise,
+                    onPressed: () => submitAndShowOutcome(context, ref),
+                  ),
+                ],
               ),
-              const Spacer(),
-              PrimaryButton(
-                label: 'Kembali ke Beranda',
-                onPressed: () => context.go('/home'),
-              ),
-              const SizedBox(height: 28),
-            ],
-          ),
+            ),
+            const Spacer(),
+            OutlineButton(
+              label: 'Kembali ke Beranda',
+              onPressed: () => context.go('/home'),
+            ),
+            const SizedBox(height: 28),
+          ],
         ),
       ),
     );

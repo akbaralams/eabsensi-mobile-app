@@ -11,6 +11,8 @@ class SegmentItem<T> {
 
 /// Segmented berbentuk pil. `gradient: true` = segmen aktif bergradien (kategori
 /// cuti); selain itu segmen aktif putih dengan bayangan (Login/SSO).
+/// Pada teks sistem besar (> 1,3x) segmen disusun 2 kolom dan labelnya boleh
+/// membungkus, supaya tidak terpotong menjadi "Din…".
 class PillSegmented<T> extends StatelessWidget {
   const PillSegmented({
     required this.items,
@@ -28,45 +30,70 @@ class PillSegmented<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final large = MediaQuery.textScalerOf(context).scale(14) / 14 > 1.3;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: c.surfaceAlt,
         borderRadius: BorderRadius.circular(AppRadius.segmentTrack),
       ),
-      child: Row(
-        children: [
-          for (final item in items)
-            Expanded(
-              child: Semantics(
-                button: true,
-                selected: item.value == value,
-                label: item.label,
-                excludeSemantics: true,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onChanged(item.value),
-                  child: AnimatedContainer(
-                    duration: MediaQuery.disableAnimationsOf(context)
-                        ? Duration.zero
-                        : const Duration(milliseconds: 180),
-                    constraints: const BoxConstraints(minHeight: 44),
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: _decoration(c, item.value == value),
-                    child: Text(
-                      item.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppType.captionBold.copyWith(
-                        color: _textColor(c, item.value == value),
+      child: large
+          ? LayoutBuilder(
+              builder: (context, box) {
+                final width = (box.maxWidth - 4) / 2;
+                return Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  children: [
+                    for (final item in items)
+                      SizedBox(
+                        width: width,
+                        child: _segment(context, item, wrap: true),
                       ),
-                    ),
-                  ),
-                ),
-              ),
+                  ],
+                );
+              },
+            )
+          : Row(
+              children: [
+                for (final item in items)
+                  Expanded(child: _segment(context, item)),
+              ],
             ),
-        ],
+    );
+  }
+
+  Widget _segment(
+    BuildContext context,
+    SegmentItem<T> item, {
+    bool wrap = false,
+  }) {
+    final c = context.colors;
+    final selected = item.value == value;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: item.label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onChanged(item.value),
+        child: AnimatedContainer(
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 180),
+          constraints: const BoxConstraints(minHeight: AppSpace.minTouch),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          decoration: _decoration(c, selected),
+          child: Text(
+            item.label,
+            textAlign: TextAlign.center,
+            maxLines: wrap ? 3 : 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppType.captionBold.copyWith(color: _textColor(c, selected)),
+          ),
+        ),
       ),
     );
   }
