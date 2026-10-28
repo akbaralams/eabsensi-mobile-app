@@ -6,13 +6,17 @@ import '../../../core/mock/mock_env.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../../punch/presentation/punch_providers.dart';
 import '../data/mock_history_repository.dart';
+import '../data/punch_history_repository.dart';
 import '../domain/history.dart';
 
 final historyRepositoryProvider = Provider<HistoryRepository>((ref) {
   if (AppConfig.useMock) {
     return MockHistoryRepository(ref.watch(mockEnvProvider));
   }
-  throw UnimplementedError('Client API nyata belum tersedia (Task 3).');
+  return PunchHistoryRepository(
+    ref.watch(punchRepositoryProvider),
+    now: ref.watch(clockProvider),
+  );
 });
 
 /// Bulan yang sedang dilihat (hari pertama bulan), dibatasi 12 bulan ke belakang.

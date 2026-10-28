@@ -23,11 +23,11 @@ Urutan wajib. Tiap task selesai bila kriteria "Selesai bila" terpenuhi dan sudah
 - Golden test untuk tiap komponen (light + dark, text scale 1.0 dan 1.3).
 - **Selesai bila**: galeri cocok secara visual dengan prototipe; golden test hijau; target sentuh ≥ 48dp; kontras teks ≥ 4.5:1 di kedua mode.
 
-## [ ] Task 3. Client API dari OpenAPI
-- **Status**: ditunda (backend dilewati dulu). Sementara repository dummy di belakang interface.
-- Bangkitkan client Dart dari `../eabsensi-v2/docs/openapi/mobile-api.yaml` dengan generator stabil terbaru; skrip `tool/generate_api.*` di-commit.
-- Lapisan tipis di atasnya: header `Accept`, Bearer token, pemetaan galat (401 → logout, 422 aturan → pesan, 422 validasi → per field, 429 → coba lagi nanti).
-- **Selesai bila**: test unit pemetaan galat lulus dengan contoh respons dari kontrak.
+## [x] Task 3. Client API dari OpenAPI
+- **Status**: selesai dengan test (adapter HTTP palsu; belum diuji terhadap server nyata). Dibangkitkan dengan `dart run tool/generate_api.dart` (`swagger_parser` + `retrofit_generator`, Dio 5); hasil di `lib/core/network/generated`, salinan kontrak di `api/mobile-api.yaml`.
+- Lapisan tipis: `Accept: application/json`, Bearer dari penyimpanan aman, pemetaan galat (401 → logout lewat `withSession`, 422 aturan → pesan, 422 validasi → per field, 429, offline) di `lib/core/network`; repository `Remote*` untuk auth, punch, event, cuti, dan riwayat (dirakit dari `GET /punches?date=`, lihat DEVIATIONS). Inbox dan menu tetap statis.
+- `USE_MOCK=false` memakai server; default tetap dummy.
+- **Selesai bila**: test unit pemetaan galat lulus dengan contoh respons dari kontrak. (Terpenuhi: `test/core/network`.) Sisa: uji end-to-end terhadap server nyata dari emulator/perangkat.
 
 ## [ ] Task 4. Login dan profil
 - **Status (data dummy)**: login, sesi, 401 -> login, profil, mode gelap, keluar selesai dengan test. Akun contoh `kontrak` / `rahasia123`, `kontrak.tanpa-pegawai`, `kontrak.akun-nonaktif`. Belum diuji terhadap Laravel.

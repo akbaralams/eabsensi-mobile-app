@@ -6,6 +6,7 @@ import '../../../core/clock/clock.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/geo/geo.dart';
 import '../../../core/mock/mock_env.dart';
+import '../../../core/network/api_providers.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../../events/domain/event_item.dart';
 import '../../events/presentation/event_providers.dart';
@@ -13,13 +14,14 @@ import '../data/fake_location_service.dart';
 import '../data/real_camera_service.dart';
 import '../data/geolocator_location_service.dart';
 import '../data/mock_punch_repository.dart';
+import '../data/remote_punch_repository.dart';
 import '../domain/camera.dart';
 import '../domain/location.dart';
 import '../domain/punch.dart';
 
 final punchRepositoryProvider = Provider<PunchRepository>((ref) {
   if (AppConfig.useMock) return MockPunchRepository(ref.watch(mockEnvProvider));
-  throw UnimplementedError('Client API nyata belum tersedia (Task 3).');
+  return RemotePunchRepository(ref.watch(mobileApiClientProvider).punch);
 });
 
 final locationServiceProvider = Provider<LocationService>((ref) {

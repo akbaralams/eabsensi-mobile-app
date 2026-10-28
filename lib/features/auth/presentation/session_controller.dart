@@ -4,16 +4,21 @@ import 'package:flutter_riverpod/misc.dart' show ProviderListenable;
 import '../../../core/config/app_config.dart';
 import '../../../core/mock/mock_env.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/api_providers.dart';
 import '../../../core/storage/preferences.dart';
 import '../data/device_name.dart';
 import '../data/mock_auth_repository.dart';
+import '../data/remote_auth_repository.dart';
 import '../data/token_store.dart';
 import '../domain/auth_repository.dart';
 import '../domain/user_profile.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   if (AppConfig.useMock) return MockAuthRepository(ref.watch(mockEnvProvider));
-  throw UnimplementedError('Client API nyata belum tersedia (Task 3).');
+  return RemoteAuthRepository(
+    ref.watch(mobileApiClientProvider),
+    ref.watch(tokenStoreProvider),
+  );
 });
 
 /// Sesi pengguna: profil bila sudah masuk, `null` bila belum.

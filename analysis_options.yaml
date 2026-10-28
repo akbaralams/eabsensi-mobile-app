@@ -4,6 +4,8 @@ analyzer:
   exclude:
     - build/**
     - android/**
+    # Dibangkitkan oleh tool/generate_api.dart; jangan diedit tangan.
+    - lib/core/network/generated/**
   language:
     strict-casts: true
     strict-inference: true

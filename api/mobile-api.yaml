@@ -1,0 +1,447 @@
+openapi: 3.1.0
+info:
+  title: eAbsensi API mobile
+  version: 1.0.0
+  description: |
+    API untuk aplikasi pegawai (Flutter). Deskripsi naratif dan aturan bisnis ada di `docs/mobile-api.md`;
+    perilakunya dijaga suite test kontrak `tests/contract/mobile` (Hurl). File ini bentuk mesin dari kontrak
+    yang sama, untuk membangkitkan client dan memeriksa implementasi.
+
+    Semua respons JSON. Klien sebaiknya mengirim `Accept: application/json`.
+    Waktu yang dikembalikan selalu ISO 8601 di zona waktu bisnis (`timezone` di profil, default `Asia/Jakarta`).
+
+    **Dua bentuk 422.** Galat validasi berisi `message` + `errors` (nama field dijamin, teks pesan informatif).
+    Penolakan aturan bisnis berisi `message` saja; teksnya bagian dari kontrak dan aman ditampilkan apa adanya.
+
+    **Batas laju.** Login: 60/menit per IP dan 5/menit per akun+IP. Semua endpoint ber-token: 120/menit per token.
+    Punch, check-in event, dan pengajuan cuti: tambahan 20/menit per pengguna. Melebihi batas: 429.
+servers:
+  - url: /api
+    description: Relatif terhadap host aplikasi (mis. https://absensi.example.go.id/api)
+tags:
+  - name: Auth
+    description: Login per perangkat, profil, dan logout.
+  - name: Punch
+    description: Absen masuk/pulang dari aplikasi, dengan foto dan lokasi.
+  - name: Event
+    description: Event seperti upacara yang punya daftar hadir sendiri.
+  - name: Cuti
+    description: Pengajuan cuti, izin, atau dinas; persetujuan di web operator.
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Masuk dan dapatkan token perangkat
+      description: |
+        Satu perangkat satu token: login ulang dengan `device_name` yang sama mencabut token lama.
+        Token berlaku 30 hari (`SANCTUM_TOKEN_EXPIRATION`). Pesan galat sama untuk user tidak ada,
+        sandi salah, dan akun nonaktif.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Berhasil
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '403':
+          description: Akun belum terhubung ke data pegawai
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Message' }
+              example: { message: Akun ini belum terhubung ke data pegawai. }
+        '422':
+          description: Validasi gagal, atau username/sandi salah, atau akun nonaktif
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/Message'
+              examples:
+                kredensial:
+                  value: { message: Username atau kata sandi salah. }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Cabut token yang sedang dipakai
+      responses:
+        '200':
+          description: Berhasil
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Message' }
+              example: { message: Berhasil keluar. }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /me:
+    get:
+      tags: [Auth]
+      operationId: me
+      summary: Profil pengguna dan pengaturan aplikasi
+      responses:
+        '200':
+          description: Profil
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/Me' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /punches:
+    get:
+      tags: [Punch]
+      operationId: listPunches
+      summary: Punch milik sendiri pada satu hari (semua status)
+      parameters:
+        - name: date
+          in: query
+          required: false
+          description: Tanggal di zona bisnis. Kosong atau tidak valid berarti hari ini.
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Daftar punch, terlama dulu
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Punch' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/NoEmployee' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+    post:
+      tags: [Punch]
+      operationId: createPunch
+      summary: Catat punch (waktu dari server)
+      description: |
+        Field waktu dari klien diabaikan. Status `pending` bila profil `requires_approval` (belum dihitung sebagai
+        kehadiran sampai disetujui atasan), selain itu `approved`.
+
+        Penolakan aturan (422, `message` saja):
+        - `Akun ini belum terhubung ke data pegawai.`
+        - `Pegawai tidak aktif.`
+        - `Tunggu {n} detik sebelum melakukan punch lagi.` (n = `ATTENDANCE_MOBILE_MIN_INTERVAL`, default 60)
+        - `Periode bulan ini sudah ditutup.`
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/EvidenceForm' }
+            encoding:
+              photo: { contentType: 'image/jpeg, image/png' }
+      responses:
+        '201':
+          description: Tercatat
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/Punch' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /events:
+    get:
+      tags: [Event]
+      operationId: listEvents
+      summary: Event aktif hari ini yang boleh diikuti pegawai
+      description: Event untuk semua pegawai, atau untuk department pegawai beserta induknya.
+      responses:
+        '200':
+          description: Daftar event
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Event' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/NoEmployee' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /events/{event}/check-in:
+    post:
+      tags: [Event]
+      operationId: checkInEvent
+      summary: Check-in ke event (sekali per pegawai)
+      description: |
+        Penolakan aturan (422, `message` saja):
+        - `Akun ini belum terhubung ke data pegawai.`
+        - `Pegawai tidak aktif.`
+        - `Event ini tidak aktif.`
+        - `Anda tidak termasuk peserta event ini.`
+        - `Check-in hanya bisa dilakukan pada tanggal event.`
+        - `Check-in dibuka pukul {mulai} sampai {selesai}.`
+        - `Anda sudah check-in di event ini.`
+      parameters:
+        - name: event
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/EvidenceForm' }
+            encoding:
+              photo: { contentType: 'image/jpeg, image/png' }
+      responses:
+        '201':
+          description: Tercatat
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/EventCheckIn' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /leaves:
+    get:
+      tags: [Cuti]
+      operationId: listLeaves
+      summary: Pengajuan cuti milik sendiri dan jenis yang bisa dipilih
+      responses:
+        '200':
+          description: Pengajuan (tanggal mulai terbaru dulu) dan jenis cuti
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, types]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Leave' }
+                  types:
+                    description: Status kehadiran aktif, urut nama.
+                    type: array
+                    items: { $ref: '#/components/schemas/Option' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/NoEmployee' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+    post:
+      tags: [Cuti]
+      operationId: createLeave
+      summary: Ajukan cuti (menunggu persetujuan atasan di web)
+      description: |
+        Penolakan aturan (422, `message` saja):
+        - `Rentang cuti maksimal 62 hari.`
+        - `Pegawai sudah punya pengajuan yang menunggu atau disetujui pada tanggal tersebut.`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LeaveRequest' }
+      responses:
+        '201':
+          description: Diajukan
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/Leave' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/NoEmployee' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Token dari `POST /auth/login`, berbentuk `<id>|<rahasia>`. Perlakukan sebagai string opak.
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [login, password, device_name]
+      properties:
+        login: { type: string, maxLength: 255, description: Username atau email }
+        password: { type: string, maxLength: 255 }
+        device_name: { type: string, maxLength: 100, description: Nama perangkat; satu token per nama }
+
+    LoginResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token: { type: string, example: '12|Q3m4x...' }
+        user: { $ref: '#/components/schemas/Me' }
+
+    Me:
+      type: object
+      required: [id, name, username, employee, timezone, requires_photo, requires_approval]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        username: { type: string }
+        employee:
+          oneOf:
+            - $ref: '#/components/schemas/EmployeeSummary'
+            - type: 'null'
+        timezone: { type: string, example: Asia/Jakarta }
+        requires_photo: { type: boolean, description: Foto wajib pada punch dan check-in }
+        requires_approval: { type: boolean, description: Punch berstatus pending sampai disetujui }
+
+    EmployeeSummary:
+      type: object
+      required: [id, employee_number, name, department]
+      properties:
+        id: { type: integer }
+        employee_number: { type: string }
+        name: { type: string }
+        department: { type: [string, 'null'], description: Nama department }
+
+    EvidenceForm:
+      type: object
+      properties:
+        photo:
+          type: string
+          format: binary
+          description: JPG/PNG maks 4 MB; wajib bila `requires_photo`.
+        latitude: { type: number, minimum: -90, maximum: 90, description: Wajib bersama longitude }
+        longitude: { type: number, minimum: -180, maximum: 180, description: Wajib bersama latitude }
+        accuracy: { type: integer, minimum: 0, maximum: 65535, description: Akurasi lokasi dalam meter }
+
+    Punch:
+      type: object
+      required: [id, punched_at, source, status, status_label, has_photo]
+      properties:
+        id: { type: integer }
+        punched_at: { type: string, format: date-time, example: '2026-10-25T07:58:12+07:00' }
+        source: { type: string, enum: [mobile, web, manual, device], description: '`device` = dari mesin absensi (ADMS), langsung approved tanpa foto' }
+        status: { type: string, enum: [pending, approved, rejected] }
+        status_label: { type: string, example: Menunggu persetujuan }
+        has_photo: { type: boolean }
+
+    Event:
+      type: object
+      required: [id, name, event_date, starts_at, ends_at, checked_in]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        event_date: { type: string, format: date }
+        starts_at: { type: string, pattern: '^\d{2}:\d{2}$', example: '07:00' }
+        ends_at: { type: string, pattern: '^\d{2}:\d{2}$', example: '09:00' }
+        checked_in: { type: boolean }
+
+    EventCheckIn:
+      type: object
+      required: [event_id, checked_in_at]
+      properties:
+        event_id: { type: integer }
+        checked_in_at: { type: string, format: date-time }
+
+    LeaveRequest:
+      type: object
+      required: [attendance_status_id, start_date, end_date]
+      properties:
+        attendance_status_id: { type: integer, description: 'Salah satu `types[].id` dari GET /leaves' }
+        start_date: { type: string, format: date }
+        end_date: { type: string, format: date, description: Sama dengan atau setelah start_date }
+        reason: { type: [string, 'null'], maxLength: 500 }
+
+    Leave:
+      type: object
+      required: [id, type, attendance_status_id, start_date, end_date, reason, status, status_label]
+      properties:
+        id: { type: integer }
+        type: { type: string, description: Nama jenis cuti }
+        attendance_status_id: { type: integer }
+        start_date: { type: string, format: date }
+        end_date: { type: string, format: date }
+        reason: { type: [string, 'null'] }
+        status: { type: string, enum: [pending, approved, rejected, cancelled] }
+        status_label: { type: string, example: Menunggu }
+
+    Option:
+      type: object
+      required: [id, code, name]
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        name: { type: string }
+
+    Message:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
+
+    ValidationError:
+      type: object
+      required: [message, errors]
+      properties:
+        message: { type: string }
+        errors:
+          type: object
+          description: Nama field ke daftar pesan. Nama field dijamin; teks pesan informatif.
+          additionalProperties:
+            type: array
+            items: { type: string }
+
+  responses:
+    Unauthenticated:
+      description: Token tidak ada, salah, kedaluwarsa, atau sudah dicabut
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Message' }
+          example: { message: Unauthenticated. }
+    NoEmployee:
+      description: Akun belum terhubung ke data pegawai
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Message' }
+          example: { message: Akun ini belum terhubung ke data pegawai. }
+    NotFound:
+      description: Data tidak ditemukan
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Message' }
+    Unprocessable:
+      description: Galat validasi (`errors`) atau penolakan aturan bisnis (`message` saja)
+      content:
+        application/json:
+          schema:
+            anyOf:
+              - $ref: '#/components/schemas/ValidationError'
+              - $ref: '#/components/schemas/Message'
+    TooManyRequests:
+      description: Batas laju terlampaui
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Message' }

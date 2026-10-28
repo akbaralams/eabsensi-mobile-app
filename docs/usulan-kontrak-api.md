@@ -4,7 +4,7 @@ Aplikasi tidak boleh menambah atau mengubah endpoint dari repo ini (`CLAUDE.md`)
 
 | Kebutuhan | Layar | Usulan |
 |---|---|---|
-| Rekap absensi bulanan dengan status harian (hadir, terlambat, tidak hadir, menunggu) dan jam masuk/keluar | Riwayat | `GET /attendance/history?month=YYYY-MM` -> `{ data: [{ date, status, status_label, check_in, check_out }], summary: {...} }`. Hari berjalan harus ikut. Tanpa ini klien hanya bisa menampilkan Hadir/Menunggu dari `GET /punches?date=` per hari (kontrak sekarang) |
+| Rekap absensi bulanan dengan status harian (hadir, terlambat, tidak hadir, menunggu) dan jam masuk/keluar | Riwayat | `GET /attendance/history?month=YYYY-MM` -> `{ data: [{ date, status, status_label, check_in, check_out }], summary: {...} }`. Hari berjalan harus ikut. Tanpa ini klien merakit satu bulan dari `GET /punches?date=` per hari (sampai 31 permintaan dari batas 120/menit per token, tanpa klasifikasi) |
 | Lokasi kantor / geofence dan nama lokasi | Check In, Beranda | Field `work_location: { name, latitude, longitude, radius_m }` di `/me` |
 | Jadwal/shift hari ini | Beranda ("Jam Kerja"), klasifikasi terlambat | Field `today_schedule` di `/me` atau endpoint tersendiri |
 | Peran atasan | Beranda, Profil | Field `is_supervisor` (atau daftar izin) di `/me` |

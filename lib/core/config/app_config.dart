@@ -12,8 +12,8 @@ class AppConfig {
     defaultValue: 'http://10.0.2.2:8000/api',
   );
 
-  /// Selama backend belum tersedia, aplikasi memakai data dummy.
-  /// Matikan dengan `--dart-define=USE_MOCK=false` saat client API sudah ada.
+  /// Data dummy (default, tanpa backend). `--dart-define=USE_MOCK=false` memakai
+  /// server di [baseUrl]; inbox dan menu tetap statis karena belum ada di kontrak.
   static const useMock = bool.fromEnvironment('USE_MOCK', defaultValue: true);
 
   /// Alat uji (galeri komponen, panel skenario): hanya di build debug, atau bila

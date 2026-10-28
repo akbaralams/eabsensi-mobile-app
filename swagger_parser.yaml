@@ -1,0 +1,18 @@
+# Konfigurasi pembangkit client dari kontrak OpenAPI. Jalankan lewat
+# `dart run tool/generate_api.dart` (jangan menjalankan swagger_parser langsung,
+# skrip itu juga menyalin kontrak dan menjalankan build_runner).
+swagger_parser:
+  schema_path: .dart_tool/api/mobile-api.yaml
+  output_directory: lib/core/network/generated
+  language: dart
+  json_serializer: json_serializable
+  root_client: true
+  root_client_name: MobileApiClient
+  client_postfix: Api
+  export_file: true
+  put_in_folder: true
+  put_clients_in_folder: true
+  use_multipart_file: true
+  enums_to_json: true
+  unknown_enum_value: true
+  mark_files_as_generated: true

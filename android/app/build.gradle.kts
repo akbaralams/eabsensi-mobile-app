@@ -19,6 +19,9 @@ android {
         // dipasang berdampingan dengan build biasa, mis. APP_ID_SUFFIX=.baru APP_LABEL="eAbsensi Baru".
         applicationId = "id.eabsensi.app" + (System.getenv("APP_ID_SUFFIX") ?: "")
         manifestPlaceholders["appLabel"] = System.getenv("APP_LABEL") ?: "eAbsensi"
+        // HTTP polos (tanpa TLS) hanya untuk uji ke server lokal: otomatis di build debug,
+        // dan di build lain hanya bila ALLOW_CLEARTEXT=true. Produksi wajib HTTPS.
+        manifestPlaceholders["cleartext"] = System.getenv("ALLOW_CLEARTEXT") ?: "false"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
@@ -32,6 +35,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["cleartext"] = "true"
+        }
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.

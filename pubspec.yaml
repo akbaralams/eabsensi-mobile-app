@@ -43,6 +43,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   camera: ^0.12.1
+  dio: ^5.11.1
+  retrofit: ^4.10.0
+  json_annotation: ^4.12.0
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +57,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  swagger_parser: ^1.45.0
+  retrofit_generator: ^10.3.2
+  build_runner: ^2.17.1
+  json_serializable: ^6.15.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

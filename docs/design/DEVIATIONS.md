@@ -7,7 +7,7 @@ Kontrak API dan `CLAUDE.md` menang atas `docs/design/README.md`. Setiap perbedaa
 |---|---|---|---|
 | Login | Tab SSO, tombol SSO, "Ingat saya", "Lupa password?" | Disembunyikan. Token selalu disimpan aman. | Endpoint SSO / reset password bila diinginkan |
 | Event (§9) | Pindai QR | Check-in lewat foto + lokasi (field kontrak). Layar pindai tidak dibuat; teks banner "check-in dengan foto dan lokasi". Chip "Belum dibuka" tidak ada (server yang menolak di luar jam, pesan ditampilkan apa adanya). | Field QR/token di check-in, bila QR dipakai |
-| Riwayat (§7) | Tile Hadir/Terlambat/Tidak Hadir dan status per hari | Kontrak hanya punya `GET /punches?date=`: tidak ada rekap bulanan dan tidak ada klasifikasi terlambat/tidak hadir. UI sesuai desain, **data dummy**. | `GET` rekap bulanan dengan status harian |
+| Riwayat (§7) | Tile Hadir/Terlambat/Tidak Hadir dan status per hari | Kontrak hanya punya `GET /punches?date=`: tidak ada rekap bulanan dan tidak ada klasifikasi terlambat/tidak hadir. Mode dummy: UI sesuai desain dengan data dummy. Mode nyata (`PunchHistoryRepository`): satu bulan dirakit dari `GET /punches?date=` per hari (maks. 4 paralel, cache 1 menit), hanya hari yang punya punch, tanpa Terlambat/Tidak Hadir (tidak dikarang). Sampai 31 permintaan per bulan dari batas 120/menit per token. | `GET` rekap bulanan dengan status harian |
 | Cuti (§8) | Lampiran opsional | Tidak ditampilkan: `POST /leaves` hanya JSON, tanpa lampiran. | Upload lampiran |
 | Cuti (§8) | Alasan wajib (validasi lokal) | Alasan **opsional** (kontrak: `reason` nullable). | - |
 | Cuti (§8) | Kategori Cuti/Izin/Dinas Luar/Lainnya | `types[]` hanya punya `id`, `code`, `name`. Pengelompokan memakai awalan `code` (`C-`, `I-`, `D-`, selain itu Lainnya) di `LeaveCategory`. | Field `category` di `types[]` |
@@ -47,3 +47,10 @@ Diubah dari spesifikasi desain karena aksesibilitas dan konvensi Android:
 - **Menu debug** (galeri komponen, skenario uji) hanya di build debug atau `--dart-define=DEBUG_TOOLS=true`.
 
 Sengaja **tidak** diubah (keputusan desain, bukan cacat): tombol bergradien dan bayangan berwarna, ikon Phosphor, segmented berbentuk pil, skala tipe kustom (bukan peran tipe Material), dan tanpa Dynamic Color.
+
+## Client API nyata (Task 3)
+- **Waktu = jam dinding zona bisnis.** `punched_at` dan `checked_in_at` (`2026-10-25T07:58:12+07:00`) ditampilkan sebagai 07:58, offset tidak dikonversi ke zona perangkat (`api_time.dart`). Konsekuensi: pembanding "hari ini" di klien (`clockProvider`, jam perangkat) mengikuti zona perangkat; bila perangkat berada di zona lain dari `timezone` di `/me`, batas hari bisa meleset. Memperbaikinya butuh database zona waktu di klien.
+- **Tanggal kontrak adalah teks.** `format: date` dikirim `yyyy-MM-dd` (bukan ISO penuh); pembangkit memetakannya ke `DateTime` sehingga skrip membuat salinan turunan (lihat README).
+- **Status tak dikenal** (`status`/`source` di luar enum kontrak) tidak dianggap disetujui: `status` -> pending, `source` -> `unknown`; `status_label` server tetap ditampilkan.
+- **Cuti**: field wajib yang kosong ditolak di klien dengan galat per field (tidak bisa dikirim); semua aturan lain (urutan tanggal, 62 hari, tumpang tindih) tetap dari server.
+- **Offline**: timeout dan tanpa koneksi dipetakan ke `OfflineFailure` (pesan yang sama di semua layar).
