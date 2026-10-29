@@ -17,6 +17,21 @@ Kontrak API dan `CLAUDE.md` menang atas `docs/design/README.md`. Setiap perbedaa
 | Menu dinamis | `GET /menus` | `StaticMenuRepository`. | `GET /menus` atau field di `/me` |
 | Check-in lokasi | Info "Waktu `09:41 · server`" | "Dicatat oleh server": waktu punch ditentukan server, jam perangkat tidak ditampilkan sebagai waktu punch. | - |
 
+## Menunggu API v2 (TASKS-API API-7)
+Tetap memakai data contoh/statis sampai endpoint-nya ada di kontrak `eabsensi-mobile-api` (rancangan: `../eabsensi-mobile-api/docs/api-v2-design.md`, status rancangan per 30 Oktober 2026). Aplikasi tidak menambah endpoint sendiri. Begitu endpoint masuk `docs/openapi.yaml` di repo API, masing-masing jadi task tersendiri: `dart run tool/sync_contract.dart`, `dart run tool/generate_api.dart`, lalu repository nyata.
+
+| Fitur | Sekarang di aplikasi | Rancangan API v2 | Fase |
+|---|---|---|---|
+| Peran atasan | `UserProfile.isSupervisor` selalu `false` pada mode nyata (kartu/entri persetujuan tersembunyi); hanya data dummy yang `true` | `GET /api/v2/me` `abilities` (`approve_punches`, `approve_leaves`), bagian "Fase 1 / `GET /api/v2/me`" | 1 |
+| Rekap riwayat bulanan | Hari dimuat satu per satu dari `GET /punches?date=`, tanpa Terlambat/Tidak Hadir (lihat baris Riwayat di atas) | `GET /api/v2/attendance/monthly?month=YYYY-MM`, bagian "Fase 1" | 1 |
+| Menu beranda dinamis | `StaticMenuRepository` | `GET /api/v2/menus` (bentuk mengikuti `MenuItemData`), bagian "Fase 1" lalu "Menu dari database" | 1 -> 2 |
+| QR check-in | Check-in event dengan foto + lokasi; tidak ada layar pindai | `requires_qr` di `GET /api/events`, `qr_code` di `POST /api/events/{id}/check-in`, bagian "Fase 2 / QR check-in" | 2 |
+| Lampiran cuti | Tidak ditampilkan (`POST /leaves` hanya JSON) | `POST /api/v2/leaves` multipart (`attachment`), `has_attachment`, bagian "Fase 2 / Lampiran cuti" | 2 |
+| Persetujuan punch/cuti | Layar Persetujuan dengan **data contoh** dan pita "Data contoh. Fitur ini menunggu kontrak API." | `GET /api/v2/approvals`, `POST /api/v2/approvals/punches/{id}`, `.../leaves/{id}`, bagian "Fase 3 / Persetujuan" (eksekusi persetujuan cuti belum diputuskan) | 3 |
+| Notifikasi | Layar Notifikasi dengan **data contoh** dan pita yang sama | `GET /api/v2/notifications`, tandai dibaca, bagian "Fase 3 / Notifikasi" (push FCM di luar rancangan) | 3 |
+
+Belum ada di rancangan (masih diusulkan, `docs/usulan-kontrak-api.md`): lokasi kantor/geofence, jadwal hari ini, kategori jenis cuti.
+
 ## Karena aksesibilitas (kontras teks >= 4,5:1, `CLAUDE.md`)
 - Gradien tombol utama `#059669 -> #0D9488` (putih di atasnya hanya 3,7:1) diganti `#047857 -> #0F766E` (>= 5,4:1).
 - Teks aksen hijau di atas surface (label tab aktif, teks segmen aktif) memakai `#047857`, bukan `#059669` (3,8:1). Ikon tetap `#059669`.

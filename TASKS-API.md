@@ -152,7 +152,7 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
 - **Selesai bila**: hari ini dan detail hari tampil dari server dengan jam zona bisnis; tidak ada status yang dikarang klien.
 - **Verifikasi (30 Okt 2026):** test widget `test/features/history_api_test.dart` (buka Riwayat hanya meminta `?date=` hari ini; membuka tanggal lain meminta tanggal itu sekali dan barisnya diperbarui; Terlambat/Tidak Hadir tidak muncul) dan test live punch (`GET /punches?date=` dengan jam dari offset zona bisnis). `GET /api/v2/attendance/monthly` belum ada di kontrak, jadi sumber bulan belum diganti.
 
-## [ ] API-7. Fitur yang menunggu API v2
+## [x] API-7. Fitur yang menunggu API v2
 
 Tetap memakai data contoh/statis sampai endpoint-nya ada di repo API. Jangan menambah endpoint dari sini. Begitu tersedia, masing-masing jadi task sendiri dengan model dari OpenAPI terbaru:
 
@@ -162,6 +162,7 @@ Tetap memakai data contoh/statis sampai endpoint-nya ada di repo API. Jangan men
 - QR check-in: field `requires_qr` di event, `qr_code` di check-in (layar pindai QR).
 - Lampiran cuti: `POST /api/v2/leaves` multipart.
 - **Selesai bila**: daftar ini tercermin di `docs/design/DEVIATIONS.md` dengan rujukan ke rancangan API, dan pita "menunggu kontrak API" tetap tampil di layar terkait.
+- **Verifikasi (30 Okt 2026):** bagian "Menunggu API v2" di `docs/design/DEVIATIONS.md` merujuk bagian `api-v2-design.md`; pita "Data contoh. Fitur ini menunggu kontrak API." tetap diuji di `test/features/profile_inbox_test.dart`. Belum ada endpoint v2 selain refresh token di kontrak ter-pin, jadi belum ada task lanjutan.
 
 ## [ ] API-8. Uji ujung ke ujung dan mode rilis
 
