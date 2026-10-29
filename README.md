@@ -14,10 +14,19 @@ Aplikasi pegawai eAbsensi (Flutter, Android). Lihat [CLAUDE.md](CLAUDE.md) untuk
 ## Menjalankan
 ```bash
 flutter pub get
-flutter run --dart-define=USE_MOCK=true                 # data dummy (default selama backend belum ada)
+flutter run --dart-define=USE_MOCK=true                 # data dummy
 flutter run --dart-define=USE_MOCK=false \
-            --dart-define=API_BASE_URL=http://10.0.2.2:8000/api   # backend Laravel lokal
+            --dart-define=API_BASE_URL=http://10.0.2.2:8080/api   # API Rust lokal (cargo run)
+flutter run --dart-define=USE_MOCK=false \
+            --dart-define=API_BASE_URL=http://10.0.2.2:8000/api   # Laravel lokal (v1 saja)
 ```
+
+## Kontrak API
+Pemilik kontrak: repo `eabsensi-mobile-api` (`docs/openapi.yaml`, `docs/api.md`, rancangan `docs/api-v2-design.md`). Salinan ter-pin ada di `api/openapi.yaml`, asal commit-nya di `api/CONTRACT_VERSION`, sehingga build tidak bergantung pada folder tetangga.
+```bash
+dart run tool/sync_contract.dart
+```
+Skrip itu menyalin ulang dari `../eabsensi-mobile-api` (atau path yang diberikan sebagai argumen). `/api/v2/*` (refresh token) hanya ada di Rust; terhadap Laravel aplikasi memakai v1.
 `flutter analyze`, `dart format .`, dan `flutter test` harus bersih sebelum commit.
 
 ## Keputusan teknis

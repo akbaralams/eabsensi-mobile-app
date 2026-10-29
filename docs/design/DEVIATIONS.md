@@ -2,7 +2,7 @@
 
 Kontrak API dan `CLAUDE.md` menang atas `docs/design/README.md`. Setiap perbedaan dicatat di sini.
 
-## Karena kontrak API (`../eabsensi-v2/docs/openapi/mobile-api.yaml`)
+## Karena kontrak API (`api/openapi.yaml`, dari `../eabsensi-mobile-api/docs/openapi.yaml`)
 | Layar | Desain | Yang dibangun | Butuh dari repo API |
 |---|---|---|---|
 | Login | Tab SSO, tombol SSO, "Ingat saya", "Lupa password?" | Disembunyikan. Token selalu disimpan aman. | Endpoint SSO / reset password bila diinginkan |

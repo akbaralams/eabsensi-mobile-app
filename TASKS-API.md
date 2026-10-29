@@ -33,7 +33,7 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
 - **Batas laju**: 429 dengan header `Retry-After` (login juga 429 saat server sibuk memverifikasi sandi). Batas aksi 20/menit per pengguna; jangan mengirim ulang otomatis berulang-ulang.
 - **Ukuran body** maks 5 MB (413). Foto maks 4 MB; target unggahan ±50-100 KB (lihat API-3) karena memengaruhi biaya server dan bandwidth (`../eabsensi-mobile-api/docs/kebutuhan-infrastruktur.md`).
 
-## [ ] API-0. Sumber kontrak dan konfigurasi
+## [x] API-0. Sumber kontrak dan konfigurasi
 
 - Salin `../eabsensi-mobile-api/docs/openapi.yaml` ke `api/openapi.yaml` dan catat commit asalnya di `api/CONTRACT_VERSION`, agar build tidak bergantung pada folder tetangga. Skrip `tool/sync_contract.*` untuk memperbarui keduanya.
 - Perbarui `CLAUDE.md` dan `README.md`: sumber kontrak pindah ke `eabsensi-mobile-api`; `API_BASE_URL` contoh untuk Rust (`http://10.0.2.2:8080/api`) dan Laravel (`:8000`).
