@@ -116,13 +116,15 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
 - **Verifikasi (30 Okt 2026, `test/live/live_punch_test.dart` terhadap Rust lokal `:8081`):** punch `kontrak` 201 `pending` dengan foto; berkas foto tersimpan identik di `eabsensi-v2/storage/app/private/mobile-punches/...` beserta lat/long/akurasi; punch kedua menampilkan "Tunggu 60 detik sebelum melakukan punch lagi."; `kontrak.pegawai-nonaktif` menampilkan "Pegawai tidak aktif."; `GET /punches?date=` memuat punch itu dengan jam zona bisnis; log debug mencatat ukuran foto (`Foto bukti terkirim: 19.9 KB`, `[photo=19.9 KB]`). Bukti kosong (foto tidak wajib + lokasi ditolak) tetap terkirim (Tonik menolak multipart kosong; `ApiClient.postEmptyMultipart`).
   - **Belum**: melihat foto di halaman Persetujuan punch web, mode pesawat di HP, dan ukuran hasil kompresi kamera sungguhan (JPEG 80, sisi pendek maks 480) di perangkat.
 
-## [ ] API-4. Event (upacara)
+## [x] API-4. Event (upacara)
 
 - `EventRepository` nyata:
   - `GET /api/events` (event hari ini, `checked_in`);
   - `POST /api/events/{id}/check-in` multipart dengan bukti yang sama dengan punch (kompresi foto sama).
 - 404 (event dihapus) -> muat ulang daftar dengan pesan singkat.
 - **Selesai bila**: check-in "Apel Kontrak" berhasil dan status berubah menjadi sudah check-in; check-in kedua menampilkan "Anda sudah check-in di event ini."; event di luar jam menampilkan "Check-in dibuka pukul HH:MM sampai HH:MM." apa adanya.
+- **Verifikasi (30 Okt 2026, `test/live/live_event_test.dart` terhadap Rust lokal `:8081`, fixture dimuat ulang):** "Apel Kontrak" terlihat (event department lain tidak), check-in 201 lalu `checked_in` menjadi `true`, check-in kedua menampilkan "Anda sudah check-in di event ini.", event tidak ada -> 404. Check-in 404 di aplikasi: layar "Event tidak tersedia", daftar event dimuat ulang (test widget).
+  - **Belum**: pesan di luar jam terhadap server (fixture tidak punya event dengan jam sempit; jalur pesan aturan apa adanya sama dengan check-in kedua dan diuji dengan data dummy).
 
 ## [ ] API-5. Cuti
 

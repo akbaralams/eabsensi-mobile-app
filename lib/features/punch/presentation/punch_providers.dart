@@ -7,6 +7,7 @@ import '../../../core/clock/clock.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/geo/geo.dart';
 import '../../../core/mock/mock_env.dart';
+import '../../../core/network/api_failure.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../../events/domain/event_item.dart';
 import '../../events/presentation/event_providers.dart';
@@ -204,6 +205,10 @@ class PunchFlowController extends Notifier<PunchFlowState> {
       await _deletePhoto(state.photoPath);
       state = state.copyWith(submitting: false, result: result);
     } on Object catch (e) {
+      // Event dihapus/dinonaktifkan sejak daftar dimuat: muat ulang daftar.
+      if (e is NotFoundFailure && state.target is EventTarget) {
+        ref.invalidate(eventsTodayProvider);
+      }
       state = state.copyWith(submitting: false, failure: e);
     }
   }

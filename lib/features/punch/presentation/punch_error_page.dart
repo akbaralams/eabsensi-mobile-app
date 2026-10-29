@@ -17,7 +17,13 @@ class PunchErrorPage extends ConsumerWidget {
     final flow = ref.watch(punchFlowProvider);
     final failure = flow.failure;
 
+    final eventGone = failure is NotFoundFailure && flow.target is EventTarget;
     final (title, message, icon) = switch (failure) {
+      NotFoundFailure() when eventGone => (
+        'Event tidak tersedia',
+        'Event ini sudah dihapus atau dinonaktifkan. Daftar event dimuat ulang.',
+        PhosphorIconsFill.warning,
+      ),
       OfflineFailure() => (
         'Tidak ada koneksi',
         failure.message,
@@ -83,11 +89,17 @@ class PunchErrorPage extends ConsumerWidget {
                     style: AppType.body.copyWith(color: c.textSecondary),
                   ),
                   const SizedBox(height: 18),
-                  PrimaryButton(
-                    label: 'Coba lagi',
-                    icon: PhosphorIconsRegular.arrowClockwise,
-                    onPressed: () => submitAndShowOutcome(context, ref),
-                  ),
+                  if (eventGone)
+                    PrimaryButton(
+                      label: 'Lihat daftar event',
+                      onPressed: () => context.go('/events'),
+                    )
+                  else
+                    PrimaryButton(
+                      label: 'Coba lagi',
+                      icon: PhosphorIconsRegular.arrowClockwise,
+                      onPressed: () => submitAndShowOutcome(context, ref),
+                    ),
                 ],
               ),
             ),
