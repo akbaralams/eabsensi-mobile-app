@@ -12,14 +12,20 @@ Aplikasi pegawai eAbsensi (Flutter, Android). Lihat [CLAUDE.md](CLAUDE.md) untuk
 `flutter doctor` bersih untuk Android (SDK platform 36, build-tools 36.0.0). Chrome dan Linux desktop tidak dipakai. Di VM cloud, `tool/cloud-setup.sh` memasang Flutter dan Android SDK.
 
 ## Menjalankan
+Build **debug** memakai data dummy secara default; build **rilis/profil** memakai API sungguhan (`USE_MOCK=false`). `API_BASE_URL` default `http://10.0.2.2:8080/api` (Rust lokal dari emulator).
 ```bash
 flutter pub get
-flutter run --dart-define=USE_MOCK=true                 # data dummy
-flutter run --dart-define=USE_MOCK=false \
-            --dart-define=API_BASE_URL=http://10.0.2.2:8080/api   # API Rust lokal (cargo run)
+flutter run                                             # debug, data dummy
+flutter run --dart-define=USE_MOCK=false                # debug, API Rust lokal (cargo run, :8080)
 flutter run --dart-define=USE_MOCK=false \
             --dart-define=API_BASE_URL=http://10.0.2.2:8000/api   # Laravel lokal (v1 saja)
+flutter build apk --release \
+            --dart-define=API_BASE_URL=https://<staging>/api      # rilis: wajib HTTPS
 ```
+- HTTP biasa (backend lokal) hanya diizinkan di build debug/profil (`android/app/src/{debug,profile}/AndroidManifest.xml`); build rilis menolak cleartext.
+- HP fisik: pakai IP LAN komputer (`http://192.168.x.x:8080/api`) dan jalankan backend dengan `LISTEN_ADDR=0.0.0.0:8080` (Rust) atau `--host=0.0.0.0` (Laravel).
+
+`flutter analyze`, `dart format .`, dan `flutter test` harus bersih sebelum commit.
 
 ## Kontrak API
 Pemilik kontrak: repo `eabsensi-mobile-api` (`docs/openapi.yaml`, `docs/api.md`, rancangan `docs/api-v2-design.md`). Salinan ter-pin ada di `api/openapi.yaml`, asal commit-nya di `api/CONTRACT_VERSION`, sehingga build tidak bergantung pada folder tetangga.
@@ -37,9 +43,8 @@ dart run tool/generate_api.dart       # api/openapi.yaml -> packages/eabsensi_ap
 - Hasil generator adalah paket tersendiri `packages/eabsensi_api` (path dependency), **tidak diedit tangan**, dan dikecualikan dari `flutter analyze`.
 - Penyesuaian satu-satunya: Tonik 0.11 menyalin `encoding.contentType` `image/jpeg, image/png` apa adanya ke header bagian multipart dan Dio menolaknya. Skrip memberi Tonik salinan spesifikasi yang memakai jenis pertama (`image/jpeg`; aplikasi selalu mengirim JPEG). `api/openapi.yaml` tetap salinan persis kontrak.
 - Lapisan tipis di atasnya: `lib/core/api/api_client.dart` (header `Accept`/`Authorization`, timeout sambung 10 dtk dan kirim/terima 60 dtk, refresh token sekali saat 401, pemetaan galat ke `ApiFailure`), `lib/core/api/mappers.dart` (model hasil generator ke model domain; UI tidak menyentuh model hasil generator).
-`flutter analyze`, `dart format .`, dan `flutter test` harus bersih sebelum commit.
 
-### Uji terhadap backend sungguhan
+## Uji terhadap backend sungguhan
 `test/live/` memanggil repository nyata ke backend yang sedang berjalan (data uji dari `tests/contract/fixtures.sql` di repo API). Dilewati tanpa `LIVE_API`, jadi `flutter test` biasa tetap tanpa jaringan.
 ```bash
 flutter test test/live --dart-define=LIVE_API=http://127.0.0.1:8080/api        # Rust
@@ -47,7 +52,26 @@ flutter test test/live --dart-define=LIVE_API=http://127.0.0.1:8000/api        #
 flutter test test/live/live_auth_test.dart --dart-define=LIVE_API=http://127.0.0.1:8081/api \
             --dart-define=LIVE_SLOW=true   # Rust dengan MOBILE_ACCESS_TOKEN_TTL_MINUTES=2: refresh diam-diam setelah 3 menit
 ```
-Batas login 5/menit per akun: jalankan file satu per satu bila muncul 429.
+Batas login 5/menit per akun: jalankan file satu per satu bila muncul 429. Muat ulang fixture sebelum `live_event_test` dan `live_leave_test` (check-in dan pengajuan hanya sekali per pegawai/tanggal).
+
+### Hasil uji ujung ke ujung
+Status 30 Oktober 2026 (`api/CONTRACT_VERSION`: `eabsensi-mobile-api` f6853ba).
+
+| Alur | Rust lokal (f6853ba, `cargo run`) | Laravel lokal (`eabsensi-v2` 16d9f68) | Emulator | HP fisik |
+|---|---|---|---|---|
+| Login, profil, pesan galat kontrak | lulus (live) | lulus, fallback v1 (live) | belum | belum |
+| Refresh token diam-diam (TTL 2 menit, cek setelah 3 menit) | lulus (live) | tidak berlaku (v1) | belum | belum |
+| Punch foto + lokasi, aturan 60 detik, pegawai nonaktif | lulus (live) | lulus (live) | belum | belum |
+| Riwayat hari ini / detail hari (`?date=`, jam zona bisnis) | lulus (live + widget) | lulus (live) | belum | belum |
+| Event: check-in, check-in kedua, 404 | lulus (live) | lulus (live) | belum | belum |
+| Cuti: ajukan, tumpang tindih, > 62 hari, kategori jenis | lulus (live) | lulus (live) | belum | belum |
+| Keluar (token dicabut di server) | lulus (live) | lulus (live) | belum | belum |
+| 401 token dicabut -> login | lulus (live, login ulang perangkat sama) | lulus (live) | belum | belum |
+| 429 | lulus (live: login > 5/menit, `Retry-After` dibaca) | lulus (live) | belum | belum |
+| Offline | test unit/widget saja | test unit/widget saja | belum | belum |
+| Mode terang dan gelap | - | - | belum | belum |
+
+"live" = `test/live` (repository nyata, tanpa UI). Alur layar mode nyata (login -> beranda -> Check In -> keluar, token dicabut -> login) diuji dengan HTTP palsu di `test/features/real_mode_test.dart`. Belum dijalankan di emulator/HP: di mesin ini tidak ada AVD maupun perangkat terhubung, dan sebagian lisensi Android SDK belum diterima (`flutter doctor --android-licenses`). Staging HTTPS belum diuji.
 
 ## Keputusan teknis
 - **State management: Riverpod** (`flutter_riverpod` 3). Dependensi (repository, layanan lokasi, jam) disuntikkan lewat provider sehingga mock dan implementasi nyata bisa ditukar dan di-override di test tanpa mengubah UI.

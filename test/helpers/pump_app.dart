@@ -37,6 +37,7 @@ Future<ProviderContainer> pumpApp(
   Map<String, Object> prefs = const {},
   CameraService camera = const FakeCameraService(),
   List<Override> overrides = const [],
+  TokenStore? tokens,
 }) async {
   SharedPreferences.setMockInitialValues(prefs);
   final sp = await SharedPreferences.getInstance();
@@ -60,7 +61,7 @@ Future<ProviderContainer> pumpApp(
     overrides: [
       sharedPreferencesProvider.overrideWithValue(sp),
       tokenStoreProvider.overrideWithValue(
-        MemoryTokenStore(signedIn ? '7|test-token' : null),
+        tokens ?? MemoryTokenStore(signedIn ? '7|test-token' : null),
       ),
       clockProvider.overrideWithValue(() => clock),
       tickingClockProvider.overrideWith((ref) => Stream.value(clock)),

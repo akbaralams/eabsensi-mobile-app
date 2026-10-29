@@ -6,15 +6,20 @@ import 'package:flutter/foundation.dart';
 class AppConfig {
   const AppConfig._();
 
-  /// URL dasar API mobile (mis. `http://10.0.2.2:8000/api`).
+  /// URL dasar API mobile: Rust `http://10.0.2.2:8080/api` (emulator) atau
+  /// Laravel `:8000`; staging/produksi wajib HTTPS.
   static const baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000/api',
+    defaultValue: 'http://10.0.2.2:8080/api',
   );
 
-  /// Selama backend belum tersedia, aplikasi memakai data dummy.
-  /// Matikan dengan `--dart-define=USE_MOCK=false` saat client API sudah ada.
-  static const useMock = bool.fromEnvironment('USE_MOCK', defaultValue: true);
+  /// Data dummy hanya di build debug (default) atau bila diminta lewat
+  /// `--dart-define=USE_MOCK=true`. Build rilis/profil memakai API sungguhan.
+  /// Debug terhadap backend: `--dart-define=USE_MOCK=false`.
+  static const useMock = bool.fromEnvironment(
+    'USE_MOCK',
+    defaultValue: kDebugMode,
+  );
 
   /// Alat uji (galeri komponen, panel skenario): hanya di build debug, atau bila
   /// diminta lewat `--dart-define=DEBUG_TOOLS=true` (mis. APK uji data dummy).

@@ -179,3 +179,7 @@ Tetap memakai data contoh/statis sampai endpoint-nya ada di repo API. Jangan men
   - offline.
 - Jalankan juga terhadap Laravel `:8000` untuk memastikan fallback v1 dan kontrak identik.
 - **Selesai bila**: seluruh alur di atas lulus di perangkat fisik terhadap Rust (mode terang dan gelap); hasilnya dicatat di README (versi backend, tanggal, perangkat).
+- **Progres (30 Okt 2026), belum selesai:**
+  - Selesai: build rilis default `USE_MOCK=false` (`defaultValue: kDebugMode`), tidak ada lagi `UnimplementedError` di provider repository, HTTP biasa hanya di build debug/profil, `API_BASE_URL` default Rust `:8080`.
+  - Seluruh alur diuji di level repository terhadap Rust lokal dan Laravel lokal (`test/live`, lulus), dan alur layar mode nyata dengan HTTP palsu (`test/features/real_mode_test.dart`). Tabel hasil di README.
+  - **Menunggu user**: emulator/HP fisik (mode terang dan gelap), staging HTTPS, offline/mode pesawat di perangkat, melihat foto punch dan pengajuan cuti di web. Mesin ini tidak punya AVD/perangkat terhubung dan lisensi Android SDK belum diterima.
