@@ -83,6 +83,8 @@ void main() {
         await settle(t);
         await t.tap(find.byKey(const Key('shutter')));
         await settle(t);
+        await t.tap(find.byKey(const Key('submit-photo')));
+        await settle(t);
         await t.tap(find.text('Kembali ke Beranda'));
         await settle(t);
         await _openHistory(t);

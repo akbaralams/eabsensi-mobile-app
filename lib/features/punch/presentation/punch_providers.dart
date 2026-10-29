@@ -116,11 +116,12 @@ class PunchFlowState {
     FlowResult? result,
     Object? failure,
     bool clearFailure = false,
+    bool clearPhoto = false,
   }) => PunchFlowState(
     target: target,
     phase: phase ?? this.phase,
     fix: fix ?? this.fix,
-    photoPath: photoPath ?? this.photoPath,
+    photoPath: clearPhoto ? null : photoPath ?? this.photoPath,
     submitting: submitting ?? this.submitting,
     result: result ?? this.result,
     failure: clearFailure ? null : failure ?? this.failure,
@@ -161,6 +162,13 @@ class PunchFlowController extends Notifier<PunchFlowState> {
   }
 
   void setPhoto(String path) => state = state.copyWith(photoPath: path);
+
+  /// Foto Ulang: buang foto sebelumnya (berkas sementaranya ikut dihapus).
+  Future<void> discardPhoto() async {
+    final path = state.photoPath;
+    state = state.copyWith(clearPhoto: true);
+    await _deletePhoto(path);
+  }
 
   Future<void> submit() async {
     if (state.submitting) return;

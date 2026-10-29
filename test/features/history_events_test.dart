@@ -81,6 +81,8 @@ void main() {
       await settle(tester);
       await tester.tap(find.byKey(const Key('shutter')));
       await settle(tester);
+      await tester.tap(find.byKey(const Key('submit-photo')));
+      await settle(tester);
 
       expect(
         find.text('Check-in Apel Kontrak tercatat · waktu server'),
@@ -103,6 +105,8 @@ void main() {
       await tester.tap(find.textContaining('Konfirmasi'));
       await settle(tester);
       await tester.tap(find.byKey(const Key('shutter')));
+      await settle(tester);
+      await tester.tap(find.byKey(const Key('submit-photo')));
       await settle(tester);
       expect(
         find.text('Check-in dibuka pukul 15:30 sampai 16:30.'),

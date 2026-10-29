@@ -230,6 +230,12 @@ final class AppColors extends ThemeExtension<AppColors> {
   /// Penggelap area di luar bingkai oval kamera.
   static const cameraMask = Color(0x4D064E3B);
 
+  /// Layar kamera penuh: latar, scrim atas/bawah, dan tombol jepret nonaktif.
+  static const cameraBackground = Color(0xFF000000);
+  static const cameraScrimTop = Color(0xB3000000);
+  static const cameraScrimBottom = Color(0xCC000000);
+  static const cameraShutterIdle = Color(0xFF64748B);
+
   /// Bayangan dan isi lencana jam di beranda.
   static const badgeShadow = Color(0x4D0D9488);
   static const badgeGlyph = Color(0xFF047857);

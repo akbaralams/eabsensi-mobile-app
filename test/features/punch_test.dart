@@ -13,8 +13,11 @@ Future<void> _punchFromHome(WidgetTester tester, String button) async {
   await settle(tester);
 }
 
+/// Jepret lalu kirim dari langkah konfirmasi.
 Future<void> _shoot(WidgetTester tester) async {
   await tester.tap(find.byKey(const Key('shutter')));
+  await settle(tester);
+  await tester.tap(find.byKey(const Key('submit-photo')));
   await settle(tester);
 }
 
@@ -32,7 +35,7 @@ void main() {
 
     await tester.tap(find.text('Konfirmasi Check In'));
     await settle(tester);
-    expect(find.text('Ambil foto'), findsOneWidget);
+    expect(find.text('WAJAH TERDETEKSI'), findsOneWidget);
 
     await _shoot(tester);
     expect(find.byKey(const Key('result-time')), findsOneWidget);
@@ -60,7 +63,7 @@ void main() {
       await settle(tester);
       await tester.tap(find.text('Konfirmasi Check In'));
       await settle(tester);
-      expect(find.text('Ambil foto'), findsNothing);
+      expect(find.byKey(const Key('shutter')), findsNothing);
       expect(find.text('Disetujui'), findsOneWidget);
       await tester.tap(find.text('Kembali ke Beranda'));
       await settle(tester);
