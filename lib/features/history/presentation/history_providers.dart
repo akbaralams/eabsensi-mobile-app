@@ -5,6 +5,7 @@ import '../../../core/config/app_config.dart';
 import '../../../core/mock/mock_env.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../../punch/presentation/punch_providers.dart';
+import '../data/api_history_repository.dart';
 import '../data/mock_history_repository.dart';
 import '../domain/history.dart';
 
@@ -12,8 +13,40 @@ final historyRepositoryProvider = Provider<HistoryRepository>((ref) {
   if (AppConfig.useMock) {
     return MockHistoryRepository(ref.watch(mockEnvProvider));
   }
-  throw UnimplementedError('Client API nyata belum tersedia (Task 3).');
+  return ApiHistoryRepository(
+    ref.watch(punchRepositoryProvider),
+    now: () => ref.read(clockProvider)(),
+  );
 });
+
+/// Hari yang sudah dimuat dari server (detail hari), menggantikan baris
+/// "Belum dimuat" di daftar bulan. Dikosongkan saat tarik-untuk-muat-ulang.
+class HistoryDayCache extends Notifier<Map<DateTime, DayRecord>> {
+  @override
+  Map<DateTime, DayRecord> build() => const {};
+
+  void put(DayRecord day) => state = {...state, _key(day.date): day};
+
+  void clear() => state = const {};
+
+  DayRecord merge(DayRecord day) => state[_key(day.date)] ?? day;
+
+  static DateTime _key(DateTime d) => DateTime(d.year, d.month, d.day);
+}
+
+final historyDayCacheProvider =
+    NotifierProvider<HistoryDayCache, Map<DateTime, DayRecord>>(
+      HistoryDayCache.new,
+    );
+
+/// Detail satu hari dari server (`GET /punches?date=`), dimuat saat dibuka.
+final dayDetailProvider = FutureProvider.autoDispose
+    .family<DayRecord, DateTime>(
+      (ref, date) => withSession(
+        ref.read,
+        () => ref.watch(historyRepositoryProvider).day(date),
+      ),
+    );
 
 /// Bulan yang sedang dilihat (hari pertama bulan), dibatasi 12 bulan ke belakang.
 class HistoryMonthController extends Notifier<DateTime> {

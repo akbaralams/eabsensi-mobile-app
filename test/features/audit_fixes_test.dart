@@ -37,6 +37,9 @@ class _SlowSecondMonth implements HistoryRepository {
     if (calls > 1) await gate.future;
     return _inner.month(year, month);
   }
+
+  @override
+  Future<DayRecord> day(DateTime date) => _inner.day(date);
 }
 
 class _NoClassification implements HistoryRepository {
@@ -58,6 +61,9 @@ class _NoClassification implements HistoryRepository {
       ],
     );
   }
+
+  @override
+  Future<DayRecord> day(DateTime date) => _inner.day(date);
 }
 
 Future<void> _openHistory(WidgetTester t) async {

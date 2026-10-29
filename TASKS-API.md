@@ -141,7 +141,7 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
 - **Verifikasi (30 Okt 2026, `test/live/live_leave_test.dart` terhadap Rust lokal `:8081`):** `types` server `CUTI=cuti, DINAS=dinas, IZIN=izin, SAKIT=izin`; pengajuan `kontrak` 201 berstatus `pending` ("Menunggu") dan muncul di `GET /leaves`; tumpang tindih dan rentang > 62 hari menampilkan pesan kontrak apa adanya. Menu Sakit membuka jenis `SAKIT` (test widget).
   - **Belum**: melihat pengajuan di halaman cuti web.
 
-## [ ] API-6. Riwayat
+## [x] API-6. Riwayat
 
 - Kontrak saat ini hanya punya `GET /api/punches?date=`, tanpa rekap bulanan dan klasifikasi terlambat/tidak hadir.
 - Repository nyata:
@@ -150,6 +150,7 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
 - Jangan memanggil `?date=` untuk setiap hari dalam sebulan sekaligus (30 request per buka layar). Muat per hari saat dibuka, atau tunggu endpoint rekap.
 - Setelah `GET /api/v2/attendance/monthly` tersedia di repo API (rancangan fase 1), ganti sumber bulan ke endpoint itu dan aktifkan klasifikasi.
 - **Selesai bila**: hari ini dan detail hari tampil dari server dengan jam zona bisnis; tidak ada status yang dikarang klien.
+- **Verifikasi (30 Okt 2026):** test widget `test/features/history_api_test.dart` (buka Riwayat hanya meminta `?date=` hari ini; membuka tanggal lain meminta tanggal itu sekali dan barisnya diperbarui; Terlambat/Tidak Hadir tidak muncul) dan test live punch (`GET /punches?date=` dengan jam dari offset zona bisnis). `GET /api/v2/attendance/monthly` belum ada di kontrak, jadi sumber bulan belum diganti.
 
 ## [ ] API-7. Fitur yang menunggu API v2
 

@@ -101,7 +101,9 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
       builder: (context) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
-          child: _DayDetail(day: day),
+          child: day.status == DayStatus.unknown
+              ? _RemoteDayDetail(date: day.date)
+              : _DayDetail(day: day),
         ),
       ),
     );
@@ -119,6 +121,9 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
     final classified = ref
         .watch(historyRepositoryProvider)
         .supportsClassification;
+    // Hari yang sudah dibuka menggantikan baris "Belum dimuat".
+    ref.watch(historyDayCacheProvider);
+    final cache = ref.read(historyDayCacheProvider.notifier);
 
     return Column(
       children: [
@@ -130,6 +135,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async {
+              ref.read(historyDayCacheProvider.notifier).clear();
               ref.invalidate(monthHistoryProvider);
               await ref
                   .read(monthHistoryProvider.future)
@@ -178,7 +184,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                         Opacity(
                           opacity: data.isLoading ? .5 : 1,
                           child: _Content(
-                            history: data.requireValue,
+                            history: data.requireValue.mapDays(cache.merge),
                             classified: classified,
                             filter: _filter,
                             onFilter: (s) => setState(
@@ -390,11 +396,22 @@ class _Content extends StatelessWidget {
         if (filter == null || d.status == filter) d,
     ];
     final large = _largeText(context);
+    // Tanpa rekap bulanan dari server, jumlah dari hari yang sudah dimuat saja
+    // menyesatkan: tile diganti keterangan.
+    final partial =
+        !classified && history.days.any((d) => d.status == DayStatus.unknown);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (large)
+        if (partial)
+          Text(
+            'Rekap bulanan belum tersedia dari server. Ketuk tanggal untuk '
+            'melihat punch hari itu.',
+            key: const Key('history-no-summary'),
+            style: AppType.small.copyWith(color: c.textSecondary),
+          )
+        else if (large)
           for (final t in tiles) ...[t, const SizedBox(height: 8)]
         else
           IntrinsicHeight(
@@ -513,18 +530,20 @@ class _StatTile extends StatelessWidget {
   }
 }
 
-(String, StatusVariant) _statusOf(DayStatus s) => switch (s) {
+(String, StatusVariant) _statusOf(DayRecord d) => switch (d.status) {
   DayStatus.present => ('Hadir', StatusVariant.success),
   DayStatus.late => ('Terlambat', StatusVariant.late),
   DayStatus.absent => ('Tidak Hadir', StatusVariant.absent),
   DayStatus.pending => ('Menunggu', StatusVariant.pending),
-  DayStatus.none => ('Belum absen', StatusVariant.neutral),
+  DayStatus.none when d.isToday => ('Belum absen', StatusVariant.neutral),
+  DayStatus.none => ('Tidak ada punch', StatusVariant.neutral),
+  DayStatus.unknown => ('Belum dimuat', StatusVariant.neutral),
 };
 
 String _spokenDay(DayRecord d) {
   final date =
       '${IdFormat.dayName(d.date)} ${d.date.day} ${IdFormat.monthName(d.date.month)}';
-  final (label, _) = _statusOf(d.status);
+  final (label, _) = _statusOf(d);
   final times = d.checkIn == null
       ? 'tidak ada catatan jam'
       : 'masuk ${d.checkIn}${d.checkOut == null ? '' : ', keluar ${d.checkOut}'}';
@@ -541,7 +560,7 @@ class _DayRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final (label, variant) = _statusOf(day.status);
+    final (label, variant) = _statusOf(day);
     final times = day.checkIn == null
         ? '-'
         : day.checkOut == null
@@ -638,13 +657,15 @@ class _DayDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final (label, variant) = _statusOf(day.status);
+    final (label, variant) = _statusOf(day);
     final note = switch (day.status) {
       DayStatus.pending => 'Menunggu persetujuan atasan. Belum dihitung sebagai kehadiran sampai disetujui.',
       DayStatus.absent => 'Tidak ada punch tercatat pada hari ini.',
       DayStatus.late => 'Masuk setelah jam yang ditentukan.',
-      DayStatus.none => 'Belum ada punch hari ini.',
+      DayStatus.none when day.isToday => 'Belum ada punch hari ini.',
+      DayStatus.none => 'Tidak ada punch tercatat pada tanggal ini.',
       DayStatus.present => 'Kehadiran tercatat.',
+      DayStatus.unknown => 'Belum dimuat.',
     };
     Widget row(String name, String? value) => Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -682,9 +703,81 @@ class _DayDetail extends StatelessWidget {
         const SizedBox(height: 8),
         row('Masuk', day.checkIn),
         row('Keluar', day.checkOut),
+        if (day.punches.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text('Punch', style: AppType.small.copyWith(color: c.textMuted)),
+          for (final p in day.punches)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  Text(
+                    IdFormat.time(p.punchedAt),
+                    style: AppType.bodyBold.copyWith(
+                      color: c.textPrimary,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Label status dari server, apa adanya.
+                  Expanded(
+                    child: Text(
+                      p.statusLabel,
+                      style: AppType.small.copyWith(color: c.textSecondary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
         const SizedBox(height: 4),
         Text(note, style: AppType.caption.copyWith(color: c.textSecondary)),
       ],
     );
+  }
+}
+
+/// Detail hari yang belum dimuat: `GET /punches?date=` saat dibuka, lalu
+/// barisnya di daftar bulan diperbarui.
+class _RemoteDayDetail extends ConsumerWidget {
+  const _RemoteDayDetail({required this.date});
+
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.colors;
+    ref.listen(dayDetailProvider(date), (_, next) {
+      final day = next.value;
+      if (day != null) ref.read(historyDayCacheProvider.notifier).put(day);
+    });
+    final detail = ref.watch(dayDetailProvider(date));
+    return switch (detail) {
+      AsyncData(:final value) => _DayDetail(day: value),
+      AsyncError(:final error) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            IdFormat.longDate(date),
+            style: AppType.cardTitle.copyWith(color: c.textPrimary),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error is ApiFailure ? error.message : 'Terjadi kesalahan.',
+            style: AppType.body.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: 12),
+          OutlineButton(
+            label: 'Coba lagi',
+            onPressed: () => ref.invalidate(dayDetailProvider(date)),
+          ),
+        ],
+      ),
+      _ => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 32),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+    };
   }
 }
