@@ -24,6 +24,7 @@ Urutan wajib. Tiap task selesai bila kriteria "Selesai bila" terpenuhi dan sudah
 - **Selesai bila**: galeri cocok secara visual dengan prototipe; golden test hijau; target sentuh ≥ 48dp; kontras teks ≥ 4.5:1 di kedua mode.
 
 ## [ ] Task 3. Client API dari OpenAPI
+- **Diganti oleh [TASKS-API.md](TASKS-API.md)** (integrasi dengan `eabsensi-mobile-api`, termasuk refresh token). Uji terhadap backend di Task 4-9 juga dikerjakan lewat file itu.
 - **Status**: ditunda (backend dilewati dulu). Sementara repository dummy di belakang interface.
 - Bangkitkan client Dart dari `../eabsensi-v2/docs/openapi/mobile-api.yaml` dengan generator stabil terbaru; skrip `tool/generate_api.*` di-commit.
 - Lapisan tipis di atasnya: header `Accept`, Bearer token, pemetaan galat (401 → logout, 422 aturan → pesan, 422 validasi → per field, 429 → coba lagi nanti).
