@@ -40,7 +40,7 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
 - Perbarui `docs/usulan-kontrak-api.md`: tandai usulan yang sudah masuk rancangan `../eabsensi-mobile-api/docs/api-v2-design.md` (rekap bulanan, menu, peran atasan, notifikasi, persetujuan, QR, lampiran) dan yang belum (lokasi kantor/geofence, jadwal hari ini, kategori jenis cuti).
 - **Selesai bila**: berkas kontrak ter-pin di repo; dokumen menunjuk ke repo API.
 
-## [ ] API-1. Client API dari OpenAPI dan pemetaan galat
+## [x] API-1. Client API dari OpenAPI dan pemetaan galat
 
 - Bangkitkan model dan client Dart dari `api/openapi.yaml` dengan generator stabil terbaru. Syarat: mendukung OpenAPI 3.1 (tipe nullable `type: [string, 'null']`, `oneOf` null), `multipart/form-data` dengan berkas, dan tidak butuh Java bila ada pilihan setara. Catat pilihan dan alasannya di README. Skrip `tool/generate_api.*` di-commit, hasil generator di folder tersendiri (mis. `lib/core/api/generated/`) dan tidak diedit tangan.
 - Lapisan HTTP tipis di atas client hasil generator:
