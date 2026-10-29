@@ -74,6 +74,9 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> resume() async {}
+
+  @override
   Future<void> logout() async {
     await _network();
     await _env.tokens.clear();

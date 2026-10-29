@@ -74,6 +74,8 @@ final mockEnvProvider = Provider<MockEnv>((ref) {
   return MockEnv(
     tokens: ref.watch(tokenStoreProvider),
     scenario: () => ref.read(mockScenarioProvider),
-    now: ref.watch(clockProvider),
+    // Dibaca saat dipakai: jam zona bisnis bergantung pada sesi, dan sesi
+    // memakai repository mock ini (hindari ketergantungan melingkar).
+    now: () => ref.read(clockProvider)(),
   );
 });

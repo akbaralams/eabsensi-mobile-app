@@ -72,7 +72,7 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
   - `{"message":"Too Many Attempts."}` dengan `Retry-After: 42`;
   - 413 dan 503.
 
-## [ ] API-2. Login, refresh token, profil, keluar
+## [x] API-2. Login, refresh token, profil, keluar
 
 - `AuthRepository` nyata, dengan alur login berurutan:
   - `POST /api/v2/auth/login` lebih dulu;
@@ -94,6 +94,10 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
   - token yang dicabut dari web (ubah sandi/nonaktifkan akun) membawa ke layar login;
   - login terhadap Laravel (`:8000`) tetap berhasil lewat fallback v1;
   - test unit untuk interceptor refresh (sekali, satu per satu, 401 kedua -> logout).
+- **Verifikasi (30 Okt 2026, `test/live/live_auth_test.dart`, repository nyata tanpa emulator):**
+  - Rust lokal (`eabsensi-mobile-api` f6853ba, `:8081`, `MOBILE_ACCESS_TOKEN_TTL_MINUTES=2`): login `kontrak` + `/me`, pesan `kontrak.tanpa-pegawai` dan `kontrak.akun-nonaktif` apa adanya, refresh diam-diam setelah 3 menit (satu refresh), token dicabut -> sesi berakhir, keluar mencabut token. Lulus.
+  - Laravel lokal (`eabsensi-v2` 16d9f68, `:8000`): login lewat fallback v1 (v2 dibalas 404), pesan galat sama, token dicabut -> sesi berakhir. Lulus.
+  - Pencabutan token diuji dengan login ulang `device_name` yang sama (mencabut pasangan lama). **Belum**: ubah sandi/nonaktifkan akun dari web dan alur layar di emulator/HP (lihat API-8).
 
 ## [ ] API-3. Punch dan riwayat hari ini
 

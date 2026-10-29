@@ -29,7 +29,11 @@ class TokenRefresher {
     // Token sudah diganti oleh refresh lain selama request ini berjalan.
     if (usedToken != null && current.accessToken != usedToken) return;
     final refresh = current.refreshToken;
-    if (refresh == null) throw const UnauthenticatedFailure();
+    if (refresh == null) {
+      // Token v1 (backend Laravel): tidak bisa diperbarui.
+      await _tokens.clear();
+      throw const UnauthenticatedFailure();
+    }
     return _start(refresh);
   }
 

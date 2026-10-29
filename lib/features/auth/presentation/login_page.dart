@@ -41,6 +41,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       _passwordError = _password.text.isEmpty ? 'Password wajib diisi.' : null;
       _ruleMessage = null;
     });
+    ref.read(sessionNoticeProvider.notifier).take();
     if (_loginError != null || _passwordError != null) return;
 
     setState(() => _loading = true);
@@ -69,6 +70,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    // Alasan sesi diakhiri server (mis. akun dinonaktifkan), apa adanya.
+    final ruleMessage = _ruleMessage ?? ref.watch(sessionNoticeProvider);
     return AppScaffold(
       body: CustomScrollView(
         slivers: [
@@ -120,9 +123,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           errorText: _passwordError,
                           onSubmitted: _submit,
                         ),
-                        if (_ruleMessage != null) ...[
+                        if (ruleMessage != null) ...[
                           const SizedBox(height: AppSpace.block),
-                          _RuleMessage(message: _ruleMessage!),
+                          _RuleMessage(message: ruleMessage),
                         ],
                         const SizedBox(height: AppSpace.block),
                         PrimaryButton(

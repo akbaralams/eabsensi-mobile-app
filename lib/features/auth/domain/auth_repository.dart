@@ -9,7 +9,13 @@ abstract class AuthRepository {
     required String deviceName,
   });
 
+  /// Saat aplikasi dibuka: perbarui token akses lebih awal bila hampir
+  /// kedaluwarsa. Melempar `UnauthenticatedFailure` bila sesi berakhir.
+  Future<void> resume() async {}
+
   Future<UserProfile> fetchMe();
 
+  /// Cabut token di server. Token di perangkat dihapus oleh pemanggil walau
+  /// server tidak terjangkau.
   Future<void> logout();
 }

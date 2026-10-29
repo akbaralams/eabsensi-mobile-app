@@ -39,6 +39,16 @@ dart run tool/generate_api.dart       # api/openapi.yaml -> packages/eabsensi_ap
 - Lapisan tipis di atasnya: `lib/core/api/api_client.dart` (header `Accept`/`Authorization`, timeout sambung 10 dtk dan kirim/terima 60 dtk, refresh token sekali saat 401, pemetaan galat ke `ApiFailure`), `lib/core/api/mappers.dart` (model hasil generator ke model domain; UI tidak menyentuh model hasil generator).
 `flutter analyze`, `dart format .`, dan `flutter test` harus bersih sebelum commit.
 
+### Uji terhadap backend sungguhan
+`test/live/` memanggil repository nyata ke backend yang sedang berjalan (data uji dari `tests/contract/fixtures.sql` di repo API). Dilewati tanpa `LIVE_API`, jadi `flutter test` biasa tetap tanpa jaringan.
+```bash
+flutter test test/live --dart-define=LIVE_API=http://127.0.0.1:8080/api        # Rust
+flutter test test/live --dart-define=LIVE_API=http://127.0.0.1:8000/api        # Laravel (fallback v1)
+flutter test test/live/live_auth_test.dart --dart-define=LIVE_API=http://127.0.0.1:8081/api \
+            --dart-define=LIVE_SLOW=true   # Rust dengan MOBILE_ACCESS_TOKEN_TTL_MINUTES=2: refresh diam-diam setelah 3 menit
+```
+Batas login 5/menit per akun: jalankan file satu per satu bila muncul 429.
+
 ## Keputusan teknis
 - **State management: Riverpod** (`flutter_riverpod` 3). Dependensi (repository, layanan lokasi, jam) disuntikkan lewat provider sehingga mock dan implementasi nyata bisa ditukar dan di-override di test tanpa mengubah UI.
 - **Routing: `go_router`**. Redirect berbasis sesi (belum login ke `/login`, token dicabut kembali ke login) dan `StatefulShellRoute` untuk navigasi bawah.
