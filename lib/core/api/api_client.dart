@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:eabsensi_api/eabsensi_api.dart';
 import 'package:flutter/foundation.dart';
@@ -17,7 +19,7 @@ typedef ApiResult<R> = TonikResult<R, RawResponse>;
 /// pemetaan galat ke [ApiFailure]. UI tidak menyentuh model hasil generator.
 class ApiClient {
   ApiClient({
-    required String baseUrl,
+    required this.baseUrl,
     required this.tokens,
     HttpClientAdapter? adapter,
   }) : dio = Dio(
@@ -42,6 +44,7 @@ class ApiClient {
     refresher = TokenRefresher(tokens, _exchange);
   }
 
+  final String baseUrl;
   final Dio dio;
   final TokenStore tokens;
   late final AuthApi auth;
@@ -68,6 +71,52 @@ class ApiClient {
     }
     return unwrapResult(result, onSuccess);
   }
+
+  /// `POST` multipart tanpa bagian apa pun (bukti kosong: foto tidak wajib dan
+  /// izin lokasi ditolak), sah menurut kontrak. Client hasil generator (Tonik
+  /// 0.11) menolak body multipart kosong, jadi request ini dikirim lewat Dio
+  /// yang sama; respons tetap di-decode dengan model hasil generator.
+  Future<T> postEmptyMultipart<T extends Object>(
+    String path, {
+    required int successStatus,
+    required T Function(Object? json) decode,
+  }) => send<T, T>(() async {
+    final RawResponse response;
+    try {
+      response = await dio.post<List<int>>(
+        '$baseUrl$path',
+        data: FormData(),
+        options: Options(
+          responseType: ResponseType.bytes,
+          validateStatus: (_) => true,
+        ),
+      );
+    } on DioException catch (e, st) {
+      return TonikError<T, RawResponse>(
+        e,
+        stackTrace: st,
+        type: TonikErrorType.network,
+        response: e.response,
+      );
+    }
+    try {
+      if (response.statusCode != successStatus) {
+        throw StateError('status ${response.statusCode}');
+      }
+      final bytes = response.data! as List<int>;
+      return TonikSuccess<T, RawResponse>(
+        decode(jsonDecode(utf8.decode(bytes))),
+        response,
+      );
+    } on Object catch (e, st) {
+      return TonikError<T, RawResponse>(
+        e,
+        stackTrace: st,
+        type: TonikErrorType.decoding,
+        response: response,
+      );
+    }
+  }, (value) => value);
 
   Future<AuthTokens> _exchange(String refreshToken) => send(
     () => auth.refreshToken(body: RefreshRequest(refreshToken: refreshToken)),

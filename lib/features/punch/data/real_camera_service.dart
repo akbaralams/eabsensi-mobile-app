@@ -227,6 +227,8 @@ class _RealCameraSession implements CameraSession {
     }
   }
 
+  static const _maxShortSide = 480;
+
   @override
   Future<String> capture() async {
     await _stopDetection();
@@ -239,7 +241,10 @@ class _RealCameraSession implements CameraSession {
     }
   }
 
-  /// JPEG kualitas 70 (menjaga ukuran di bawah batas 4 MB kontrak).
+  /// Satu-satunya kompresi sebelum unggah: JPEG kualitas 80, sisi pendek
+  /// paling banyak [_maxShortSide] px (pratinjau `medium` ≈ 480x720 potret,
+  /// jadi sisi terpanjang ±720 px). Target ±50-100 KB, jauh di bawah batas
+  /// 4 MB kontrak; ukuran yang terkirim tercatat di log debug.
   static Future<String> _compress(String raw) async {
     final dot = raw.lastIndexOf('.');
     final target = '${dot < 0 ? raw : raw.substring(0, dot)}_c.jpg';
@@ -247,7 +252,11 @@ class _RealCameraSession implements CameraSession {
       final out = await FlutterImageCompress.compressAndGetFile(
         raw,
         target,
-        quality: 70,
+        quality: 80,
+        // Plugin memperkecil hingga kedua sisi >= nilai ini (rasio tetap):
+        // sisi pendek jadi 480 bila kamera memberi gambar lebih besar.
+        minWidth: _maxShortSide,
+        minHeight: _maxShortSide,
       );
       if (out == null) return raw;
       try {

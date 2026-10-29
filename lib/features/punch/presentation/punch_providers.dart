@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/api/api_providers.dart';
 import '../../../core/clock/clock.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/geo/geo.dart';
@@ -9,6 +10,7 @@ import '../../../core/mock/mock_env.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../../events/domain/event_item.dart';
 import '../../events/presentation/event_providers.dart';
+import '../data/api_punch_repository.dart';
 import '../data/fake_location_service.dart';
 import '../data/real_camera_service.dart';
 import '../data/geolocator_location_service.dart';
@@ -19,7 +21,7 @@ import '../domain/punch.dart';
 
 final punchRepositoryProvider = Provider<PunchRepository>((ref) {
   if (AppConfig.useMock) return MockPunchRepository(ref.watch(mockEnvProvider));
-  throw UnimplementedError('Client API nyata belum tersedia (Task 3).');
+  return ApiPunchRepository(ref.watch(apiClientProvider));
 });
 
 final locationServiceProvider = Provider<LocationService>((ref) {
@@ -39,7 +41,7 @@ final officeAreaProvider = Provider<OfficeArea?>(
   (ref) => AppConfig.useMock ? FakeLocationService.office : null,
 );
 
-/// Punch hari ini dari server (terlama dulu).
+/// Punch hari ini (tanggal zona bisnis) dari server, terlama dulu.
 final todayPunchesProvider = FutureProvider.autoDispose<List<Punch>>((ref) {
   final today = ref.watch(clockProvider)();
   return withSession(

@@ -99,7 +99,7 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
   - Laravel lokal (`eabsensi-v2` 16d9f68, `:8000`): login lewat fallback v1 (v2 dibalas 404), pesan galat sama, token dicabut -> sesi berakhir. Lulus.
   - Pencabutan token diuji dengan login ulang `device_name` yang sama (mencabut pasangan lama). **Belum**: ubah sandi/nonaktifkan akun dari web dan alur layar di emulator/HP (lihat API-8).
 
-## [ ] API-3. Punch dan riwayat hari ini
+## [x] API-3. Punch dan riwayat hari ini
 
 - `PunchRepository` nyata:
   - `POST /api/punches` multipart: `photo` berkas, `latitude`/`longitude` berpasangan, `accuracy` bilangan bulat meter. Tanpa field waktu.
@@ -113,6 +113,8 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
   - `kontrak.pegawai-nonaktif` menampilkan "Pegawai tidak aktif.";
   - mode pesawat menampilkan layar galat offline;
   - ukuran foto terkirim tercatat di log debug.
+- **Verifikasi (30 Okt 2026, `test/live/live_punch_test.dart` terhadap Rust lokal `:8081`):** punch `kontrak` 201 `pending` dengan foto; berkas foto tersimpan identik di `eabsensi-v2/storage/app/private/mobile-punches/...` beserta lat/long/akurasi; punch kedua menampilkan "Tunggu 60 detik sebelum melakukan punch lagi."; `kontrak.pegawai-nonaktif` menampilkan "Pegawai tidak aktif."; `GET /punches?date=` memuat punch itu dengan jam zona bisnis; log debug mencatat ukuran foto (`Foto bukti terkirim: 19.9 KB`, `[photo=19.9 KB]`). Bukti kosong (foto tidak wajib + lokasi ditolak) tetap terkirim (Tonik menolak multipart kosong; `ApiClient.postEmptyMultipart`).
+  - **Belum**: melihat foto di halaman Persetujuan punch web, mode pesawat di HP, dan ukuran hasil kompresi kamera sungguhan (JPEG 80, sisi pendek maks 480) di perangkat.
 
 ## [ ] API-4. Event (upacara)
 
