@@ -31,7 +31,7 @@ class StaticMenuRepository implements MenuRepository {
       icon: 'firstAid',
       tone: MenuTone.amber,
       isActive: true,
-      action: LeaveFormAction(category: 'izin', typeCode: 'I-SAKIT'),
+      action: LeaveFormAction(category: 'izin', typeCode: 'SAKIT'),
       sort: 3,
     ),
     MenuItemData(

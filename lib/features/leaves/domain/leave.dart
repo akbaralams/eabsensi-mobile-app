@@ -2,25 +2,29 @@ import 'package:flutter/foundation.dart';
 
 enum LeaveStatus { pending, approved, rejected, cancelled }
 
-/// Pengelompokan tampilan jenis cuti. Kontrak belum punya field kategori, jadi
-/// pengelompokan memakai awalan `code` (lihat docs/design/DEVIATIONS.md).
+/// Pengelompokan tampilan jenis cuti. Kontrak belum punya field kategori di
+/// `types[]` (diusulkan ke repo API), jadi kode jenis bawaan dipetakan di satu
+/// tempat ini: `CUTI` -> Cuti, `IZIN` dan `SAKIT` -> Izin, `DINAS` -> Dinas
+/// Luar, kode lain -> Lainnya (lihat docs/design/DEVIATIONS.md).
 enum LeaveCategory {
-  cuti('Cuti', 'C-'),
-  izin('Izin', 'I-'),
-  dinas('Dinas Luar', 'D-'),
-  lainnya('Lainnya', '');
+  cuti('Cuti'),
+  izin('Izin'),
+  dinas('Dinas Luar'),
+  lainnya('Lainnya');
 
-  const LeaveCategory(this.label, this.codePrefix);
+  const LeaveCategory(this.label);
 
   final String label;
-  final String codePrefix;
 
-  static LeaveCategory forCode(String code) {
-    for (final c in values) {
-      if (c.codePrefix.isNotEmpty && code.startsWith(c.codePrefix)) return c;
-    }
-    return lainnya;
-  }
+  static const _byCode = {
+    'CUTI': cuti,
+    'IZIN': izin,
+    'SAKIT': izin,
+    'DINAS': dinas,
+  };
+
+  static LeaveCategory forCode(String code) =>
+      _byCode[code.trim().toUpperCase()] ?? lainnya;
 
   static LeaveCategory byName(String? name) =>
       values.firstWhere((c) => c.name == name, orElse: () => cuti);

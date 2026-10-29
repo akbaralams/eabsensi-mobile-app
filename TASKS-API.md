@@ -126,7 +126,7 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
 - **Verifikasi (30 Okt 2026, `test/live/live_event_test.dart` terhadap Rust lokal `:8081`, fixture dimuat ulang):** "Apel Kontrak" terlihat (event department lain tidak), check-in 201 lalu `checked_in` menjadi `true`, check-in kedua menampilkan "Anda sudah check-in di event ini.", event tidak ada -> 404. Check-in 404 di aplikasi: layar "Event tidak tersedia", daftar event dimuat ulang (test widget).
   - **Belum**: pesan di luar jam terhadap server (fixture tidak punya event dengan jam sempit; jalur pesan aturan apa adanya sama dengan check-in kedua dan diuji dengan data dummy).
 
-## [ ] API-5. Cuti
+## [x] API-5. Cuti
 
 - `LeaveRepository` nyata:
   - `GET /api/leaves`: `data` + `types`, urut tanggal mulai terbaru;
@@ -138,6 +138,8 @@ File ini menggantikan **Task 3** di [TASKS.md](TASKS.md) dan bagian "diuji terha
   - rentang > 62 hari menampilkan "Rentang cuti maksimal 62 hari.";
   - tumpang tindih menampilkan "Pegawai sudah punya pengajuan yang menunggu atau disetujui pada tanggal tersebut.";
   - keempat jenis bawaan masuk kategori yang benar.
+- **Verifikasi (30 Okt 2026, `test/live/live_leave_test.dart` terhadap Rust lokal `:8081`):** `types` server `CUTI=cuti, DINAS=dinas, IZIN=izin, SAKIT=izin`; pengajuan `kontrak` 201 berstatus `pending` ("Menunggu") dan muncul di `GET /leaves`; tumpang tindih dan rentang > 62 hari menampilkan pesan kontrak apa adanya. Menu Sakit membuka jenis `SAKIT` (test widget).
+  - **Belum**: melihat pengajuan di halaman cuti web.
 
 ## [ ] API-6. Riwayat
 
