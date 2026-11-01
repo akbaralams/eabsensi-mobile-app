@@ -1,4 +1,6 @@
 import 'package:eabsensi/core/design/design.dart';
+import 'package:eabsensi/features/home/presentation/home_page.dart';
+import 'package:eabsensi/features/home/presentation/status_card.dart';
 import 'package:eabsensi/features/menus/data/static_menu_repository.dart';
 import 'package:eabsensi/features/menus/domain/menu_item.dart';
 import 'package:eabsensi/features/menus/presentation/menu_providers.dart';
@@ -18,9 +20,20 @@ void main() {
     expect(find.byKey(const Key('hero-clock')), findsOneWidget);
     expect(find.text('09:41'), findsOneWidget);
     expect(find.text('Belum Check In'), findsOneWidget);
-    expect(find.text('Belum absen'), findsOneWidget);
+    expect(find.text('Belum Absen'), findsOneWidget);
     expect(find.text('Status Kehadiran Hari Ini'), findsOneWidget);
-    expect(find.text('0j 0m'), findsOneWidget);
+    final card = find.byType(AttendanceStatusCard);
+    for (final label in ['Masuk', 'Keluar', 'Durasi']) {
+      expect(
+        find.descendant(of: card, matching: find.text(label)),
+        findsOneWidget,
+      );
+    }
+    // Belum ada punch: tiga sel kosong, bukan "0j 0m".
+    expect(
+      find.descendant(of: card, matching: find.text('-')),
+      findsNWidgets(3),
+    );
     expect(find.text('Kantor Pusat'), findsOneWidget);
   });
 
@@ -39,10 +52,12 @@ void main() {
     );
     handle.dispose();
 
+    await tester.ensureVisible(find.text('Lembur'));
+    await settle(tester);
     await tester.tap(find.text('Lembur'), warnIfMissed: false);
     await settle(tester);
     expect(find.text('Lembur segera tersedia'), findsNothing);
-    expect(find.text('Selamat pagi,'), findsOneWidget);
+    expect(find.byType(HomePage), findsOneWidget);
   });
 
   testWidgets('menu nonaktif mode sembunyi: tidak muncul', (tester) async {
@@ -104,12 +119,15 @@ void main() {
   ) async {
     await pumpApp(tester);
     await tester.scrollUntilVisible(
-      find.text('3 menunggu persetujuanmu'),
+      find.text('Menunggu Persetujuan'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(find.textContaining('Apel Kontrak · 00.00'), findsOneWidget);
-    expect(find.text('3 menunggu persetujuanmu'), findsOneWidget);
+    expect(find.text('Apel Kontrak'), findsOneWidget);
+    expect(find.text('3 event hari ini'), findsOneWidget);
+    expect(find.text('00.00 – 23.59'), findsOneWidget);
+    expect(find.text('Foto wajib'), findsOneWidget);
+    expect(find.text('Menunggu Persetujuan'), findsOneWidget);
   });
 
   testWidgets('mode gelap: tema gelap dipakai di beranda', (tester) async {

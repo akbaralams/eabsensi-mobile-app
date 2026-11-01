@@ -91,13 +91,7 @@ void main() {
       tester,
     ) async {
       await pumpApp(tester);
-      await tester.scrollUntilVisible(
-        find.text('3 menunggu persetujuanmu'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(find.text('3 menunggu persetujuanmu'));
-      await settle(tester);
+      await openApprovalsFromHome(tester);
       expect(find.text('Rina Maharani'), findsOneWidget);
 
       await tester.tap(

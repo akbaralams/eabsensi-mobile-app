@@ -1,5 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
+import '../../../core/design/phosphor.dart';
 import '../../../core/design/widgets/menu_tile.dart';
 
 @immutable
@@ -19,11 +20,24 @@ class AppNotification {
   final bool read;
 }
 
+/// Kelompok persetujuan di kartu beranda. Belum ada di kontrak API; usulannya
+/// di docs/usulan-kontrak-api.md.
+enum ApprovalCategory {
+  outOfArea('Absensi di luar area', PhosphorIconsRegular.mapPin),
+  teamLeave('Cuti tim', PhosphorIconsRegular.airplaneTilt);
+
+  const ApprovalCategory(this.label, this.icon);
+
+  final String label;
+  final IconData icon;
+}
+
 @immutable
 class ApprovalRequest {
   const ApprovalRequest({
     required this.id,
     required this.kind,
+    required this.category,
     required this.requester,
     required this.detail,
     required this.whenLabel,
@@ -33,6 +47,7 @@ class ApprovalRequest {
 
   /// mis. "Absen di luar area", "Cuti Tahunan".
   final String kind;
+  final ApprovalCategory category;
   final String requester;
   final String detail;
   final String whenLabel;

@@ -64,6 +64,12 @@ abstract final class PhosphorIconsRegular {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
+  static const camera = IconData(
+    0xe10e,
+    fontFamily: 'PhosphorRegular',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
   static const caretDown = IconData(
     0xe136,
     fontFamily: 'PhosphorRegular',
@@ -396,6 +402,12 @@ abstract final class PhosphorIconsFill {
 abstract final class PhosphorIconsBold {
   static const arrowRight = IconData(
     0xe06c,
+    fontFamily: 'PhosphorBold',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
+  static const caretRight = IconData(
+    0xe13a,
     fontFamily: 'PhosphorBold',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,

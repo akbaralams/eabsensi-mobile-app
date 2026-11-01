@@ -89,3 +89,27 @@ Future<ProviderContainer> pumpApp(
 
 Future<void> settle(WidgetTester tester) =>
     tester.pumpAndSettle(const Duration(milliseconds: 50));
+
+/// Mengetuk menu beranda: digulir ke atas layar dulu, karena baris kedua grid
+/// bisa tertutup navigasi bawah pada layar pendek.
+Future<void> tapMenu(WidgetTester tester, String label) async {
+  await tester.ensureVisible(find.text(label));
+  await settle(tester);
+  await tester.tap(find.text(label));
+  await settle(tester);
+}
+
+/// Menggulir beranda ke kartu persetujuan (di bawah navigasi bila tidak
+/// digulir lebih jauh) lalu mengetuknya.
+Future<void> openApprovalsFromHome(WidgetTester tester) async {
+  final card = find.text('Menunggu Persetujuan');
+  await tester.scrollUntilVisible(
+    card,
+    200,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
+  await settle(tester);
+  await tester.tap(card);
+  await settle(tester);
+}
