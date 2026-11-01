@@ -258,13 +258,7 @@ void main() {
   group('persetujuan: konfirmasi dan urungkan', () {
     Future<void> open(WidgetTester t) async {
       await pumpApp(t);
-      await t.scrollUntilVisible(
-        find.text('3 menunggu persetujuanmu'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await t.tap(find.text('3 menunggu persetujuanmu'));
-      await settle(t);
+      await openApprovalsFromHome(t);
     }
 
     testWidgets('Tolak meminta konfirmasi; Batal tidak mengubah apa pun', (
@@ -333,8 +327,7 @@ void main() {
 
   testWidgets('event: hanya satu tombol utama', (t) async {
     await pumpApp(t);
-    await t.tap(find.text('Upacara'));
-    await settle(t);
+    await tapMenu(t, 'Upacara');
     expect(find.widgetWithText(PrimaryButton, 'Check-in'), findsOneWidget);
     expect(find.widgetWithText(OutlineButton, 'Check-in'), findsOneWidget);
   });

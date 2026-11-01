@@ -11,6 +11,7 @@ class MockInboxRepository implements InboxRepository {
     const ApprovalRequest(
       id: 1,
       kind: 'Absen di luar area',
+      category: ApprovalCategory.outOfArea,
       requester: 'Rina Maharani',
       detail: 'Check In 08:02 · Lokasi 420 m dari kantor',
       whenLabel: '10 menit lalu',
@@ -18,6 +19,7 @@ class MockInboxRepository implements InboxRepository {
     const ApprovalRequest(
       id: 2,
       kind: 'Cuti Tahunan',
+      category: ApprovalCategory.teamLeave,
       requester: 'Budi Santoso',
       detail: '3 hari · 9-11 November 2026',
       whenLabel: '1 jam lalu',
@@ -25,6 +27,7 @@ class MockInboxRepository implements InboxRepository {
     const ApprovalRequest(
       id: 3,
       kind: 'Izin Keperluan Pribadi',
+      category: ApprovalCategory.teamLeave,
       requester: 'Dewi Lestari',
       detail: '1 hari · 28 Oktober 2026',
       whenLabel: 'Kemarin',

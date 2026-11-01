@@ -1,5 +1,6 @@
 import 'package:eabsensi/core/mock/mock_env.dart';
 import 'package:eabsensi/features/punch/presentation/punch_providers.dart';
+import 'package:eabsensi/features/home/presentation/status_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,7 +68,15 @@ void main() {
       expect(find.text('Disetujui'), findsOneWidget);
       await tester.tap(find.text('Kembali ke Beranda'));
       await settle(tester);
-      expect(find.text('Sudah Check In'), findsOneWidget);
+      // Chip di kartu absen dan di kartu Status Kehadiran.
+      expect(find.text('Sudah Check In'), findsNWidgets(2));
+      expect(
+        find.descendant(
+          of: find.byType(AttendanceStatusCard),
+          matching: find.text('Sudah Check In'),
+        ),
+        findsOneWidget,
+      );
     },
   );
 

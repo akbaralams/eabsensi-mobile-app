@@ -1,4 +1,10 @@
 import 'package:eabsensi/core/design/design.dart';
+import 'package:eabsensi/features/events/domain/event_item.dart';
+import 'package:eabsensi/features/home/presentation/approval_card.dart';
+import 'package:eabsensi/features/home/presentation/attendance_summary.dart';
+import 'package:eabsensi/features/home/presentation/event_card.dart';
+import 'package:eabsensi/features/home/presentation/status_card.dart';
+import 'package:eabsensi/features/inbox/domain/inbox.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -211,9 +217,109 @@ void main() {
                 enabled: false,
                 onTap: null,
               ),
+              MenuTile(
+                icon: PhosphorIconsRegular.graduationCap,
+                label: 'Tugas Belajar',
+                tone: MenuTone.teal,
+                onTap: () {},
+              ),
             ],
           ),
         ),
+      ],
+    );
+  });
+
+  goldenGroup('status-kehadiran', 1150, () {
+    final now = DateTime(2026, 10, 26, 10, 12);
+    final checkIn = DateTime(2026, 10, 26, 7, 58);
+    final checkOut = DateTime(2026, 10, 26, 16, 5);
+    Widget card(AttendanceSummary s, {String? place}) =>
+        AttendanceStatusCard(summary: s, now: now, locationName: place);
+    return Column(
+      children: [
+        card(
+          const AttendanceSummary(phase: DayPhase.none),
+          place: 'Kantor Pusat',
+        ),
+        _gap(),
+        card(
+          AttendanceSummary(
+            phase: DayPhase.checkedIn,
+            checkIn: checkIn,
+            count: 1,
+          ),
+          place: 'Kantor Pusat',
+        ),
+        _gap(),
+        card(
+          AttendanceSummary(
+            phase: DayPhase.checkedOut,
+            checkIn: checkIn,
+            checkOut: checkOut,
+            count: 2,
+          ),
+        ),
+        _gap(),
+        card(
+          AttendanceSummary(
+            phase: DayPhase.pending,
+            checkIn: checkIn,
+            hasPending: true,
+            count: 1,
+          ),
+        ),
+        _gap(),
+        card(
+          AttendanceSummary(
+            phase: DayPhase.checkedIn,
+            checkIn: DateTime(2026, 10, 26, 8, 41),
+            count: 1,
+            flag: AttendanceFlag.late,
+          ),
+        ),
+        _gap(),
+        card(
+          const AttendanceSummary(
+            phase: DayPhase.none,
+            flag: AttendanceFlag.absent,
+          ),
+        ),
+      ],
+    );
+  });
+
+  goldenGroup('kartu-event-persetujuan', 760, () {
+    final event = EventItem(
+      id: 1,
+      name: 'Apel Kontrak',
+      eventDate: DateTime(2026, 10, 26),
+      startsAt: '07:00',
+      endsAt: '09:00',
+      checkedIn: false,
+    );
+    ApprovalRequest req(int id, ApprovalCategory c) => ApprovalRequest(
+      id: id,
+      kind: 'x',
+      category: c,
+      requester: 'x',
+      detail: 'x',
+      whenLabel: 'x',
+    );
+    return Column(
+      children: [
+        EventCard(event: event, total: 3, requiresPhoto: true, onTap: () {}),
+        _gap(),
+        ApprovalCard(
+          approvals: [
+            req(1, ApprovalCategory.outOfArea),
+            req(2, ApprovalCategory.teamLeave),
+            req(3, ApprovalCategory.teamLeave),
+          ],
+          onTap: () {},
+        ),
+        _gap(),
+        ApprovalCard(approvals: const [], onTap: () {}),
       ],
     );
   });

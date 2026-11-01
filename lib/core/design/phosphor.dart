@@ -64,6 +64,12 @@ abstract final class PhosphorIconsRegular {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
+  static const camera = IconData(
+    0xe10e,
+    fontFamily: 'PhosphorRegular',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
   static const cameraRotate = IconData(
     0xe7a4,
     fontFamily: 'PhosphorRegular',

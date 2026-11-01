@@ -13,7 +13,10 @@ import '../../menus/domain/menu_item.dart';
 import '../../menus/presentation/menu_providers.dart';
 import '../../punch/presentation/punch_providers.dart';
 import 'attendance_card.dart';
+import 'approval_card.dart';
 import 'attendance_summary.dart';
+import 'event_card.dart';
+import 'status_card.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -86,16 +89,17 @@ class HomePage extends ConsumerWidget {
           ),
           if (nextEvent != null) ...[
             const SizedBox(height: AppSpace.block),
-            _EventBanner(
+            EventCard(
               event: nextEvent,
               total: events.length,
+              requiresPhoto: profile?.requiresPhoto ?? false,
               onTap: () => context.push('/events'),
             ),
           ],
-          if (profile?.isSupervisor ?? false) ...[
+          if ((profile?.isSupervisor ?? false) && approvals != null) ...[
             const SizedBox(height: AppSpace.block),
-            _ApprovalCard(
-              count: approvals?.length ?? 0,
+            ApprovalCard(
+              approvals: approvals,
               onTap: () => context.push('/approvals'),
             ),
           ],
@@ -201,128 +205,6 @@ class _LoadError extends StatelessWidget {
   }
 }
 
-class StatusCard extends ConsumerWidget {
-  const StatusCard({required this.summary, super.key});
-
-  final AttendanceSummary summary;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.colors;
-    final now = ref
-        .watch(tickingClockProvider)
-        .maybeWhen(data: (d) => d, orElse: () => ref.read(clockProvider)());
-    final office = ref.watch(officeAreaProvider);
-    final (label, variant) = switch (summary.phase) {
-      DayPhase.none => ('Belum absen', StatusVariant.neutral),
-      DayPhase.pending => ('Menunggu', StatusVariant.pending),
-      _ when summary.hasPending => ('Menunggu', StatusVariant.pending),
-      _ => ('Hadir', StatusVariant.success),
-    };
-    final d = summary.workDuration(now);
-    final work = '${d.inHours}j ${d.inMinutes % 60}m';
-    return AppCard(
-      secondary: true,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Semantics(
-                  header: true,
-                  child: Text(
-                    'Status Kehadiran Hari Ini',
-                    style: AppType.cardTitle.copyWith(color: c.textPrimary),
-                  ),
-                ),
-              ),
-              StatusChip(label: label, variant: variant),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _InfoCell(
-                  icon: PhosphorIconsRegular.timer,
-                  tint: c.amberTint,
-                  iconColor: c.amberIcon,
-                  label: 'Jam Kerja',
-                  value: work,
-                ),
-              ),
-              Expanded(
-                child: _InfoCell(
-                  icon: PhosphorIconsFill.mapPin,
-                  tint: c.mintTint,
-                  iconColor: c.accent,
-                  label: 'Lokasi',
-                  value: office?.name ?? '-',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoCell extends StatelessWidget {
-  const _InfoCell({
-    required this.icon,
-    required this.tint,
-    required this.iconColor,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final Color tint;
-  final Color iconColor;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Semantics(
-      label: '$label $value',
-      excludeSemantics: true,
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
-            child: Center(
-              child: PhosphorIcon(icon, size: 18, color: iconColor),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: AppType.caption.copyWith(color: c.textMuted),
-                ),
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppType.bodyBold.copyWith(color: c.textPrimary),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _MenuGrid extends ConsumerWidget {
   const _MenuGrid();
 
@@ -367,142 +249,5 @@ class _MenuGrid extends ConsumerWidget {
       case ComingSoonAction():
         AppToast.show(context, '${item.label} segera tersedia');
     }
-  }
-}
-
-class _EventBanner extends StatelessWidget {
-  const _EventBanner({
-    required this.event,
-    required this.total,
-    required this.onTap,
-  });
-
-  final EventItem event;
-  final int total;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    final start = event.startsAt.replaceFirst(':', '.');
-    return Semantics(
-      button: true,
-      label: '${event.name}, $start. Buka daftar event hari ini',
-      excludeSemantics: true,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              gradient: c.bannerGradient,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: c.surface,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: PhosphorIcon(
-                      PhosphorIconsRegular.flag,
-                      size: 22,
-                      color: c.accent,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${event.name} · $start',
-                        style: AppType.bodyBold.copyWith(
-                          color: c.textPrimary,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        '$total event hari ini · check-in dengan foto dan lokasi',
-                        style: AppType.caption.copyWith(color: c.textSecondary),
-                      ),
-                    ],
-                  ),
-                ),
-                PhosphorIcon(
-                  PhosphorIconsRegular.caretRight,
-                  size: 18,
-                  color: c.textSecondary,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ApprovalCard extends StatelessWidget {
-  const _ApprovalCard({required this.count, required this.onTap});
-
-  final int count;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return AppCard(
-      secondary: true,
-      onTap: onTap,
-      semanticLabel: '$count menunggu persetujuanmu. Buka persetujuan tim',
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: c.amberTint,
-              borderRadius: BorderRadius.circular(AppRadius.iconBox),
-            ),
-            child: Center(
-              child: PhosphorIcon(
-                PhosphorIconsRegular.stamp,
-                size: 22,
-                color: c.amberIcon,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$count menunggu persetujuanmu',
-                  style: AppType.cardTitle.copyWith(color: c.textPrimary),
-                ),
-                Text(
-                  'Absen di luar area & cuti tim',
-                  style: AppType.caption.copyWith(color: c.textMuted),
-                ),
-              ],
-            ),
-          ),
-          PhosphorIcon(
-            PhosphorIconsRegular.caretRight,
-            size: 18,
-            color: c.textMuted,
-          ),
-        ],
-      ),
-    );
   }
 }
