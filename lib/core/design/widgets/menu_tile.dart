@@ -6,14 +6,26 @@ import '../tokens.dart';
 
 enum MenuTone { mint, teal, amber }
 
-/// Tinggi sel grid menu; ikut membesar bersama ukuran teks sistem.
-double menuTileExtent(BuildContext context) {
-  final scale = MediaQuery.textScalerOf(context).scale(11) / 11;
-  return 104 + 34 * (scale < 1 ? 0 : scale - 1);
+const double _iconBox = 44;
+const double _padTop = 12;
+const double _padBottom = 8;
+const double _gap = 8;
+
+/// Tinggi area label: selalu dua baris (mengikuti ukuran teks sistem) supaya
+/// ikon semua tile sejajar walau labelnya satu atau dua baris.
+double _labelHeight(BuildContext context) {
+  final size = AppType.micro.fontSize ?? 11;
+  return MediaQuery.textScalerOf(context).scale(size) * 1.25 * 2;
 }
 
-/// Tile menu beranda. Nonaktif = abu-abu, gembok, tidak bisa ditekan, dan
-/// dibaca "nonaktif" oleh screen reader.
+/// Tinggi sel grid menu; ikut membesar bersama ukuran teks sistem.
+double menuTileExtent(BuildContext context) =>
+    _padTop + _iconBox + _gap + _labelHeight(context) + _padBottom;
+
+/// Tile menu beranda dengan ukuran, padding, dan ikon yang sama untuk semua.
+/// Nonaktif: ikon diredupkan dan abu-abu, label memakai warna redup yang tetap
+/// terbaca, gembok di sudut kotak ikon, tidak bisa ditekan, dan dibaca
+/// "nonaktif" oleh screen reader (status tidak hanya lewat warna).
 class MenuTile extends StatelessWidget {
   const MenuTile({
     required this.icon,
@@ -47,72 +59,67 @@ class MenuTile extends StatelessWidget {
     };
     final radius = BorderRadius.circular(AppRadius.tile);
 
-    Widget content = Container(
-      constraints: const BoxConstraints(minHeight: 92),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+    Widget box = Container(
+      width: _iconBox,
+      height: _iconBox,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(AppRadius.iconBox),
+      ),
+      child: Center(child: PhosphorIcon(icon, size: 22, color: fg)),
+    );
+    if (!enabled) {
+      box = Opacity(
+        opacity: .55,
+        child: ColorFiltered(colorFilter: _grayscale, child: box),
+      );
+      box = Stack(
+        clipBehavior: Clip.none,
+        children: [
+          box,
+          Positioned(right: -5, bottom: -5, child: _LockBadge(colors: c)),
+        ],
+      );
+    }
+
+    final content = Container(
+      padding: const EdgeInsets.fromLTRB(4, _padTop, 4, _padBottom),
       decoration: BoxDecoration(
         color: c.surface,
         borderRadius: radius,
         boxShadow: c.tileShadow,
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(AppRadius.iconBox),
+          box,
+          const SizedBox(height: _gap),
+          SizedBox(
+            height: _labelHeight(context),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppType.micro.copyWith(
+                  height: 1.25,
+                  color: enabled ? c.textPrimary : c.textMuted,
+                ),
+              ),
             ),
-            child: Center(child: PhosphorIcon(icon, size: 22, color: fg)),
-          ),
-          const SizedBox(height: 7),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: AppType.micro.copyWith(color: c.textPrimary),
           ),
         ],
       ),
     );
 
     if (!enabled) {
-      content = Opacity(
-        opacity: .5,
-        child: ColorFiltered(colorFilter: _grayscale, child: content),
-      );
       return Semantics(
         label: '$label, nonaktif',
         enabled: false,
         button: true,
         excludeSemantics: true,
-        child: Stack(
-          children: [
-            content,
-            Positioned(
-              top: 6,
-              right: 6,
-              child: Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: c.textMuted,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: PhosphorIcon(
-                    PhosphorIconsFill.lock,
-                    size: 11,
-                    color: c.surface,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        child: content,
       );
     }
 
@@ -123,6 +130,32 @@ class MenuTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(borderRadius: radius, onTap: onTap, child: content),
+      ),
+    );
+  }
+}
+
+class _LockBadge extends StatelessWidget {
+  const _LockBadge({required this.colors});
+
+  final AppColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 20,
+      height: 20,
+      decoration: BoxDecoration(
+        color: colors.textMuted,
+        shape: BoxShape.circle,
+        border: Border.all(color: colors.surface, width: 2),
+      ),
+      child: Center(
+        child: PhosphorIcon(
+          PhosphorIconsFill.lock,
+          size: 10,
+          color: colors.surface,
+        ),
       ),
     );
   }

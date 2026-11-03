@@ -212,11 +212,15 @@ void main() {
       );
     });
 
-    test('kategori dari kode jenis', () {
-      expect(LeaveCategory.forCode('C-BESAR'), LeaveCategory.cuti);
-      expect(LeaveCategory.forCode('I-SAKIT'), LeaveCategory.izin);
-      expect(LeaveCategory.forCode('D-LUAR'), LeaveCategory.dinas);
-      expect(LeaveCategory.forCode('X-LAIN'), LeaveCategory.lainnya);
+    test('kategori dari kode jenis bawaan server', () {
+      expect(LeaveCategory.forCode('CUTI'), LeaveCategory.cuti);
+      expect(LeaveCategory.forCode('IZIN'), LeaveCategory.izin);
+      expect(LeaveCategory.forCode('SAKIT'), LeaveCategory.izin);
+      expect(LeaveCategory.forCode('DINAS'), LeaveCategory.dinas);
+      expect(LeaveCategory.forCode(' cuti '), LeaveCategory.cuti);
+      expect(LeaveCategory.forCode('TB'), LeaveCategory.lainnya);
+      // Awalan lama tidak dipakai server.
+      expect(LeaveCategory.forCode('C-TAHUNAN'), LeaveCategory.lainnya);
     });
   });
 }

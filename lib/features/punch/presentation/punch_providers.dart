@@ -2,13 +2,16 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/api/api_providers.dart';
 import '../../../core/clock/clock.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/geo/geo.dart';
 import '../../../core/mock/mock_env.dart';
+import '../../../core/network/api_failure.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../../events/domain/event_item.dart';
 import '../../events/presentation/event_providers.dart';
+import '../data/api_punch_repository.dart';
 import '../data/fake_location_service.dart';
 import '../data/real_camera_service.dart';
 import '../data/geolocator_location_service.dart';
@@ -19,7 +22,7 @@ import '../domain/punch.dart';
 
 final punchRepositoryProvider = Provider<PunchRepository>((ref) {
   if (AppConfig.useMock) return MockPunchRepository(ref.watch(mockEnvProvider));
-  throw UnimplementedError('Client API nyata belum tersedia (Task 3).');
+  return ApiPunchRepository(ref.watch(apiClientProvider));
 });
 
 final locationServiceProvider = Provider<LocationService>((ref) {
@@ -39,7 +42,7 @@ final officeAreaProvider = Provider<OfficeArea?>(
   (ref) => AppConfig.useMock ? FakeLocationService.office : null,
 );
 
-/// Punch hari ini dari server (terlama dulu).
+/// Punch hari ini (tanggal zona bisnis) dari server, terlama dulu.
 final todayPunchesProvider = FutureProvider.autoDispose<List<Punch>>((ref) {
   final today = ref.watch(clockProvider)();
   return withSession(
@@ -116,11 +119,12 @@ class PunchFlowState {
     FlowResult? result,
     Object? failure,
     bool clearFailure = false,
+    bool clearPhoto = false,
   }) => PunchFlowState(
     target: target,
     phase: phase ?? this.phase,
     fix: fix ?? this.fix,
-    photoPath: photoPath ?? this.photoPath,
+    photoPath: clearPhoto ? null : photoPath ?? this.photoPath,
     submitting: submitting ?? this.submitting,
     result: result ?? this.result,
     failure: clearFailure ? null : failure ?? this.failure,
@@ -162,6 +166,13 @@ class PunchFlowController extends Notifier<PunchFlowState> {
 
   void setPhoto(String path) => state = state.copyWith(photoPath: path);
 
+  /// Foto Ulang: buang foto sebelumnya (berkas sementaranya ikut dihapus).
+  Future<void> discardPhoto() async {
+    final path = state.photoPath;
+    state = state.copyWith(clearPhoto: true);
+    await _deletePhoto(path);
+  }
+
   Future<void> submit() async {
     if (state.submitting) return;
     state = state.copyWith(submitting: true, clearFailure: true);
@@ -194,6 +205,10 @@ class PunchFlowController extends Notifier<PunchFlowState> {
       await _deletePhoto(state.photoPath);
       state = state.copyWith(submitting: false, result: result);
     } on Object catch (e) {
+      // Event dihapus/dinonaktifkan sejak daftar dimuat: muat ulang daftar.
+      if (e is NotFoundFailure && state.target is EventTarget) {
+        ref.invalidate(eventsTodayProvider);
+      }
       state = state.copyWith(submitting: false, failure: e);
     }
   }

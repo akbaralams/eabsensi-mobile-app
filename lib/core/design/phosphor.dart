@@ -64,6 +64,18 @@ abstract final class PhosphorIconsRegular {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
+  static const camera = IconData(
+    0xe10e,
+    fontFamily: 'PhosphorRegular',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
+  static const cameraRotate = IconData(
+    0xe7a4,
+    fontFamily: 'PhosphorRegular',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
   static const caretDown = IconData(
     0xe136,
     fontFamily: 'PhosphorRegular',
@@ -156,6 +168,12 @@ abstract final class PhosphorIconsRegular {
   );
   static const flag = IconData(
     0xe244,
+    fontFamily: 'PhosphorRegular',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
+  static const flashlight = IconData(
+    0xe246,
     fontFamily: 'PhosphorRegular',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
@@ -295,6 +313,12 @@ abstract final class PhosphorIconsFill {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
+  static const camera = IconData(
+    0xe10e,
+    fontFamily: 'PhosphorFill',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
   static const checkCircle = IconData(
     0xe184,
     fontFamily: 'PhosphorFill',
@@ -327,6 +351,12 @@ abstract final class PhosphorIconsFill {
   );
   static const files = IconData(
     0xe710,
+    fontFamily: 'PhosphorFill',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
+  static const flashlight = IconData(
+    0xe246,
     fontFamily: 'PhosphorFill',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
@@ -400,6 +430,12 @@ abstract final class PhosphorIconsBold {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
+  static const caretRight = IconData(
+    0xe13a,
+    fontFamily: 'PhosphorBold',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
   static const check = IconData(
     0xe182,
     fontFamily: 'PhosphorBold',
@@ -408,6 +444,12 @@ abstract final class PhosphorIconsBold {
   );
   static const hourglassMedium = IconData(
     0xe2b8,
+    fontFamily: 'PhosphorBold',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
+  static const x = IconData(
+    0xe4f6,
     fontFamily: 'PhosphorBold',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,

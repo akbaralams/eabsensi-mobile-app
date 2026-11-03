@@ -1,0 +1,5 @@
+# Asal api/openapi.yaml. Diperbarui oleh tool/sync_contract.dart; jangan edit tangan.
+repo: eabsensi-mobile-api
+file: docs/openapi.yaml
+head: f6853ba0e0eaf7c981bee738a96d905aefb24bd6
+last_change: b151ad229865a99adc711d8d49cd7fd8b72ad6ef 2026-10-30 feat(auth): refresh token di /api/v2 (login, refresh berotasi, logout)

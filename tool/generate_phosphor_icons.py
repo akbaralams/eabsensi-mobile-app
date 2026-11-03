@@ -17,7 +17,15 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'lib/core/design/phosphor.dart')
 STYLES = {'Regular': 'regular', 'Fill': 'fill', 'Bold': 'bold'}
 
-pkg = sorted(glob.glob(os.path.expanduser('~/.pub-cache/hosted/pub.dev/phosphor_flutter-*')))
+caches = [
+    os.environ.get('PUB_CACHE', ''),
+    os.path.expanduser('~/.pub-cache'),
+    os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Pub', 'Cache'),
+]
+pkg = sorted(
+    p for c in caches if c
+    for p in glob.glob(os.path.join(c, 'hosted/pub.dev/phosphor_flutter-*'))
+)
 if not pkg:
     sys.exit('phosphor_flutter belum ada di pub cache; jalankan flutter pub get')
 src_dir = os.path.join(pkg[-1], 'lib/src')

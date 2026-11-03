@@ -38,6 +38,11 @@ List<(String, Color, Color)> _textPairs(AppColors c) {
     ('banner event (teal)', c.textSecondary, c.tealTint),
     ('judul banner', c.textPrimary, c.mintTint),
     ('toast', c.toastText, c.toastBackground),
+    ('eyebrow kartu event', c.accentText, c.mintTint),
+    ('chip syarat event', c.textSecondary, c.surface),
+    ('lencana persetujuan', c.surface, c.amberText),
+    ('judul kartu persetujuan', c.textPrimary, amberOnSurface),
+    ('menu nonaktif', c.textMuted, c.surface),
   ];
 }
 
@@ -63,6 +68,7 @@ void main() {
         ('ikon muted/surface', c.textMuted, c.surface),
         ('batas field/surface (WCAG 1.4.11)', c.border, c.surface),
         ('ikon aksen/surface', c.accent, c.surface),
+        ('ikon amber/surface', c.amberIcon, c.surface),
       ];
       final failures = [
         for (final (label, fg, bg) in pairs)

@@ -8,15 +8,14 @@ class MockLeaveRepository implements LeaveRepository {
   final MockEnv _env;
   int _nextId = 50;
 
+  /// Kode bawaan sama dengan server (`attendance_statuses`: CUTI, IZIN,
+  /// SAKIT, DINAS) ditambah satu kode lain untuk kategori Lainnya.
   static const types = [
-    LeaveType(id: 1, code: 'C-TAHUNAN', name: 'Cuti Tahunan'),
-    LeaveType(id: 2, code: 'C-MELAHIRKAN', name: 'Cuti Melahirkan'),
-    LeaveType(id: 3, code: 'C-BESAR', name: 'Cuti Besar'),
-    LeaveType(id: 4, code: 'I-SAKIT', name: 'Sakit'),
-    LeaveType(id: 5, code: 'I-PRIBADI', name: 'Izin Keperluan Pribadi'),
-    LeaveType(id: 6, code: 'D-DALAM', name: 'Dinas Luar Dalam Kota'),
-    LeaveType(id: 7, code: 'D-LUAR', name: 'Dinas Luar Luar Kota'),
-    LeaveType(id: 8, code: 'X-LAIN', name: 'Lainnya'),
+    LeaveType(id: 1, code: 'CUTI', name: 'Cuti Tahunan'),
+    LeaveType(id: 2, code: 'IZIN', name: 'Izin Keperluan Pribadi'),
+    LeaveType(id: 3, code: 'SAKIT', name: 'Sakit'),
+    LeaveType(id: 4, code: 'DINAS', name: 'Dinas Luar Dalam Kota'),
+    LeaveType(id: 5, code: 'TB', name: 'Tugas Belajar'),
   ];
 
   late final List<Leave> _leaves = _seed();
@@ -38,7 +37,7 @@ class MockLeaveRepository implements LeaveRepository {
       Leave(
         id: 24,
         type: 'Sakit',
-        attendanceStatusId: 4,
+        attendanceStatusId: 3,
         startDate: today.subtract(const Duration(days: 20)),
         endDate: today.subtract(const Duration(days: 19)),
         reason: 'Demam',

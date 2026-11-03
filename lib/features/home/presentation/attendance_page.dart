@@ -9,7 +9,7 @@ import '../../punch/domain/punch.dart';
 import '../../punch/presentation/punch_providers.dart';
 import 'attendance_card.dart';
 import 'attendance_summary.dart';
-import 'home_page.dart' show StatusCard;
+import 'status_card.dart';
 
 /// Tab Absensi: tujuan tersendiri (bukan aksi) berisi status hari ini, tombol
 /// Check In/Out, dan daftar punch hari ini dari server.

@@ -62,4 +62,13 @@ class MockHistoryRepository implements HistoryRepository {
     }
     return MonthHistory(year: year, month: month, days: days);
   }
+
+  @override
+  Future<DayRecord> day(DateTime date) async {
+    final month = await this.month(date.year, date.month);
+    return month.days.firstWhere(
+      (d) => d.date.day == date.day,
+      orElse: () => DayRecord(date: date, status: DayStatus.none),
+    );
+  }
 }

@@ -4,6 +4,14 @@ import '../../punch/domain/punch.dart';
 
 enum DayPhase { none, checkedIn, pending, checkedOut }
 
+/// Klasifikasi kehadiran dari server. Kontrak belum menyediakannya (tidak ada
+/// jadwal di `/me`), jadi klien tidak boleh menentukannya sendiri; tampilannya
+/// sudah siap dan hanya menyala bila nilai ini diisi dari server.
+enum AttendanceFlag { late, absent }
+
+/// Status gabungan yang ditampilkan di kartu Status Kehadiran.
+enum AttendanceState { notYet, checkedIn, checkedOut, pending, late, absent }
+
 /// Ringkasan absen hari ini yang diturunkan dari punch server: punch pertama =
 /// masuk, punch terakhir (bila ada dua atau lebih) = keluar.
 @immutable
@@ -14,10 +22,13 @@ class AttendanceSummary {
     this.checkOut,
     this.hasPending = false,
     this.count = 0,
+    this.flag,
   });
 
-  factory AttendanceSummary.from(List<Punch> punches) {
-    if (punches.isEmpty) return const AttendanceSummary(phase: DayPhase.none);
+  factory AttendanceSummary.from(List<Punch> punches, {AttendanceFlag? flag}) {
+    if (punches.isEmpty) {
+      return AttendanceSummary(phase: DayPhase.none, flag: flag);
+    }
     final first = punches.first;
     final last = punches.length >= 2 ? punches.last : null;
     final hasPending = punches.any((p) => p.status == PunchStatus.pending);
@@ -33,6 +44,7 @@ class AttendanceSummary {
       checkOut: last?.punchedAt,
       hasPending: hasPending,
       count: punches.length,
+      flag: flag,
     );
   }
 
@@ -41,6 +53,19 @@ class AttendanceSummary {
   final DateTime? checkOut;
   final bool hasPending;
   final int count;
+  final AttendanceFlag? flag;
+
+  /// Klasifikasi server menang atas fase punch.
+  AttendanceState get state => switch ((flag, phase)) {
+    (AttendanceFlag.absent, _) => AttendanceState.absent,
+    (AttendanceFlag.late, _) => AttendanceState.late,
+    (_, DayPhase.none) => AttendanceState.notYet,
+    (_, DayPhase.checkedIn) when hasPending => AttendanceState.pending,
+    (_, DayPhase.checkedOut) when hasPending => AttendanceState.pending,
+    (_, DayPhase.pending) => AttendanceState.pending,
+    (_, DayPhase.checkedIn) => AttendanceState.checkedIn,
+    (_, DayPhase.checkedOut) => AttendanceState.checkedOut,
+  };
 
   /// Check Out menjadi aksi utama setelah ada punch masuk.
   bool get nextIsCheckOut => count >= 1;

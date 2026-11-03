@@ -1,5 +1,6 @@
 import 'package:eabsensi/core/mock/mock_env.dart';
 import 'package:eabsensi/features/punch/presentation/punch_providers.dart';
+import 'package:eabsensi/features/home/presentation/status_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,8 +14,11 @@ Future<void> _punchFromHome(WidgetTester tester, String button) async {
   await settle(tester);
 }
 
+/// Jepret lalu kirim dari langkah konfirmasi.
 Future<void> _shoot(WidgetTester tester) async {
   await tester.tap(find.byKey(const Key('shutter')));
+  await settle(tester);
+  await tester.tap(find.byKey(const Key('submit-photo')));
   await settle(tester);
 }
 
@@ -32,7 +36,7 @@ void main() {
 
     await tester.tap(find.text('Konfirmasi Check In'));
     await settle(tester);
-    expect(find.text('Ambil foto'), findsOneWidget);
+    expect(find.text('WAJAH TERDETEKSI'), findsOneWidget);
 
     await _shoot(tester);
     expect(find.byKey(const Key('result-time')), findsOneWidget);
@@ -60,11 +64,19 @@ void main() {
       await settle(tester);
       await tester.tap(find.text('Konfirmasi Check In'));
       await settle(tester);
-      expect(find.text('Ambil foto'), findsNothing);
+      expect(find.byKey(const Key('shutter')), findsNothing);
       expect(find.text('Disetujui'), findsOneWidget);
       await tester.tap(find.text('Kembali ke Beranda'));
       await settle(tester);
-      expect(find.text('Sudah Check In'), findsOneWidget);
+      // Chip di kartu absen dan di kartu Status Kehadiran.
+      expect(find.text('Sudah Check In'), findsNWidgets(2));
+      expect(
+        find.descendant(
+          of: find.byType(AttendanceStatusCard),
+          matching: find.text('Sudah Check In'),
+        ),
+        findsOneWidget,
+      );
     },
   );
 

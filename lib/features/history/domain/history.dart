@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../punch/domain/punch.dart';
 
-/// `none` hanya untuk hari ini bila belum ada punch.
-enum DayStatus { present, late, absent, pending, none }
+/// `none`: tidak ada punch (hari ini: belum absen). `unknown`: hari belum
+/// dimuat dari server (kontrak tanpa rekap bulanan; dimuat saat dibuka).
+enum DayStatus { present, late, absent, pending, none, unknown }
 
 @immutable
 class DayRecord {
@@ -13,6 +14,7 @@ class DayRecord {
     this.checkIn,
     this.checkOut,
     this.isToday = false,
+    this.punches = const [],
   });
 
   final DateTime date;
@@ -22,6 +24,9 @@ class DayRecord {
   final String? checkIn;
   final String? checkOut;
   final bool isToday;
+
+  /// Punch hari itu dari server bila sudah dimuat (detail hari).
+  final List<Punch> punches;
 }
 
 @immutable
@@ -40,6 +45,12 @@ class MonthHistory {
 
   int count(DayStatus s) => days.where((d) => d.status == s).length;
 
+  MonthHistory mapDays(DayRecord Function(DayRecord day) f) => MonthHistory(
+    year: year,
+    month: month,
+    days: [for (final d in days) f(d)],
+  );
+
   MonthHistory withToday(DayRecord today) => MonthHistory(
     year: year,
     month: month,
@@ -51,19 +62,41 @@ class MonthHistory {
 /// bila belum ada punch di akhir pekan.
 DayRecord? todayRecord(DateTime now, List<Punch> punches) {
   final date = DateTime(now.year, now.month, now.day);
-  if (punches.isEmpty) {
-    if (date.weekday > DateTime.friday) return null;
-    return DayRecord(date: date, status: DayStatus.none, isToday: true);
+  if (punches.isEmpty && date.weekday > DateTime.friday) return null;
+  return dayFromPunches(date, punches, isToday: true);
+}
+
+/// Satu hari dari punch server, tanpa klasifikasi buatan klien: ada punch
+/// menunggu -> Menunggu, ada punch disetujui -> Hadir, selain itu tidak ada
+/// punch. Punch ditolak tidak dihitung (tetap tampil di detail hari).
+DayRecord dayFromPunches(
+  DateTime date,
+  List<Punch> punches, {
+  bool isToday = false,
+}) {
+  final day = DateTime(date.year, date.month, date.day);
+  final counted = [
+    for (final p in punches)
+      if (p.status != PunchStatus.rejected) p,
+  ];
+  if (counted.isEmpty) {
+    return DayRecord(
+      date: day,
+      status: DayStatus.none,
+      isToday: isToday,
+      punches: punches,
+    );
   }
   String hhmm(DateTime d) =>
       '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
-  final pending = punches.any((p) => p.status == PunchStatus.pending);
+  final pending = counted.any((p) => p.status == PunchStatus.pending);
   return DayRecord(
-    date: date,
+    date: day,
     status: pending ? DayStatus.pending : DayStatus.present,
-    checkIn: hhmm(punches.first.punchedAt),
-    checkOut: punches.length >= 2 ? hhmm(punches.last.punchedAt) : null,
-    isToday: true,
+    checkIn: hhmm(counted.first.punchedAt),
+    checkOut: counted.length >= 2 ? hhmm(counted.last.punchedAt) : null,
+    isToday: isToday,
+    punches: punches,
   );
 }
 
@@ -78,5 +111,10 @@ abstract class HistoryRepository {
   /// klien tidak boleh mengarangnya, jadi tile dan status itu disembunyikan.
   bool get supportsClassification;
 
+  /// Hari-hari bulan itu. Tanpa rekap bulanan, hari yang belum dimuat berstatus
+  /// [DayStatus.unknown] (tanpa memanggil server per hari).
   Future<MonthHistory> month(int year, int month);
+
+  /// Detail satu hari, dimuat saat dibuka.
+  Future<DayRecord> day(DateTime date);
 }

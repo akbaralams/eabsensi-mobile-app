@@ -37,6 +37,9 @@ class _SlowSecondMonth implements HistoryRepository {
     if (calls > 1) await gate.future;
     return _inner.month(year, month);
   }
+
+  @override
+  Future<DayRecord> day(DateTime date) => _inner.day(date);
 }
 
 class _NoClassification implements HistoryRepository {
@@ -58,6 +61,9 @@ class _NoClassification implements HistoryRepository {
       ],
     );
   }
+
+  @override
+  Future<DayRecord> day(DateTime date) => _inner.day(date);
 }
 
 Future<void> _openHistory(WidgetTester t) async {
@@ -82,6 +88,8 @@ void main() {
         await t.tap(find.text('Konfirmasi Check In'));
         await settle(t);
         await t.tap(find.byKey(const Key('shutter')));
+        await settle(t);
+        await t.tap(find.byKey(const Key('submit-photo')));
         await settle(t);
         await t.tap(find.text('Kembali ke Beranda'));
         await settle(t);
@@ -250,13 +258,7 @@ void main() {
   group('persetujuan: konfirmasi dan urungkan', () {
     Future<void> open(WidgetTester t) async {
       await pumpApp(t);
-      await t.scrollUntilVisible(
-        find.text('3 menunggu persetujuanmu'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await t.tap(find.text('3 menunggu persetujuanmu'));
-      await settle(t);
+      await openApprovalsFromHome(t);
     }
 
     testWidgets('Tolak meminta konfirmasi; Batal tidak mengubah apa pun', (
@@ -325,8 +327,7 @@ void main() {
 
   testWidgets('event: hanya satu tombol utama', (t) async {
     await pumpApp(t);
-    await t.tap(find.text('Upacara'));
-    await settle(t);
+    await tapMenu(t, 'Upacara');
     expect(find.widgetWithText(PrimaryButton, 'Check-in'), findsOneWidget);
     expect(find.widgetWithText(OutlineButton, 'Check-in'), findsOneWidget);
   });

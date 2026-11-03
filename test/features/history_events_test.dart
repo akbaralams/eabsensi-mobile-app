@@ -60,8 +60,7 @@ void main() {
   group('event', () {
     testWidgets('daftar event dan check-in Apel Kontrak', (tester) async {
       await pumpApp(tester);
-      await tester.tap(find.text('Upacara'));
-      await settle(tester);
+      await tapMenu(tester, 'Upacara');
 
       expect(find.text('Event Hari Ini'), findsOneWidget);
       expect(find.text('Apel Kontrak'), findsOneWidget);
@@ -81,6 +80,8 @@ void main() {
       await settle(tester);
       await tester.tap(find.byKey(const Key('shutter')));
       await settle(tester);
+      await tester.tap(find.byKey(const Key('submit-photo')));
+      await settle(tester);
 
       expect(
         find.text('Check-in Apel Kontrak tercatat · waktu server'),
@@ -91,8 +92,7 @@ void main() {
 
     testWidgets('di luar jam: pesan kontrak apa adanya', (tester) async {
       await pumpApp(tester);
-      await tester.tap(find.text('Upacara'));
-      await settle(tester);
+      await tapMenu(tester, 'Upacara');
       await tester.tap(
         find.descendant(
           of: find.byKey(const Key('event-3')),
@@ -103,6 +103,8 @@ void main() {
       await tester.tap(find.textContaining('Konfirmasi'));
       await settle(tester);
       await tester.tap(find.byKey(const Key('shutter')));
+      await settle(tester);
+      await tester.tap(find.byKey(const Key('submit-photo')));
       await settle(tester);
       expect(
         find.text('Check-in dibuka pukul 15:30 sampai 16:30.'),
