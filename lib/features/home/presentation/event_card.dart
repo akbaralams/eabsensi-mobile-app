@@ -37,98 +37,104 @@ class EventCard extends StatelessWidget {
           '${requiresPhoto ? 'foto dan lokasi' : 'lokasi'}. '
           'Buka daftar event hari ini',
       excludeSemantics: true,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: radius,
-          onTap: onTap,
-          child: Container(
-            constraints: const BoxConstraints(minHeight: AppSpace.minTouch),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: c.surface,
-              borderRadius: radius,
-              boxShadow: c.tileShadow,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Center(
-                    child: PhosphorDuotoneIcon(
-                      PhosphorIconsDuotone.flag,
-                      size: 28,
+      child: Pressable(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: radius,
+            onTap: onTap,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: AppSpace.minTouch),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: c.surface,
+                borderRadius: radius,
+                boxShadow: c.tileShadow,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Center(
+                      child: PhosphorDuotoneIcon(
+                        PhosphorIconsDuotone.flag,
+                        size: 28,
+                        color: c.accent,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          eyebrow,
+                          style: AppType.microBold.copyWith(
+                            color: c.accentText,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          event.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppType.cardTitle.copyWith(
+                            color: c.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            PhosphorIcon(
+                              PhosphorIconsRegular.clock,
+                              size: 14,
+                              color: c.textSecondary,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              schedule,
+                              style: AppType.small.copyWith(
+                                color: c.textSecondary,
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            if (requiresPhoto)
+                              const _Requirement(
+                                icon: PhosphorIconsRegular.camera,
+                                label: 'Foto wajib',
+                              ),
+                            const _Requirement(
+                              icon: PhosphorIconsRegular.mapPin,
+                              label: 'Lokasi',
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: PhosphorIcon(
+                      PhosphorIconsBold.caretRight,
+                      size: 18,
                       color: c.accent,
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        eyebrow,
-                        style: AppType.microBold.copyWith(color: c.accentText),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        event.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppType.cardTitle.copyWith(color: c.textPrimary),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          PhosphorIcon(
-                            PhosphorIconsRegular.clock,
-                            size: 14,
-                            color: c.textSecondary,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            schedule,
-                            style: AppType.small.copyWith(
-                              color: c.textSecondary,
-                              fontFeatures: const [
-                                FontFeature.tabularFigures(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: [
-                          if (requiresPhoto)
-                            const _Requirement(
-                              icon: PhosphorIconsRegular.camera,
-                              label: 'Foto wajib',
-                            ),
-                          const _Requirement(
-                            icon: PhosphorIconsRegular.mapPin,
-                            label: 'Lokasi',
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: PhosphorIcon(
-                    PhosphorIconsBold.caretRight,
-                    size: 18,
-                    color: c.accent,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -61,38 +61,46 @@ class AttendancePage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                punches.when(
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                  error: (e, _) => Column(
-                    children: [
-                      Text(
-                        e is ApiFailure ? e.message : 'Terjadi kesalahan.',
-                        textAlign: TextAlign.center,
-                        style: AppType.body.copyWith(color: c.textSecondary),
-                      ),
-                      const SizedBox(height: 10),
-                      OutlineButton(
-                        label: 'Coba lagi',
-                        onPressed: () => ref.invalidate(todayPunchesProvider),
-                      ),
-                    ],
-                  ),
-                  data: (list) => list.isEmpty
-                      ? Text(
-                          'Belum ada punch hari ini.',
-                          style: AppType.body.copyWith(color: c.textMuted),
-                        )
-                      : Column(
-                          children: [
-                            for (final p in list) ...[
-                              _PunchTile(punch: p),
-                              const SizedBox(height: 10),
-                            ],
-                          ],
+                StateSwitcher(
+                  id: punches.isLoading
+                      ? 'muat'
+                      : punches.hasError
+                      ? 'galat'
+                      : 'isi',
+                  alignment: Alignment.topCenter,
+                  child: punches.when(
+                    loading: () => const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    error: (e, _) => Column(
+                      children: [
+                        Text(
+                          e is ApiFailure ? e.message : 'Terjadi kesalahan.',
+                          textAlign: TextAlign.center,
+                          style: AppType.body.copyWith(color: c.textSecondary),
                         ),
+                        const SizedBox(height: 10),
+                        OutlineButton(
+                          label: 'Coba lagi',
+                          onPressed: () => ref.invalidate(todayPunchesProvider),
+                        ),
+                      ],
+                    ),
+                    data: (list) => list.isEmpty
+                        ? Text(
+                            'Belum ada punch hari ini.',
+                            style: AppType.body.copyWith(color: c.textMuted),
+                          )
+                        : Column(
+                            children: [
+                              for (final p in list) ...[
+                                _PunchTile(punch: p),
+                                const SizedBox(height: 10),
+                              ],
+                            ],
+                          ),
+                  ),
                 ),
               ],
             ),

@@ -175,7 +175,14 @@ class _Hero extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                StatusChip(label: label, variant: variant, large: true),
+                StateSwitcher(
+                  id: label,
+                  child: StatusChip(
+                    label: label,
+                    variant: variant,
+                    large: true,
+                  ),
+                ),
               ],
             ),
           ),
@@ -269,12 +276,15 @@ class _TimeCell extends StatelessWidget {
                     label,
                     style: AppType.caption.copyWith(color: c.textMuted),
                   ),
-                  Text(
-                    value,
-                    style: AppType.cardTitle.copyWith(
-                      color: c.textPrimary,
-                      fontSize: 16,
-                      fontFeatures: const [FontFeature.tabularFigures()],
+                  StateSwitcher(
+                    id: value,
+                    child: Text(
+                      value,
+                      style: AppType.cardTitle.copyWith(
+                        color: c.textPrimary,
+                        fontSize: 16,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ),
                 ],
@@ -309,27 +319,29 @@ class _ActionButton extends StatelessWidget {
       button: true,
       label: label,
       excludeSemantics: true,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: primary ? c.primaryGradient : null,
-          color: primary ? null : c.surfaceAlt,
-          borderRadius: radius,
-          boxShadow: primary ? c.buttonShadow : null,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
+      child: Pressable(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: primary ? c.primaryGradient : null,
+            color: primary ? null : c.surfaceAlt,
             borderRadius: radius,
-            onTap: onTap,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 72),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  PhosphorIcon(icon, size: 22, color: fg),
-                  const SizedBox(height: 4),
-                  Text(label, style: AppType.bodyBold.copyWith(color: fg)),
-                ],
+            boxShadow: primary ? c.buttonShadow : null,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: radius,
+              onTap: onTap,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 72),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    PhosphorIcon(icon, size: 22, color: fg),
+                    const SizedBox(height: 4),
+                    Text(label, style: AppType.bodyBold.copyWith(color: fg)),
+                  ],
+                ),
               ),
             ),
           ),

@@ -24,7 +24,8 @@ final class DuotoneIconData {
 }
 
 /// Satu warna untuk dua lapis: isi digambar dengan [secondaryOpacity]
-/// (bawaan Phosphor 20%), jadi tetap satu aksen.
+/// (bawaan Phosphor 20%), jadi tetap satu aksen. Transparansi dipasang
+/// di warna, bukan lewat widget `Opacity` (tanpa lapisan offscreen).
 class PhosphorDuotoneIcon extends StatelessWidget {
   const PhosphorDuotoneIcon(
     this.icon, {
@@ -40,16 +41,20 @@ class PhosphorDuotoneIcon extends StatelessWidget {
   final double secondaryOpacity;
 
   @override
-  Widget build(BuildContext context) => Stack(
-    alignment: Alignment.center,
-    children: [
-      Opacity(
-        opacity: secondaryOpacity,
-        child: Icon(icon.secondary, size: size, color: color),
-      ),
-      Icon(icon.main, size: size, color: color),
-    ],
-  );
+  Widget build(BuildContext context) {
+    final base = color ?? IconTheme.of(context).color;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Icon(
+          icon.secondary,
+          size: size,
+          color: base?.withValues(alpha: base.a * secondaryOpacity),
+        ),
+        Icon(icon.main, size: size, color: base),
+      ],
+    );
+  }
 }
 
 abstract final class PhosphorIconsRegular {

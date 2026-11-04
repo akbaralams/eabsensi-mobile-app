@@ -81,6 +81,14 @@ Putih dan abu netral mendominasi; warna hanya dipakai bila bermakna.
 - **Avatar**: `linear(135°, #6EE7B7 → #14B8A6)`, inisial putih 800.
 - **Kamera/QR**: `linear(160°, #064E3B → #0F766E 60% → #14B8A6)`.
 
+### Gerak (`AppMotion` di `tokens.dart`)
+Prinsip: sedikit, cepat, bermakna (filter "find-animation-opportunities", Emil Kowalski). Semua patuh `disableAnimations`.
+- Tekan: skala 0,97, 120 ms (`Pressable`) pada tombol, tile menu, dan kartu yang bisa diketuk.
+- Pergantian status/konten: pudar + skala 0,96 -> 1, 200 ms (`StateSwitcher`) pada chip status, jam masuk/keluar, dan muat -> isi daftar.
+- Masuk layar: pudar + naik 8 px, 320 ms (`FadeSlideIn`).
+- Kurva: `Cubic(0.23, 1, 0.32, 1)`. Pantulan hanya di momen langka: orb hasil punch (520 ms, `easeOutBack`), teks menyusul berjeda 60 ms.
+- Sengaja tidak dianimasikan: pindah tab navigasi bawah (navigasi inti, sering), jam berdetak dan durasi (data yang dibaca), tile menu berurutan setiap beranda dibuka.
+
 ### Radius
 kartu 24 (kartu sekunder 22, list item 16) · tile menu 18 · tombol 16 · input 14 · segmented track 14 / segmen 11 · ikon kotak 12–13 · chip 999 · nav bawah 26 (atas saja) · tombol ikon bulat 999.
 

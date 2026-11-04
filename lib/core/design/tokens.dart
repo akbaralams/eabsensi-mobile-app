@@ -284,6 +284,28 @@ extension AppColorsContext on BuildContext {
       Theme.of(this).extension<AppColors>() ?? AppColors.light;
 }
 
+/// Gerak: satu skala durasi dan satu kurva untuk seluruh aplikasi. Semua
+/// animasi UI di bawah 300 ms kecuali momen langka (hasil punch).
+abstract final class AppMotion {
+  /// Umpan balik tekan (tile, kartu, tombol).
+  static const press = Duration(milliseconds: 120);
+
+  /// Perubahan status/konten (chip status, jam masuk/keluar, muat -> isi).
+  static const state = Duration(milliseconds: 200);
+
+  /// Masuk layar dan momen hasil.
+  static const enter = Duration(milliseconds: 320);
+
+  /// Ease-out kuat: cepat merespons, mendarat halus.
+  static const easeOut = Cubic(0.23, 1, 0.32, 1);
+
+  static const pressScale = .97;
+
+  /// [d], atau nol bila pengguna memilih mengurangi animasi.
+  static Duration of(BuildContext context, Duration d) =>
+      MediaQuery.disableAnimationsOf(context) ? Duration.zero : d;
+}
+
 /// Radius (logical px).
 abstract final class AppRadius {
   static const card = 24.0;

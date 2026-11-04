@@ -42,68 +42,91 @@ class PunchResultPage extends ConsumerWidget {
         child: Column(
           children: [
             const Spacer(),
-            Floating(
-              distance: 8,
-              period: const Duration(seconds: 4),
-              child: Container(
-                width: 112,
-                height: 112,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: pending
-                      ? AppColors.warningOrbGradient
-                      : AppColors.successOrbGradient,
-                  boxShadow: [
-                    BoxShadow(
-                      color:
-                          (pending
-                                  ? AppColors.warningOrbShadow
-                                  : AppColors.successOrbShadow)
-                              .withValues(alpha: .35),
-                      blurRadius: 30,
-                      offset: const Offset(0, 14),
+            _OrbEntrance(
+              child: Floating(
+                distance: 8,
+                period: const Duration(seconds: 4),
+                child: Container(
+                  width: 112,
+                  height: 112,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: pending
+                        ? AppColors.warningOrbGradient
+                        : AppColors.successOrbGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            (pending
+                                    ? AppColors.warningOrbShadow
+                                    : AppColors.successOrbShadow)
+                                .withValues(alpha: .35),
+                        blurRadius: 30,
+                        offset: const Offset(0, 14),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: PhosphorIcon(
+                      pending
+                          ? PhosphorIconsBold.hourglassMedium
+                          : PhosphorIconsBold.check,
+                      size: 52,
+                      color: Colors.white,
                     ),
-                  ],
-                ),
-                child: Center(
-                  child: PhosphorIcon(
-                    pending
-                        ? PhosphorIconsBold.hourglassMedium
-                        : PhosphorIconsBold.check,
-                    size: 52,
-                    color: Colors.white,
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 28),
-            Semantics(
-              header: true,
-              liveRegion: true,
-              child: Text(
-                '$heading · waktu server',
-                textAlign: TextAlign.center,
-                style: AppType.small.copyWith(color: c.textMuted),
+            FadeSlideIn(
+              delay: const Duration(milliseconds: 160),
+              child: Semantics(
+                header: true,
+                liveRegion: true,
+                child: Text(
+                  '$heading · waktu server',
+                  textAlign: TextAlign.center,
+                  style: AppType.small.copyWith(color: c.textMuted),
+                ),
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              IdFormat.time(result.time),
-              key: const Key('result-time'),
-              style: AppType.resultTime.copyWith(color: c.textPrimary),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              IdFormat.longDate(result.time),
-              style: AppType.small.copyWith(color: c.textMuted),
+            FadeSlideIn(
+              delay: const Duration(milliseconds: 220),
+              child: Column(
+                children: [
+                  Text(
+                    IdFormat.time(result.time),
+                    key: const Key('result-time'),
+                    style: AppType.resultTime.copyWith(color: c.textPrimary),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    IdFormat.longDate(result.time),
+                    style: AppType.small.copyWith(color: c.textMuted),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 14),
-            StatusChip(label: chipLabel, variant: chipVariant, large: true),
-            const SizedBox(height: 18),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: AppType.body.copyWith(color: c.textSecondary),
+            FadeSlideIn(
+              delay: const Duration(milliseconds: 280),
+              child: Column(
+                children: [
+                  StatusChip(
+                    label: chipLabel,
+                    variant: chipVariant,
+                    large: true,
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: AppType.body.copyWith(color: c.textSecondary),
+                  ),
+                ],
+              ),
             ),
             const Spacer(),
             PrimaryButton(
@@ -114,6 +137,30 @@ class PunchResultPage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Orb hasil masuk sekali: membesar dari 0,6 dengan sedikit pantulan
+/// (momen langka, satu-satunya tempat pantulan dipakai). Langsung tampil
+/// bila pengguna mengurangi animasi.
+class _OrbEntrance extends StatelessWidget {
+  const _OrbEntrance({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final reduce = MediaQuery.disableAnimationsOf(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: reduce ? 1 : 0, end: 1),
+      duration: const Duration(milliseconds: 520),
+      curve: Curves.easeOutBack,
+      builder: (_, t, child) => Opacity(
+        opacity: t.clamp(0, 1),
+        child: Transform.scale(scale: .6 + .4 * t, child: child),
+      ),
+      child: child,
     );
   }
 }

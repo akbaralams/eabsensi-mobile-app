@@ -143,7 +143,10 @@ class AttendanceStatusCard extends StatelessWidget {
               children: [
                 heading,
                 const SizedBox(height: 8),
-                StatusChip(label: label, variant: variant),
+                StateSwitcher(
+                  id: label,
+                  child: StatusChip(label: label, variant: variant),
+                ),
               ],
             )
           else
@@ -151,7 +154,10 @@ class AttendanceStatusCard extends StatelessWidget {
               children: [
                 Expanded(child: heading),
                 const SizedBox(width: 8),
-                StatusChip(label: label, variant: variant),
+                StateSwitcher(
+                  id: label,
+                  child: StatusChip(label: label, variant: variant),
+                ),
               ],
             ),
           const SizedBox(height: 12),

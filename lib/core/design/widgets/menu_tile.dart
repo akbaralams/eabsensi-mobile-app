@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../phosphor.dart';
 
 import '../tokens.dart';
+import 'motion.dart';
 
 /// Nada warna dari data menu (`tone` di rancangan API v2) dan jenis notifikasi.
 /// Tile menu beranda tidak memakainya: semua menu setara, jadi tampil netral
@@ -122,9 +123,11 @@ class MenuTile extends StatelessWidget {
       label: label,
       button: true,
       excludeSemantics: true,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(borderRadius: radius, onTap: onTap, child: content),
+      child: Pressable(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(borderRadius: radius, onTap: onTap, child: content),
+        ),
       ),
     );
   }
