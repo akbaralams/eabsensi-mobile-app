@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/design/design.dart';
 import '../domain/camera.dart';
 import 'punch_actions.dart';
@@ -309,6 +311,10 @@ class _PunchPhotoPageState extends ConsumerState<PunchPhotoPage>
                   ),
                 ),
               ),
+              if (AppConfig.debugTools &&
+                  ready &&
+                  _session?.diagnostics != null)
+                _FaceDiagnostics(diagnostics: _session!.diagnostics!),
               SafeArea(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(24, tall ? 16 : 8, 24, 16),
@@ -1137,6 +1143,46 @@ class _Problem extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Baris diagnostik deteksi wajah untuk build uji (`DEBUG_TOOLS=true`).
+class _FaceDiagnostics extends StatelessWidget {
+  const _FaceDiagnostics({required this.diagnostics});
+
+  final ValueListenable<String> diagnostics;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 8,
+      right: 8,
+      bottom: 150,
+      child: IgnorePointer(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xB3000000),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: ValueListenableBuilder<String>(
+              valueListenable: diagnostics,
+              builder: (_, text, _) => Text(
+                text,
+                key: const Key('face-diagnostics'),
+                style: const TextStyle(
+                  color: Color(0xFFB9F6CA),
+                  fontSize: 10,
+                  height: 1.3,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

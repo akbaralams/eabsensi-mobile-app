@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 
 import '../../../core/design/design.dart';
@@ -57,6 +58,9 @@ class FakeCameraSession implements CameraSession {
 
   @override
   Stream<List<Rect>> get faces => Stream.value(faceBoxes);
+
+  @override
+  ValueListenable<String>? get diagnostics => null;
 
   @override
   Widget buildPreview() => DecoratedBox(
