@@ -61,7 +61,7 @@ class AttendanceCard extends StatelessWidget {
     final large = MediaQuery.textScalerOf(context).scale(14) / 14 > 1.3;
     final inCell = _TimeCell(
       icon: PhosphorIconsRegular.signIn,
-      iconBg: c.mintTint,
+      iconBg: c.surfaceAlt,
       label: 'Masuk',
       time: summary.checkIn,
     );
@@ -147,18 +147,9 @@ class _Hero extends StatelessWidget {
             DayPhase.pending => ('Menunggu persetujuan', StatusVariant.pending),
             DayPhase.checkedOut => ('Sudah Check Out', StatusVariant.success),
           };
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        color: c.surfaceAlt,
-        gradient: RadialGradient(
-          center: const Alignment(.9, -.4),
-          radius: .9,
-          colors: [c.blobMint, c.blobMint.withValues(alpha: 0)],
-          stops: const [0, .7],
-        ),
-      ),
+    // Tanpa kotak latar: jam dan chip status langsung di atas kartu putih.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
       child: Row(
         children: [
           Expanded(

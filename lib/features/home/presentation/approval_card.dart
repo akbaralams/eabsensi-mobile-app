@@ -67,25 +67,21 @@ class ApprovalCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: c.amberTint,
+              color: c.surface,
               borderRadius: radius,
-              border: Border.all(color: c.amberIcon.withValues(alpha: .35)),
+              boxShadow: c.tileShadow,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                SizedBox(
                   width: 40,
                   height: 40,
-                  decoration: BoxDecoration(
-                    color: c.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.iconBox),
-                  ),
                   child: Center(
-                    child: PhosphorIcon(
-                      PhosphorIconsRegular.stamp,
-                      size: 22,
-                      color: c.amberIcon,
+                    child: PhosphorDuotoneIcon(
+                      PhosphorIconsDuotone.stamp,
+                      size: 28,
+                      color: c.textSecondary,
                     ),
                   ),
                 ),
@@ -167,13 +163,13 @@ class _CategoryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: c.surface,
+        color: c.surfaceAlt,
         borderRadius: BorderRadius.circular(AppRadius.chip),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PhosphorIcon(category.icon, size: 12, color: c.amberIcon),
+          PhosphorIcon(category.icon, size: 12, color: c.textSecondary),
           const SizedBox(width: 5),
           Text(
             '${category.label} · $count',
@@ -194,12 +190,15 @@ class _ReviewPill extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Tinjau', style: AppType.captionBold.copyWith(color: c.amberText)),
+        Text(
+          'Tinjau',
+          style: AppType.captionBold.copyWith(color: c.accentText),
+        ),
         const SizedBox(width: 2),
         PhosphorIcon(
           PhosphorIconsBold.caretRight,
           size: 14,
-          color: c.amberText,
+          color: c.accentText,
         ),
       ],
     );

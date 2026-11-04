@@ -46,24 +46,20 @@ class EventCard extends StatelessWidget {
             constraints: const BoxConstraints(minHeight: AppSpace.minTouch),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: c.mintTint,
+              color: c.surface,
               borderRadius: radius,
-              border: Border.all(color: c.accent.withValues(alpha: .28)),
+              boxShadow: c.tileShadow,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                SizedBox(
                   width: 40,
                   height: 40,
-                  decoration: BoxDecoration(
-                    color: c.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.iconBox),
-                  ),
                   child: Center(
-                    child: PhosphorIcon(
-                      PhosphorIconsRegular.flag,
-                      size: 22,
+                    child: PhosphorDuotoneIcon(
+                      PhosphorIconsDuotone.flag,
+                      size: 28,
                       color: c.accent,
                     ),
                   ),
@@ -153,13 +149,13 @@ class _Requirement extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: c.surface,
+        color: c.surfaceAlt,
         borderRadius: BorderRadius.circular(AppRadius.chip),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PhosphorIcon(icon, size: 12, color: c.accent),
+          PhosphorIcon(icon, size: 12, color: c.textSecondary),
           const SizedBox(width: 5),
           Text(
             label,

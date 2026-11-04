@@ -15,6 +15,43 @@ class PhosphorIcon extends StatelessWidget {
   Widget build(BuildContext context) => Icon(icon, size: size, color: color);
 }
 
+/// Ikon Duotone: glyph garis utama dan lapisan isi.
+final class DuotoneIconData {
+  const DuotoneIconData(this.main, this.secondary);
+
+  final IconData main;
+  final IconData secondary;
+}
+
+/// Satu warna untuk dua lapis: isi digambar dengan [secondaryOpacity]
+/// (bawaan Phosphor 20%), jadi tetap satu aksen.
+class PhosphorDuotoneIcon extends StatelessWidget {
+  const PhosphorDuotoneIcon(
+    this.icon, {
+    this.size,
+    this.color,
+    this.secondaryOpacity = .2,
+    super.key,
+  });
+
+  final DuotoneIconData icon;
+  final double? size;
+  final Color? color;
+  final double secondaryOpacity;
+
+  @override
+  Widget build(BuildContext context) => Stack(
+    alignment: Alignment.center,
+    children: [
+      Opacity(
+        opacity: secondaryOpacity,
+        child: Icon(icon.secondary, size: size, color: color),
+      ),
+      Icon(icon.main, size: size, color: color),
+    ],
+  );
+}
+
 abstract final class PhosphorIconsRegular {
   static const airplaneTilt = IconData(
     0xe5d6,
@@ -36,12 +73,6 @@ abstract final class PhosphorIconsRegular {
   );
   static const bell = IconData(
     0xe0ce,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
-  static const briefcase = IconData(
-    0xe0ee,
     fontFamily: 'PhosphorRegular',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
@@ -112,12 +143,6 @@ abstract final class PhosphorIconsRegular {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
-  static const clockCountdown = IconData(
-    0xed2c,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
   static const clockCounterClockwise = IconData(
     0xe1a0,
     fontFamily: 'PhosphorRegular',
@@ -160,18 +185,6 @@ abstract final class PhosphorIconsRegular {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
-  static const firstAidKit = IconData(
-    0xe570,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
-  static const flag = IconData(
-    0xe244,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
   static const flashlight = IconData(
     0xe246,
     fontFamily: 'PhosphorRegular',
@@ -190,32 +203,8 @@ abstract final class PhosphorIconsRegular {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
-  static const graduationCap = IconData(
-    0xe62c,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
-  static const hand = IconData(
-    0xe298,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
-  static const heartbeat = IconData(
-    0xe2ac,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
   static const house = IconData(
     0xe2c2,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
-  static const houseLine = IconData(
-    0xe2c4,
     fontFamily: 'PhosphorRegular',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
@@ -240,12 +229,6 @@ abstract final class PhosphorIconsRegular {
   );
   static const moon = IconData(
     0xe330,
-    fontFamily: 'PhosphorRegular',
-    fontPackage: 'phosphor_flutter',
-    matchTextDirection: true,
-  );
-  static const moonStars = IconData(
-    0xe58e,
     fontFamily: 'PhosphorRegular',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
@@ -459,5 +442,190 @@ abstract final class PhosphorIconsBold {
     fontFamily: 'PhosphorBold',
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
+  );
+}
+
+abstract final class PhosphorIconsDuotone {
+  static const airplaneTilt = DuotoneIconData(
+    IconData(
+      0xe5d7,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe5d6,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const briefcase = DuotoneIconData(
+    IconData(
+      0xe0ef,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe0ee,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const clockCountdown = DuotoneIconData(
+    IconData(
+      0xed2d,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xed2c,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const firstAidKit = DuotoneIconData(
+    IconData(
+      0xe571,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe570,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const flag = DuotoneIconData(
+    IconData(
+      0xe245,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe244,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const graduationCap = DuotoneIconData(
+    IconData(
+      0xe62d,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe62c,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const hand = DuotoneIconData(
+    IconData(
+      0xe299,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe298,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const heartbeat = DuotoneIconData(
+    IconData(
+      0xe2ad,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe2ac,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const houseLine = DuotoneIconData(
+    IconData(
+      0xe2c5,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe2c4,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const moonStars = DuotoneIconData(
+    IconData(
+      0xe58f,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe58e,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const squaresFour = DuotoneIconData(
+    IconData(
+      0xe465,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe464,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const stamp = DuotoneIconData(
+    IconData(
+      0xea49,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xea48,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+  );
+  static const umbrella = DuotoneIconData(
+    IconData(
+      0xe685,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
+    IconData(
+      0xe684,
+      fontFamily: 'PhosphorDuotone',
+      fontPackage: 'phosphor_flutter',
+      matchTextDirection: true,
+    ),
   );
 }

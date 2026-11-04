@@ -15,7 +15,7 @@ Cara membuka prototipe: buka `docs/design/prototype/eAbsensi-prototype.dc.html` 
 
 ### Font
 - **Plus Jakarta Sans** (paket `google_fonts` atau aset lokal), weight 400/500/600/700/800.
-- Ikon: **Phosphor** (paket `phosphor_flutter`), gaya *regular*; gaya *fill* untuk tab aktif, ikon status, dan ikon status bar.
+- Ikon: **Phosphor** (paket `phosphor_flutter`), gaya *regular*; gaya *fill* untuk tab aktif, ikon status, dan ikon status bar; gaya *duotone* 28 tanpa kotak untuk tile menu beranda dan ikon kartu event/persetujuan (satu warna, isi 20%).
 
 ### Skala tipe (size / weight)
 | Token | Size | Weight | Pemakaian |
@@ -31,6 +31,14 @@ Cara membuka prototipe: buka `docs/design/prototype/eAbsensi-prototype.dc.html` 
 | caption | 12 | 400–600 | meta, helper, error |
 | micro | 11 | 600–700 | chip status, label tile, label tab |
 
+### Prinsip warna (sejak November 2026)
+Putih dan abu netral mendominasi; warna hanya dipakai bila bermakna.
+- **Hijau** = aksen brand: tombol utama, tab aktif, ikon menu, link, status sukses.
+- **Amber** = menunggu / terlambat. **Merah** = tidak hadir / galat.
+- Semua tile menu setara: ikon Duotone hijau tanpa kotak latar, tanpa nada warna per menu (field `tone` dari data menu tidak dipakai untuk tampilan).
+- Kartu event dan persetujuan berlatar putih tanpa garis; warna hanya di ikon/eyebrow (event) dan lencana jumlah (persetujuan).
+- Satu elemen khas tetap berwarna: badge jam bergradien di kartu beranda.
+
 ### Warna
 | Token | Hex | Pemakaian |
 |---|---|---|
@@ -45,10 +53,11 @@ Cara membuka prototipe: buka `docs/design/prototype/eAbsensi-prototype.dc.html` 
 | mint300 | `#6EE7B7` | gradien badge/avatar |
 | mint400 | `#34D399` | logo, highlight scan |
 | mint200 | `#A7F3D0` | blob gradien |
-| mint100 | `#D1FAE5` | tint chip sukses, tile ikon |
-| teal100 | `#CCFBF1` | tint tile ikon teal |
+| mint100 | `#D1FAE5` | tint chip sukses, indikator tab aktif |
+| teal100 | `#CCFBF1` | jenis notifikasi (Inbox) |
 | mint50 | `#ECFDF5` | tile statistik Hadir |
-| bgMint | `#F0FDF4` | segmented track, tombol sekunder, ikon bulat |
+| background | `#F4F6F5` | latar layar (polos) |
+| surfaceAlt | `#F1F4F2` | segmented track, tombol sekunder, sel statistik, chip syarat |
 | surface | `#FFFFFF` | kartu, input, nav |
 | border | `#D5E6DE` | border input & tombol outline |
 | divider | `#E3EFE9` | garis pemisah, separator |
@@ -64,11 +73,11 @@ Cara membuka prototipe: buka `docs/design/prototype/eAbsensi-prototype.dc.html` 
 | errorBorder | `#F87171` | border input invalid |
 
 ### Gradien
-- **Latar layar**: tumpukan `radial(90%×40% di kanan-atas, #D1FAE5 → transparan 70%)` + `radial(80%×35% di kiri 5%, #CCFBF1 → transparan 70%)` + `linear(atas→bawah, #F0FDF4 0% → #FFFFFF 60%)`.
+- **Latar layar**: tidak bergradien lagi; warna polos `background` (lihat Prinsip warna).
 - **Tombol utama**: `linear(90°, #059669 → #0D9488)`, teks putih 15/700, shadow `0 10 24 rgba(5,150,105,.28)`.
-- **Kartu jam (hero)**: `radial(60%×90% di kanan 30%, #A7F3D0 → transparan 70%)` di atas `#F0FDF4`.
+- **Kartu jam (hero)**: tanpa kotak latar; jam dan chip status langsung di atas kartu putih.
 - **Badge jam**: `linear(145°, #6EE7B7 → #14B8A6)`, radius 26, rotasi −8°, shadow `0 14 28 rgba(13,148,136,.3)`, berisi lingkaran putih 58 dengan ikon `clock` 34 `#059669`. Animasi naik-turun 6px, 5s ease-in-out, loop.
-- **Banner event**: `linear(100°, #D1FAE5 → #CCFBF1)`.
+- **Kartu event**: putih (`surface`) dengan bayangan tile, tanpa garis.
 - **Avatar**: `linear(135°, #6EE7B7 → #14B8A6)`, inisial putih 800.
 - **Kamera/QR**: `linear(160°, #064E3B → #0F766E 60% → #14B8A6)`.
 
@@ -86,7 +95,7 @@ kartu 24 (kartu sekunder 22, list item 16) · tile menu 18 · tombol 16 · input
 Padding horizontal layar 18 · jarak antar blok 14 · padding kartu 16 · gap grid 10 · tinggi target sentuh minimal 48 (tombol utama 54, input 50, item menu 54) · tinggi nav bawah 88 (termasuk 20 inset bawah) · padding bawah konten 110 agar tidak tertutup nav.
 
 ### Mode gelap
-`CLAUDE.md` mewajibkan mode gelap; prototipe hanya light. Turunkan palet gelap dengan peran yang sama: background `#0F172A`, surface `#1E293B`, surface alt/border `#334155`, teks `#F8FAFC` / `#CBD5E1` / `#94A3B8`, tint sukses `#064E3B` + teks `#6EE7B7`, tint amber `rgba(245,158,11,.18)` + `#FBBF24`, tint error `rgba(239,68,68,.18)` + `#FCA5A5`. Gradien latar diganti radial `#064E3B` tipis di atas `#0F172A`. Primary & gradien tombol tetap.
+`CLAUDE.md` mewajibkan mode gelap; prototipe hanya light. Turunkan palet gelap dengan peran yang sama: background `#0F172A`, surface `#1E293B`, surface alt/border `#334155`, teks `#F8FAFC` / `#CBD5E1` / `#94A3B8`, tint sukses `#064E3B` + teks `#6EE7B7`, tint amber `rgba(245,158,11,.18)` + `#FBBF24`, tint error `rgba(239,68,68,.18)` + `#FCA5A5`. Latar polos `#0F172A`. Primary & gradien tombol tetap.
 
 ## Komponen (buat sebagai widget bersama)
 | Widget | Spesifikasi |

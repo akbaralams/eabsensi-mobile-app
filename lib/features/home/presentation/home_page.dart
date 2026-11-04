@@ -246,7 +246,6 @@ class _MenuGrid extends ConsumerWidget {
         return MenuTile(
           icon: menuIcon(item.icon),
           label: item.label,
-          tone: item.tone,
           enabled: item.isActive,
           onTap: item.isActive ? () => _open(context, item) : null,
         );

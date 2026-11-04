@@ -57,9 +57,8 @@ void main() {
         theme: AppTheme.light,
         home: const Scaffold(
           body: MenuTile(
-            icon: PhosphorIconsRegular.moonStars,
+            icon: PhosphorIconsDuotone.moonStars,
             label: 'Lembur',
-            tone: MenuTone.amber,
             enabled: false,
             onTap: null,
           ),

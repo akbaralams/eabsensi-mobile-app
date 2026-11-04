@@ -10,10 +10,7 @@ const fontFamily = 'PlusJakartaSans';
 final class AppColors extends ThemeExtension<AppColors> {
   const AppColors({
     required this.isDark,
-    required this.backgroundTop,
-    required this.backgroundBottom,
-    required this.blobMint,
-    required this.blobTeal,
+    required this.background,
     required this.surface,
     required this.surfaceAlt,
     required this.border,
@@ -56,11 +53,8 @@ final class AppColors extends ThemeExtension<AppColors> {
 
   final bool isDark;
 
-  // Latar layar
-  final Color backgroundTop;
-  final Color backgroundBottom;
-  final Color blobMint;
-  final Color blobTeal;
+  // Latar layar: abu netral polos, agar kartu putih yang menonjol.
+  final Color background;
 
   // Permukaan
   final Color surface;
@@ -114,12 +108,9 @@ final class AppColors extends ThemeExtension<AppColors> {
 
   static const light = AppColors(
     isDark: false,
-    backgroundTop: Color(0xFFF0FDF4),
-    backgroundBottom: Color(0xFFFFFFFF),
-    blobMint: Color(0xFFD1FAE5),
-    blobTeal: Color(0xFFCCFBF1),
+    background: Color(0xFFF4F6F5),
     surface: Color(0xFFFFFFFF),
-    surfaceAlt: Color(0xFFF0FDF4),
+    surfaceAlt: Color(0xFFF1F4F2),
     border: Color(0xFF7A9A8D),
     divider: Color(0xFFE3EFE9),
     rowDivider: Color(0xFFF0F5F2),
@@ -160,10 +151,7 @@ final class AppColors extends ThemeExtension<AppColors> {
 
   static const dark = AppColors(
     isDark: true,
-    backgroundTop: Color(0xFF0B3B33),
-    backgroundBottom: Color(0xFF0F172A),
-    blobMint: Color(0x33064E3B),
-    blobTeal: Color(0x2214B8A6),
+    background: Color(0xFF0F172A),
     surface: Color(0xFF1E293B),
     surfaceAlt: Color(0xFF334155),
     border: Color(0xFF64748B),
