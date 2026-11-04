@@ -78,6 +78,35 @@ class _RealCameraSession implements CameraSession {
   @override
   final bool canFlip;
 
+  final _diag = ValueNotifier<String>('menunggu frame pertama…');
+  final _clock = Stopwatch()..start();
+  int _frames = 0;
+  int _processed = 0;
+  int _busyDrops = 0;
+  int _noBox = 0;
+  int _noInput = 0;
+  int _errors = 0;
+  String _lastError = '-';
+  String _lastImage = '-';
+  String _lastFaces = '-';
+  int _lastPublishMs = 0;
+
+  @override
+  ValueListenable<String>? get diagnostics => _diag;
+
+  /// Memperbarui teks diagnostik paling cepat 2x per detik.
+  void _publish({bool force = false}) {
+    final now = _clock.elapsedMilliseconds;
+    if (!force && now - _lastPublishMs < 500) return;
+    _lastPublishMs = now;
+    _diag.value =
+        'frame $_frames  diproses $_processed  sibuk $_busyDrops\n'
+        'tanpa-kotak $_noBox  tanpa-input $_noInput\n'
+        'gambar $_lastImage\n'
+        'ML Kit: $_lastFaces\n'
+        'galat $_errors: $_lastError';
+  }
+
   /// Ukuran kotak pratinjau terakhir (dari [buildPreview]).
   Size _box = Size.zero;
   bool _streaming = false;
@@ -105,14 +134,39 @@ class _RealCameraSession implements CameraSession {
 
   /// Satu frame diproses sekaligus; frame lain dibuang selama sibuk.
   Future<void> _onFrame(CameraImage image) async {
-    if (_busy || _closed || _box.isEmpty) return;
+    _frames++;
+    if (_closed) return;
+    if (_busy) {
+      _busyDrops++;
+      _publish();
+      return;
+    }
+    if (_box.isEmpty) {
+      _noBox++;
+      _publish();
+      return;
+    }
     _busy = true;
     try {
       final rotation = _rotation();
+      _lastImage =
+          '${image.width}x${image.height} planes ${image.planes.length} '
+          'putar ${rotation.rawValue}° sensor '
+          '${_controller.description.sensorOrientation}° '
+          '${_controller.value.deviceOrientation.name}';
       final input = _inputImage(image, rotation);
-      if (input == null) return;
+      if (input == null) {
+        _noInput++;
+        return;
+      }
       final found = await _detector.processImage(input);
       if (_closed) return;
+      _processed++;
+      _lastFaces = found.isEmpty
+          ? '0 wajah'
+          : '${found.length} wajah, kotak '
+                '${found.first.boundingBox.width.round()}x'
+                '${found.first.boundingBox.height.round()}';
       final turned =
           rotation == InputImageRotation.rotation90deg ||
           rotation == InputImageRotation.rotation270deg;
@@ -128,10 +182,16 @@ class _RealCameraSession implements CameraSession {
             _box,
           ),
       ]);
-    } on Object {
-      // Frame gagal dianalisis: lewati, frame berikutnya dicoba lagi.
+    } on Object catch (e) {
+      // Frame gagal dianalisis: lewati, frame berikutnya dicoba lagi. Galat
+      // dicatat agar terlihat di diagnostik, bukan hilang diam-diam.
+      _errors++;
+      final text = '${e.runtimeType}: ${e.toString().split('\n').first}';
+      _lastError = text.length > 90 ? '${text.substring(0, 90)}…' : text;
+      debugPrint('Deteksi wajah gagal: $_lastError');
     } finally {
       _busy = false;
+      _publish();
     }
   }
 
@@ -278,5 +338,6 @@ class _RealCameraSession implements CameraSession {
     await _controller.dispose();
     await _detector.close();
     await _faces.close();
+    _diag.dispose();
   }
 }

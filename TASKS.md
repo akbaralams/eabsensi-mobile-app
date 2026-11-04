@@ -74,4 +74,5 @@ Urutan wajib. Tiap task selesai bila kriteria "Selesai bila" terpenuhi dan sudah
 
 ## [ ] Task 11. Rilis
 - Ikon dan nama aplikasi (logo 4 lingkaran mint), konfigurasi signing (file signing tidak di-commit), build release, catatan instalasi untuk uji internal.
+- **Status**: sebagian. Signing dari `android/key.properties`, workflow rilis `.github/workflows/release.yml`, dan pembaruan dalam aplikasi sudah ada ([docs/rilis-dan-pembaruan.md](docs/rilis-dan-pembaruan.md)); belum dijalankan (butuh keystore dan GitHub Secrets dari pemilik repo). Ikon dan nama aplikasi belum.
 - **Selesai bila**: APK/AAB release terpasang di perangkat fisik dan seluruh alur Task 4–9 lulus terhadap backend staging, dalam mode terang dan gelap.

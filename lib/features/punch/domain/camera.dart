@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/widgets.dart';
 
 enum CameraLens { front, back }
@@ -18,6 +19,11 @@ abstract class CameraSession {
   /// Kotak wajah yang terlihat, ternormalisasi 0..1 terhadap kotak pratinjau
   /// ([buildPreview]) dan sudah dicerminkan seperti pratinjau kamera depan.
   Stream<List<Rect>> get faces;
+
+  /// Teks diagnostik deteksi wajah (jumlah frame, galat, rotasi, hasil mentah
+  /// ML Kit). Hanya ditampilkan di build uji (`DEBUG_TOOLS`); `null` bila
+  /// sesi tidak punya diagnostik.
+  ValueListenable<String>? get diagnostics;
 
   /// Menyalakan/mematikan lampu senter. `false` bila kamera ini tidak punya.
   Future<bool> setTorch(bool on);

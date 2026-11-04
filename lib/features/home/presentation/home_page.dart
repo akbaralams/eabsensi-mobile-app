@@ -12,6 +12,8 @@ import '../../inbox/presentation/inbox_providers.dart';
 import '../../menus/domain/menu_item.dart';
 import '../../menus/presentation/menu_providers.dart';
 import '../../punch/presentation/punch_providers.dart';
+import '../../update/presentation/update_providers.dart';
+import '../../update/presentation/update_sheet.dart';
 import 'attendance_card.dart';
 import 'approval_card.dart';
 import 'attendance_summary.dart';
@@ -24,6 +26,18 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(sessionProvider).value;
+    // Pemberitahuan sekali saat rilis baru pertama kali diketahui; pemeriksaan
+    // ulang manual dari Profil tidak memunculkannya lagi.
+    ref.listen(availableUpdateProvider, (previous, next) {
+      final info = next.value;
+      if (info == null || previous?.value != null || !context.mounted) return;
+      AppToast.show(
+        context,
+        'Pembaruan ${info.versionName} tersedia',
+        actionLabel: 'Lihat',
+        onAction: () => showUpdateSheet(context, info),
+      );
+    });
     // Jam yang berdetak hanya dibangun di TickingAttendanceCard/StatusCard,
     // bukan seluruh halaman.
     final now = ref.watch(clockProvider)();

@@ -2,6 +2,7 @@ import 'package:eabsensi/features/punch/data/fake_camera_service.dart';
 import 'package:eabsensi/features/punch/domain/camera.dart';
 import 'package:eabsensi/features/punch/presentation/punch_photo_page.dart';
 import 'package:eabsensi/features/punch/presentation/punch_providers.dart';
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -27,6 +28,13 @@ class _ScriptedCamera implements CameraService {
 
 CameraOpenResult _ready(CameraLens lens) =>
     CameraReady(FakeCameraSession(lens: lens));
+
+class _DiagnosticSession extends FakeCameraSession {
+  final notifier = ValueNotifier<String>('frame 12  diproses 3');
+
+  @override
+  ValueListenable<String>? get diagnostics => notifier;
+}
 
 class _BrokenShutterSession extends FakeCameraSession {
   @override
@@ -286,5 +294,29 @@ void main() {
     await _shootManually(tester);
     expect(tester.takeException(), isNull);
     expect(find.text('LANGKAH 3 DARI 3'), findsOneWidget);
+  });
+
+  testWidgets('build uji: baris diagnostik deteksi wajah tampil dari sesi', (
+    tester,
+  ) async {
+    final session = _DiagnosticSession();
+    await pumpApp(
+      tester,
+      camera: FakeCameraService(result: CameraReady(session)),
+    );
+    await _toPhotoPage(tester);
+    expect(find.byKey(const Key('face-diagnostics')), findsOneWidget);
+    expect(find.text('frame 12  diproses 3'), findsOneWidget);
+    session.notifier.value = 'frame 40  diproses 9';
+    await tester.pump();
+    expect(find.text('frame 40  diproses 9'), findsOneWidget);
+  });
+
+  testWidgets('sesi tanpa diagnostik: tidak ada baris diagnostik', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await _toPhotoPage(tester);
+    expect(find.byKey(const Key('face-diagnostics')), findsNothing);
   });
 }

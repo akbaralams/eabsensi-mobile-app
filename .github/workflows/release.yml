@@ -1,0 +1,105 @@
+# Rilis APK: dipicu tag `vMAJOR.MINOR.PATCH` (mis. v1.0.3). Membangun APK bertanda tangan,
+# lalu menerbitkannya sebagai GitHub Release bersama `version.json`, yang dibaca fitur
+# "Pembaruan aplikasi" di dalam aplikasi. Panduan: docs/rilis-dan-pembaruan.md
+name: Rilis APK
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: write # membuat GitHub Release
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.8'
+          cache: true
+
+      - name: Versi dari tag
+        id: ver
+        run: |
+          NAME="${GITHUB_REF_NAME#v}"
+          IFS=. read -r MAJOR MINOR PATCH <<< "$NAME"
+          if [ "$MINOR" -ge 100 ] || [ "$PATCH" -ge 100 ]; then
+            echo "MINOR dan PATCH harus < 100 agar versionCode berurutan" >&2; exit 1
+          fi
+          # versionCode naik monoton mengikuti nomor versi: 1.0.3 -> 10003, 1.2.0 -> 10200.
+          CODE=$((MAJOR * 10000 + MINOR * 100 + PATCH))
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+
+      - name: Pasang dependensi
+        run: flutter pub get
+
+      - name: Analisis dan test
+        run: |
+          flutter analyze
+          flutter test
+
+      - name: Siapkan tanda tangan rilis
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for v in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!v}" ]; then echo "Secret $v belum diisi" >&2; exit 1; fi
+          done
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+          {
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyPassword=$KEY_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "storeFile=upload-keystore.jks"
+          } > android/key.properties
+
+      - name: Bangun APK
+        env:
+          REQUIRE_RELEASE_SIGNING: 'true'
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+        run: |
+          if [ -z "$API_BASE_URL" ]; then echo "Variabel repo API_BASE_URL belum diisi" >&2; exit 1; fi
+          flutter build apk --release \
+            --build-name="${{ steps.ver.outputs.name }}" \
+            --build-number="${{ steps.ver.outputs.code }}" \
+            --dart-define=API_BASE_URL="$API_BASE_URL"
+
+      - name: Susun berkas rilis
+        run: |
+          APK="eabsensi-v${{ steps.ver.outputs.name }}.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk "$APK"
+          SHA="$(sha256sum "$APK" | cut -d' ' -f1)"
+          NOTES="$(git tag -l --format='%(contents)' "$GITHUB_REF_NAME")"
+          jq -n \
+            --arg name "${{ steps.ver.outputs.name }}" \
+            --argjson code "${{ steps.ver.outputs.code }}" \
+            --arg url "https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF_NAME}/${APK}" \
+            --arg sha "$SHA" \
+            --arg notes "$NOTES" \
+            '{version_name: $name, version_code: $code, apk_url: $url, sha256: $sha}
+             + (if $notes == "" then {} else {notes: $notes} end)' > version.json
+          cat version.json
+          echo "APK_FILE=$APK" >> "$GITHUB_ENV"
+
+      - name: Terbitkan GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.APK_FILE }}
+            version.json
+          make_latest: true
+          generate_release_notes: true
