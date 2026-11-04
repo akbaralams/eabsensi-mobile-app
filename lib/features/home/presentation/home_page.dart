@@ -34,6 +34,7 @@ class HomePage extends ConsumerWidget {
       AppToast.show(
         context,
         'Pembaruan ${info.versionName} tersedia',
+        kind: ToastKind.info,
         actionLabel: 'Lihat',
         onAction: () => showUpdateSheet(context, info),
       );
@@ -245,7 +246,6 @@ class _MenuGrid extends ConsumerWidget {
         return MenuTile(
           icon: menuIcon(item.icon),
           label: item.label,
-          tone: item.tone,
           enabled: item.isActive,
           onTap: item.isActive ? () => _open(context, item) : null,
         );
@@ -261,7 +261,11 @@ class _MenuGrid extends ConsumerWidget {
       case EventsAction():
         context.push('/events');
       case ComingSoonAction():
-        AppToast.show(context, '${item.label} segera tersedia');
+        AppToast.show(
+          context,
+          '${item.label} segera tersedia',
+          kind: ToastKind.info,
+        );
     }
   }
 }

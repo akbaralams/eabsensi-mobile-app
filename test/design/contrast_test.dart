@@ -17,9 +17,9 @@ List<(String, Color, Color)> _textPairs(AppColors c) {
     ('textMuted/surface', c.textMuted, c.surface),
     ('textMuted/surfaceAlt', c.textMuted, c.surfaceAlt),
     ('textPrimary/surfaceAlt', c.textPrimary, c.surfaceAlt),
-    ('textMuted/backgroundTop', c.textMuted, c.backgroundTop),
-    ('textMuted/backgroundBottom', c.textMuted, c.backgroundBottom),
-    ('textPrimary/backgroundTop', c.textPrimary, c.backgroundTop),
+    ('textMuted/background', c.textMuted, c.background),
+    ('textPrimary/background', c.textPrimary, c.background),
+    ('textSecondary/background', c.textSecondary, c.background),
     ('accentText/surface', c.accentText, c.surface),
     ('accentText/surfaceAlt', c.accentText, c.surfaceAlt),
     ('onGradient/gradientStart', c.onGradient, c.gradientStart),
@@ -38,6 +38,7 @@ List<(String, Color, Color)> _textPairs(AppColors c) {
     ('banner event (teal)', c.textSecondary, c.tealTint),
     ('judul banner', c.textPrimary, c.mintTint),
     ('toast', c.toastText, c.toastBackground),
+    ('aksi toast', c.toastAccent, c.toastBackground),
     ('eyebrow kartu event', c.accentText, c.mintTint),
     ('chip syarat event', c.textSecondary, c.surface),
     ('lencana persetujuan', c.surface, c.amberText),
@@ -69,6 +70,8 @@ void main() {
         ('batas field/surface (WCAG 1.4.11)', c.border, c.surface),
         ('ikon aksen/surface', c.accent, c.surface),
         ('ikon amber/surface', c.amberIcon, c.surface),
+        ('ikon sukses toast', c.toastAccent, c.toastBackground),
+        ('ikon gagal toast', c.toastError, c.toastBackground),
       ];
       final failures = [
         for (final (label, fg, bg) in pairs)

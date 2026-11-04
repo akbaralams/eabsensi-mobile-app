@@ -84,7 +84,11 @@ class _GalleryPageState extends State<GalleryPage> {
                 PrimaryButton(
                   label: 'Masuk',
                   icon: PhosphorIconsBold.arrowRight,
-                  onPressed: () => AppToast.show(context, 'Tombol ditekan'),
+                  onPressed: () => AppToast.show(
+                    context,
+                    'Tombol ditekan',
+                    kind: ToastKind.info,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 const PrimaryButton(label: 'Menunggu lokasi…', onPressed: null),
@@ -196,27 +200,23 @@ class _GalleryPageState extends State<GalleryPage> {
                   ),
                   children: [
                     MenuTile(
-                      icon: PhosphorIconsRegular.umbrella,
+                      icon: PhosphorIconsDuotone.umbrella,
                       label: 'Cuti',
-                      tone: MenuTone.mint,
                       onTap: () {},
                     ),
                     MenuTile(
-                      icon: PhosphorIconsRegular.heartbeat,
+                      icon: PhosphorIconsDuotone.heartbeat,
                       label: 'Sakit',
-                      tone: MenuTone.teal,
                       onTap: () {},
                     ),
                     MenuTile(
-                      icon: PhosphorIconsRegular.briefcase,
+                      icon: PhosphorIconsDuotone.briefcase,
                       label: 'Dinas Luar',
-                      tone: MenuTone.amber,
                       onTap: () {},
                     ),
                     const MenuTile(
-                      icon: PhosphorIconsRegular.clockCountdown,
+                      icon: PhosphorIconsDuotone.clockCountdown,
                       label: 'Lembur',
-                      tone: MenuTone.amber,
                       enabled: false,
                       onTap: null,
                     ),

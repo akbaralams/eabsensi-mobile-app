@@ -3,63 +3,18 @@ import 'package:flutter/services.dart';
 
 import '../tokens.dart';
 
-/// Latar gradien layar (blob mint di kanan atas, blob teal di kiri).
+/// Latar layar: abu netral polos. Warna hanya dipakai bila bermakna.
 class AppBackground extends StatelessWidget {
   const AppBackground({required this.child, super.key});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: const [0, .6],
-          colors: [c.backgroundTop, c.backgroundBottom],
-        ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: const Alignment(.9, -1),
-                    radius: .9,
-                    colors: [c.blobMint, c.blobMint.withValues(alpha: 0)],
-                    stops: const [0, .7],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: const Alignment(-.9, -.9),
-                    radius: .8,
-                    colors: [c.blobTeal, c.blobTeal.withValues(alpha: 0)],
-                    stops: const [0, .7],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          child,
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      ColoredBox(color: context.colors.background, child: child);
 }
 
-/// Kerangka layar: latar gradien, status bar menyesuaikan tema, area aman atas.
+/// Kerangka layar: latar netral, status bar menyesuaikan tema, area aman atas.
 class AppScaffold extends StatelessWidget {
   const AppScaffold({
     required this.body,

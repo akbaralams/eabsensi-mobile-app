@@ -65,3 +65,10 @@ Diubah dari spesifikasi desain karena aksesibilitas dan konvensi Android:
 - **Menu debug** (galeri komponen, skenario uji) hanya di build debug atau `--dart-define=DEBUG_TOOLS=true`.
 
 Sengaja **tidak** diubah (keputusan desain, bukan cacat): tombol bergradien dan bayangan berwarna, ikon Phosphor, segmented berbentuk pil, skala tipe kustom (bukan peran tipe Material), dan tanpa Dynamic Color.
+
+## Karena arah visual (November 2026)
+Atas permintaan pemilik produk, tampilan diarahkan ke putih netral (lebih dekat ke desain "Soft" web operator, `../eabsensi-v2/DESIGN.md`). `README.md` sudah diperbarui (bagian Prinsip warna); prototipe HTML belum.
+- Latar layar: gradien mint + blob diganti abu netral polos (`background`); `surfaceAlt` terang `#F0FDF4` -> `#F1F4F2`.
+- Tile menu beranda: nada mint/teal/amber per menu dihapus; semua ikon Phosphor Duotone hijau ukuran 28 tanpa kotak (juga ikon kartu event dan persetujuan). Field `tone` di `MenuItemData` tetap ada karena rancangan `GET /api/v2/menus` mengirimnya, tetapi tidak dipakai untuk tampilan.
+- Kartu event dan kartu persetujuan: latar tint + garis diganti kartu putih; amber hanya pada lencana jumlah persetujuan.
+- Kartu jam beranda: kotak latar hero dan radial mint dihapus.

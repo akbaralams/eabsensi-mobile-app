@@ -42,8 +42,9 @@ class _PrimaryButtonState extends State<PrimaryButton> {
       child: Opacity(
         opacity: widget.onPressed == null ? .5 : 1,
         child: AnimatedScale(
-          scale: _pressed && !reduce ? .98 : 1,
-          duration: const Duration(milliseconds: 90),
+          scale: _pressed && !reduce ? AppMotion.pressScale : 1,
+          duration: AppMotion.press,
+          curve: AppMotion.easeOut,
           child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: c.primaryGradient,

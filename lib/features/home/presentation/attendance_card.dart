@@ -61,7 +61,7 @@ class AttendanceCard extends StatelessWidget {
     final large = MediaQuery.textScalerOf(context).scale(14) / 14 > 1.3;
     final inCell = _TimeCell(
       icon: PhosphorIconsRegular.signIn,
-      iconBg: c.mintTint,
+      iconBg: c.surfaceAlt,
       label: 'Masuk',
       time: summary.checkIn,
     );
@@ -147,18 +147,9 @@ class _Hero extends StatelessWidget {
             DayPhase.pending => ('Menunggu persetujuan', StatusVariant.pending),
             DayPhase.checkedOut => ('Sudah Check Out', StatusVariant.success),
           };
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        color: c.surfaceAlt,
-        gradient: RadialGradient(
-          center: const Alignment(.9, -.4),
-          radius: .9,
-          colors: [c.blobMint, c.blobMint.withValues(alpha: 0)],
-          stops: const [0, .7],
-        ),
-      ),
+    // Tanpa kotak latar: jam dan chip status langsung di atas kartu putih.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
       child: Row(
         children: [
           Expanded(
@@ -184,7 +175,14 @@ class _Hero extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                StatusChip(label: label, variant: variant, large: true),
+                StateSwitcher(
+                  id: label,
+                  child: StatusChip(
+                    label: label,
+                    variant: variant,
+                    large: true,
+                  ),
+                ),
               ],
             ),
           ),
@@ -278,12 +276,15 @@ class _TimeCell extends StatelessWidget {
                     label,
                     style: AppType.caption.copyWith(color: c.textMuted),
                   ),
-                  Text(
-                    value,
-                    style: AppType.cardTitle.copyWith(
-                      color: c.textPrimary,
-                      fontSize: 16,
-                      fontFeatures: const [FontFeature.tabularFigures()],
+                  StateSwitcher(
+                    id: value,
+                    child: Text(
+                      value,
+                      style: AppType.cardTitle.copyWith(
+                        color: c.textPrimary,
+                        fontSize: 16,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ),
                 ],
@@ -318,27 +319,29 @@ class _ActionButton extends StatelessWidget {
       button: true,
       label: label,
       excludeSemantics: true,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: primary ? c.primaryGradient : null,
-          color: primary ? null : c.surfaceAlt,
-          borderRadius: radius,
-          boxShadow: primary ? c.buttonShadow : null,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
+      child: Pressable(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: primary ? c.primaryGradient : null,
+            color: primary ? null : c.surfaceAlt,
             borderRadius: radius,
-            onTap: onTap,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 72),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  PhosphorIcon(icon, size: 22, color: fg),
-                  const SizedBox(height: 4),
-                  Text(label, style: AppType.bodyBold.copyWith(color: fg)),
-                ],
+            boxShadow: primary ? c.buttonShadow : null,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: radius,
+              onTap: onTap,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 72),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    PhosphorIcon(icon, size: 22, color: fg),
+                    const SizedBox(height: 4),
+                    Text(label, style: AppType.bodyBold.copyWith(color: fg)),
+                  ],
+                ),
               ),
             ),
           ),

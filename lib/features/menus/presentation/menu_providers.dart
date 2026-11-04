@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/design/phosphor.dart';
@@ -19,16 +18,17 @@ final menuInactiveModeProvider = Provider<MenuInactiveMode>(
   (ref) => MenuInactiveMode.locked,
 );
 
-const Map<String, IconData> menuIcons = {
-  'airplane': PhosphorIconsRegular.airplaneTilt,
-  'hand': PhosphorIconsRegular.hand,
-  'firstAid': PhosphorIconsRegular.firstAidKit,
-  'briefcase': PhosphorIconsRegular.briefcase,
-  'flag': PhosphorIconsRegular.flag,
-  'moon': PhosphorIconsRegular.moonStars,
-  'house': PhosphorIconsRegular.houseLine,
-  'graduationCap': PhosphorIconsRegular.graduationCap,
+/// Ikon menu beranda: gaya Duotone, satu aksen hijau (lihat docs/design).
+const Map<String, DuotoneIconData> menuIcons = {
+  'airplane': PhosphorIconsDuotone.airplaneTilt,
+  'hand': PhosphorIconsDuotone.hand,
+  'firstAid': PhosphorIconsDuotone.firstAidKit,
+  'briefcase': PhosphorIconsDuotone.briefcase,
+  'flag': PhosphorIconsDuotone.flag,
+  'moon': PhosphorIconsDuotone.moonStars,
+  'house': PhosphorIconsDuotone.houseLine,
+  'graduationCap': PhosphorIconsDuotone.graduationCap,
 };
 
-IconData menuIcon(String name) =>
-    menuIcons[name] ?? PhosphorIconsRegular.squaresFour;
+DuotoneIconData menuIcon(String name) =>
+    menuIcons[name] ?? PhosphorIconsDuotone.squaresFour;

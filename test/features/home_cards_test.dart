@@ -351,16 +351,14 @@ void main() {
               children: [
                 MenuTile(
                   key: const Key('satu'),
-                  icon: PhosphorIconsRegular.hand,
+                  icon: PhosphorIconsDuotone.hand,
                   label: 'Izin',
-                  tone: MenuTone.mint,
                   onTap: () {},
                 ),
                 MenuTile(
                   key: const Key('dua'),
-                  icon: PhosphorIconsRegular.graduationCap,
+                  icon: PhosphorIconsDuotone.graduationCap,
                   label: 'Tugas Belajar Panjang',
-                  tone: MenuTone.mint,
                   onTap: () {},
                 ),
               ],
@@ -371,13 +369,13 @@ void main() {
       final a = t.getTopLeft(
         find.descendant(
           of: find.byKey(const Key('satu')),
-          matching: find.byIcon(PhosphorIconsRegular.hand),
+          matching: find.byIcon(PhosphorIconsDuotone.hand.main),
         ),
       );
       final b = t.getTopLeft(
         find.descendant(
           of: find.byKey(const Key('dua')),
-          matching: find.byIcon(PhosphorIconsRegular.graduationCap),
+          matching: find.byIcon(PhosphorIconsDuotone.graduationCap.main),
         ),
       );
       expect(a.dy, b.dy);
@@ -392,9 +390,8 @@ void main() {
             height: 110,
             child: MenuTile(
               key: Key('tile'),
-              icon: PhosphorIconsRegular.moonStars,
+              icon: PhosphorIconsDuotone.moonStars,
               label: 'Lembur',
-              tone: MenuTone.amber,
               enabled: false,
               onTap: null,
             ),

@@ -80,13 +80,18 @@ final class TooManyRequestsFailure extends ApiFailure {
   }
 }
 
+/// Tanpa jaringan atau timeout. [message] umum untuk semua layar; alur punch
+/// memakai [punchMessage] yang menjelaskan mengapa absen butuh jaringan.
 final class OfflineFailure extends ApiFailure {
   const OfflineFailure();
 
-  @override
-  String get message =>
+  static const punchMessage =
       'Absen membutuhkan jaringan karena waktu dicatat oleh server. '
       'Sambungkan internet lalu coba lagi.';
+
+  @override
+  String get message =>
+      'Tidak ada koneksi internet. Sambungkan internet lalu coba lagi.';
 }
 
 final class UnknownFailure extends ApiFailure {

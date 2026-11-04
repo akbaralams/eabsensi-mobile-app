@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-/// Masuk layar: fade + naik 8px, 300ms. Patuh `disableAnimations`.
+import '../tokens.dart';
+
+/// Masuk layar: fade + naik 8px ([AppMotion.enter]). Patuh `disableAnimations`.
 class FadeSlideIn extends StatefulWidget {
   const FadeSlideIn({
     required this.child,
@@ -21,7 +23,7 @@ class _FadeSlideInState extends State<FadeSlideIn>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 320),
+    duration: AppMotion.enter,
   );
   Timer? _timer;
   bool _started = false;
@@ -51,7 +53,7 @@ class _FadeSlideInState extends State<FadeSlideIn>
 
   @override
   Widget build(BuildContext context) {
-    final curve = CurvedAnimation(parent: _c, curve: Curves.easeOut);
+    final curve = CurvedAnimation(parent: _c, curve: AppMotion.easeOut);
     return FadeTransition(
       opacity: curve,
       child: AnimatedBuilder(
@@ -121,6 +123,86 @@ class _FloatingState extends State<Floating>
         child: child,
       ),
       child: widget.child,
+    );
+  }
+}
+
+/// Umpan balik tekan: anak mengecil ke [scale] selama jari menempel, lalu
+/// kembali. Memakai [Listener], jadi tidak bersaing dengan InkWell/gesture
+/// anak. Mati bila [enabled] false atau pengguna mengurangi animasi.
+class Pressable extends StatefulWidget {
+  const Pressable({
+    required this.child,
+    this.enabled = true,
+    this.scale = AppMotion.pressScale,
+    super.key,
+  });
+
+  final Widget child;
+  final bool enabled;
+  final double scale;
+
+  @override
+  State<Pressable> createState() => _PressableState();
+}
+
+class _PressableState extends State<Pressable> {
+  bool _down = false;
+
+  void _set(bool down) {
+    if (_down != down && mounted) setState(() => _down = down);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final active =
+        widget.enabled && _down && !MediaQuery.disableAnimationsOf(context);
+    return Listener(
+      onPointerDown: widget.enabled ? (_) => _set(true) : null,
+      onPointerUp: (_) => _set(false),
+      onPointerCancel: (_) => _set(false),
+      child: AnimatedScale(
+        scale: active ? widget.scale : 1,
+        duration: AppMotion.press,
+        curve: AppMotion.easeOut,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// Pergantian status atau konten: yang lama memudar, yang baru muncul dari
+/// skala 0,96 ([AppMotion.state]). Ganti [id] untuk memicu animasi; data yang
+/// sama tidak dianimasikan ulang. Tanpa animasi bila pengguna menguranginya.
+class StateSwitcher extends StatelessWidget {
+  const StateSwitcher({
+    required this.id,
+    required this.child,
+    this.alignment = Alignment.centerLeft,
+    super.key,
+  });
+
+  final Object id;
+  final Widget child;
+  final AlignmentGeometry alignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: AppMotion.of(context, AppMotion.state),
+      switchInCurve: AppMotion.easeOut,
+      switchOutCurve: Curves.easeIn,
+      layoutBuilder: (current, previous) =>
+          Stack(alignment: alignment, children: [...previous, ?current]),
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: .96, end: 1).animate(animation),
+          alignment: alignment.resolve(Directionality.of(context)),
+          child: child,
+        ),
+      ),
+      child: KeyedSubtree(key: ValueKey(id), child: child),
     );
   }
 }

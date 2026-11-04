@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import '../phosphor.dart';
 import '../tokens.dart';
 
+/// Jenis toast: menentukan ikon, agar status tidak tersampaikan keliru.
+enum ToastKind { success, info, error }
+
 /// Umpan balik singkat lewat Snackbar Material: mengambang di atas navigasi
 /// bawah, bisa ditutup, dan bisa memuat satu aksi (mis. "Urungkan").
 abstract final class AppToast {
   static ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? show(
     BuildContext context,
     String message, {
+    ToastKind kind = ToastKind.success,
     Duration duration = const Duration(seconds: 4),
     String? actionLabel,
     VoidCallback? onAction,
@@ -16,6 +20,11 @@ abstract final class AppToast {
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return null;
     final c = context.colors;
+    final (icon, iconColor) = switch (kind) {
+      ToastKind.success => (PhosphorIconsFill.checkCircle, c.toastAccent),
+      ToastKind.info => (PhosphorIconsFill.info, c.toastText),
+      ToastKind.error => (PhosphorIconsFill.warningCircle, c.toastError),
+    };
     messenger.hideCurrentSnackBar();
     return messenger.showSnackBar(
       SnackBar(
@@ -34,11 +43,7 @@ abstract final class AppToast {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Row(
           children: [
-            PhosphorIcon(
-              PhosphorIconsFill.checkCircle,
-              size: 20,
-              color: c.mint400,
-            ),
+            PhosphorIcon(icon, size: 20, color: iconColor),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -55,7 +60,7 @@ abstract final class AppToast {
             ? null
             : SnackBarAction(
                 label: actionLabel,
-                textColor: c.mint400,
+                textColor: c.toastAccent,
                 onPressed: onAction ?? () {},
               ),
       ),

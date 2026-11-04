@@ -236,7 +236,11 @@ class _PunchPhotoPageState extends ConsumerState<PunchPhotoPage>
     if (ok) {
       setState(() => _torch = !_torch);
     } else {
-      AppToast.show(context, 'Lampu senter tidak tersedia di kamera ini.');
+      AppToast.show(
+        context,
+        'Lampu senter tidak tersedia di kamera ini.',
+        kind: ToastKind.info,
+      );
     }
   }
 
@@ -708,14 +712,52 @@ class _FrameCorner extends StatelessWidget {
   }
 }
 
-class _StatusPill extends StatelessWidget {
+/// Status wajah. Tampilan berganti seketika, tetapi screen reader hanya
+/// diberi tahu setelah status stabil ([_settle]), agar TalkBack tidak terus
+/// berbicara saat wajah keluar-masuk bingkai.
+class _StatusPill extends StatefulWidget {
   const _StatusPill({required this.status});
 
   final FaceStatus? status;
 
   @override
+  State<_StatusPill> createState() => _StatusPillState();
+}
+
+class _StatusPillState extends State<_StatusPill> {
+  static const _settle = Duration(milliseconds: 700);
+
+  late String _spoken = _spokenFor(widget.status);
+  Timer? _timer;
+
+  static String _spokenFor(FaceStatus? status) => switch (status) {
+    null => 'Membuka kamera',
+    FaceStatus.inside => 'Wajah terdeteksi',
+    FaceStatus.outside => 'Sejajarkan wajah ke bingkai',
+    FaceStatus.none => 'Wajah tidak terdeteksi',
+  };
+
+  @override
+  void didUpdateWidget(_StatusPill old) {
+    super.didUpdateWidget(old);
+    if (old.status == widget.status) return;
+    _timer?.cancel();
+    final next = _spokenFor(widget.status);
+    _timer = Timer(_settle, () {
+      if (mounted && next != _spoken) setState(() => _spoken = next);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final status = widget.status;
     final inside = status == FaceStatus.inside;
     final text = switch (status) {
       null => 'MEMBUKA KAMERA…',
@@ -724,52 +766,56 @@ class _StatusPill extends StatelessWidget {
       FaceStatus.none => 'WAJAH TIDAK TERDETEKSI',
     };
     return Semantics(
+      container: true,
       liveRegion: true,
-      child: AnimatedSwitcher(
-        duration: MediaQuery.disableAnimationsOf(context)
-            ? Duration.zero
-            : const Duration(milliseconds: 250),
-        child: Container(
-          key: ValueKey(text),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          decoration: BoxDecoration(
-            color: inside
-                ? c.gradientStart.withValues(alpha: .95)
-                : AppColors.cameraBackground.withValues(alpha: .45),
-            borderRadius: BorderRadius.circular(AppRadius.chip),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (inside)
-                const PhosphorIcon(
-                  PhosphorIconsFill.checkCircle,
-                  size: 16,
-                  color: Colors.white,
-                )
-              else
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
+      label: _spoken,
+      child: ExcludeSemantics(
+        child: AnimatedSwitcher(
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 250),
+          child: Container(
+            key: ValueKey(text),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: inside
+                  ? c.gradientStart.withValues(alpha: .95)
+                  : AppColors.cameraBackground.withValues(alpha: .45),
+              borderRadius: BorderRadius.circular(AppRadius.chip),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (inside)
+                  const PhosphorIcon(
+                    PhosphorIconsFill.checkCircle,
+                    size: 16,
                     color: Colors.white,
-                    shape: BoxShape.circle,
+                  )
+                else
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    text,
+                    key: const Key('face-status'),
+                    textAlign: TextAlign.center,
+                    style: AppType.smallBold.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: .8,
+                    ),
                   ),
                 ),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  text,
-                  key: const Key('face-status'),
-                  textAlign: TextAlign.center,
-                  style: AppType.smallBold.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: .8,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

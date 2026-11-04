@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import '../phosphor.dart';
 
 import '../tokens.dart';
+import 'motion.dart';
 
+/// Nada warna dari data menu (`tone` di rancangan API v2) dan jenis notifikasi.
+/// Tile menu beranda tidak memakainya: semua menu setara, jadi tampil netral
+/// dengan satu aksen hijau (warna hanya untuk makna).
 enum MenuTone { mint, teal, amber }
 
 const double _iconBox = 44;
@@ -30,15 +34,13 @@ class MenuTile extends StatelessWidget {
   const MenuTile({
     required this.icon,
     required this.label,
-    required this.tone,
     required this.onTap,
     this.enabled = true,
     super.key,
   });
 
-  final IconData icon;
+  final DuotoneIconData icon;
   final String label;
-  final MenuTone tone;
   final VoidCallback? onTap;
   final bool enabled;
 
@@ -52,21 +54,15 @@ class MenuTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final (bg, fg) = switch (tone) {
-      MenuTone.mint => (c.mintTint, c.accent),
-      MenuTone.teal => (c.tealTint, c.tealIcon),
-      MenuTone.amber => (c.amberTint, c.amberIcon),
-    };
     final radius = BorderRadius.circular(AppRadius.tile);
 
-    Widget box = Container(
+    // Ikon Duotone tanpa kotak latar: lapisan isinya tetap terlihat.
+    Widget box = SizedBox(
       width: _iconBox,
       height: _iconBox,
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(AppRadius.iconBox),
+      child: Center(
+        child: PhosphorDuotoneIcon(icon, size: 28, color: c.accent),
       ),
-      child: Center(child: PhosphorIcon(icon, size: 22, color: fg)),
     );
     if (!enabled) {
       box = Opacity(
@@ -127,9 +123,11 @@ class MenuTile extends StatelessWidget {
       label: label,
       button: true,
       excludeSemantics: true,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(borderRadius: radius, onTap: onTap, child: content),
+      child: Pressable(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(borderRadius: radius, onTap: onTap, child: content),
+        ),
       ),
     );
   }

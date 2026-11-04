@@ -59,70 +59,68 @@ class ApprovalCard extends StatelessWidget {
       button: true,
       label: '$total menunggu persetujuanmu: $spoken. Tinjau persetujuan tim',
       excludeSemantics: true,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: radius,
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: c.amberTint,
-              borderRadius: radius,
-              border: Border.all(color: c.amberIcon.withValues(alpha: .35)),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: c.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.iconBox),
-                  ),
-                  child: Center(
-                    child: PhosphorIcon(
-                      PhosphorIconsRegular.stamp,
-                      size: 22,
-                      color: c.amberIcon,
+      child: Pressable(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: radius,
+            onTap: onTap,
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: c.surface,
+                borderRadius: radius,
+                boxShadow: c.tileShadow,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Center(
+                      child: PhosphorDuotoneIcon(
+                        PhosphorIconsDuotone.stamp,
+                        size: 28,
+                        color: c.textSecondary,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              'Menunggu Persetujuan',
-                              style: AppType.cardTitle.copyWith(
-                                color: c.textPrimary,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                'Menunggu Persetujuan',
+                                style: AppType.cardTitle.copyWith(
+                                  color: c.textPrimary,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          _CountBadge(count: total),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          for (final e in byCategory.entries)
-                            _CategoryChip(category: e.key, count: e.value),
-                          const _ReviewPill(),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(width: 8),
+                            _CountBadge(count: total),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            for (final e in byCategory.entries)
+                              _CategoryChip(category: e.key, count: e.value),
+                            const _ReviewPill(),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -167,13 +165,13 @@ class _CategoryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: c.surface,
+        color: c.surfaceAlt,
         borderRadius: BorderRadius.circular(AppRadius.chip),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PhosphorIcon(category.icon, size: 12, color: c.amberIcon),
+          PhosphorIcon(category.icon, size: 12, color: c.textSecondary),
           const SizedBox(width: 5),
           Text(
             '${category.label} · $count',
@@ -194,12 +192,15 @@ class _ReviewPill extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Tinjau', style: AppType.captionBold.copyWith(color: c.amberText)),
+        Text(
+          'Tinjau',
+          style: AppType.captionBold.copyWith(color: c.accentText),
+        ),
         const SizedBox(width: 2),
         PhosphorIcon(
           PhosphorIconsBold.caretRight,
           size: 14,
-          color: c.amberText,
+          color: c.accentText,
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../tokens.dart';
+import 'motion.dart';
 
 class AppCard extends StatelessWidget {
   const AppCard({
@@ -40,9 +41,11 @@ class AppCard extends StatelessWidget {
     return Semantics(
       button: true,
       label: semanticLabel,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(borderRadius: radius, onTap: onTap, child: decorated),
+      child: Pressable(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(borderRadius: radius, onTap: onTap, child: decorated),
+        ),
       ),
     );
   }

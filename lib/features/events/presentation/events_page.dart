@@ -36,55 +36,67 @@ class EventsPage extends ConsumerWidget {
                   24,
                 ),
                 children: [
-                  events.when(
-                    loading: () => const Padding(
-                      padding: EdgeInsets.all(40),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                    error: (e, _) => AppCard(
-                      child: Column(
-                        children: [
-                          Text(
-                            e is ApiFailure ? e.message : 'Terjadi kesalahan.',
-                            textAlign: TextAlign.center,
-                            style: AppType.body.copyWith(
-                              color: c.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          OutlineButton(
-                            label: 'Coba lagi',
-                            onPressed: () =>
-                                ref.invalidate(eventsTodayProvider),
-                          ),
-                        ],
+                  StateSwitcher(
+                    id: events.isLoading
+                        ? 'muat'
+                        : events.hasError
+                        ? 'galat'
+                        : 'isi',
+                    alignment: Alignment.topCenter,
+                    child: events.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.all(40),
+                        child: Center(child: CircularProgressIndicator()),
                       ),
-                    ),
-                    data: (list) => list.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Text(
-                              'Tidak ada event hari ini.',
+                      error: (e, _) => AppCard(
+                        child: Column(
+                          children: [
+                            Text(
+                              e is ApiFailure
+                                  ? e.message
+                                  : 'Terjadi kesalahan.',
                               textAlign: TextAlign.center,
-                              style: AppType.body.copyWith(color: c.textMuted),
+                              style: AppType.body.copyWith(
+                                color: c.textSecondary,
+                              ),
                             ),
-                          )
-                        : Column(
-                            children: [
-                              for (final e in list) ...[
-                                _EventCard(
-                                  event: e,
-                                  primary:
-                                      e ==
-                                      list.firstWhere(
-                                        (x) => !x.checkedIn,
-                                        orElse: () => e,
-                                      ),
+                            const SizedBox(height: 12),
+                            OutlineButton(
+                              label: 'Coba lagi',
+                              onPressed: () =>
+                                  ref.invalidate(eventsTodayProvider),
+                            ),
+                          ],
+                        ),
+                      ),
+                      data: (list) => list.isEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Text(
+                                'Tidak ada event hari ini.',
+                                textAlign: TextAlign.center,
+                                style: AppType.body.copyWith(
+                                  color: c.textMuted,
                                 ),
-                                const SizedBox(height: AppSpace.block),
+                              ),
+                            )
+                          : Column(
+                              children: [
+                                for (final e in list) ...[
+                                  _EventCard(
+                                    event: e,
+                                    primary:
+                                        e ==
+                                        list.firstWhere(
+                                          (x) => !x.checkedIn,
+                                          orElse: () => e,
+                                        ),
+                                  ),
+                                  const SizedBox(height: AppSpace.block),
+                                ],
                               ],
-                            ],
-                          ),
+                            ),
+                    ),
                   ),
                 ],
               ),

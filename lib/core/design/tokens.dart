@@ -10,10 +10,7 @@ const fontFamily = 'PlusJakartaSans';
 final class AppColors extends ThemeExtension<AppColors> {
   const AppColors({
     required this.isDark,
-    required this.backgroundTop,
-    required this.backgroundBottom,
-    required this.blobMint,
-    required this.blobTeal,
+    required this.background,
     required this.surface,
     required this.surfaceAlt,
     required this.border,
@@ -50,15 +47,14 @@ final class AppColors extends ThemeExtension<AppColors> {
     required this.shadow,
     required this.toastBackground,
     required this.toastText,
+    required this.toastAccent,
+    required this.toastError,
   });
 
   final bool isDark;
 
-  // Latar layar
-  final Color backgroundTop;
-  final Color backgroundBottom;
-  final Color blobMint;
-  final Color blobTeal;
+  // Latar layar: abu netral polos, agar kartu putih yang menonjol.
+  final Color background;
 
   // Permukaan
   final Color surface;
@@ -105,14 +101,16 @@ final class AppColors extends ThemeExtension<AppColors> {
   final Color toastBackground;
   final Color toastText;
 
+  /// Ikon sukses dan tombol aksi toast; ikon gagal toast. Latar toast
+  /// berkebalikan dengan mode, jadi warnanya ikut dibalik.
+  final Color toastAccent;
+  final Color toastError;
+
   static const light = AppColors(
     isDark: false,
-    backgroundTop: Color(0xFFF0FDF4),
-    backgroundBottom: Color(0xFFFFFFFF),
-    blobMint: Color(0xFFD1FAE5),
-    blobTeal: Color(0xFFCCFBF1),
+    background: Color(0xFFF4F6F5),
     surface: Color(0xFFFFFFFF),
-    surfaceAlt: Color(0xFFF0FDF4),
+    surfaceAlt: Color(0xFFF1F4F2),
     border: Color(0xFF7A9A8D),
     divider: Color(0xFFE3EFE9),
     rowDivider: Color(0xFFF0F5F2),
@@ -147,14 +145,13 @@ final class AppColors extends ThemeExtension<AppColors> {
     shadow: Color(0xFF064E3B),
     toastBackground: Color(0xFF053B2C),
     toastText: Color(0xFFFFFFFF),
+    toastAccent: Color(0xFF34D399),
+    toastError: Color(0xFFFCA5A5),
   );
 
   static const dark = AppColors(
     isDark: true,
-    backgroundTop: Color(0xFF0B3B33),
-    backgroundBottom: Color(0xFF0F172A),
-    blobMint: Color(0x33064E3B),
-    blobTeal: Color(0x2214B8A6),
+    background: Color(0xFF0F172A),
     surface: Color(0xFF1E293B),
     surfaceAlt: Color(0xFF334155),
     border: Color(0xFF64748B),
@@ -191,6 +188,8 @@ final class AppColors extends ThemeExtension<AppColors> {
     shadow: Color(0xFF000000),
     toastBackground: Color(0xFFF8FAFC),
     toastText: Color(0xFF0F172A),
+    toastAccent: Color(0xFF047857),
+    toastError: Color(0xFFB91C1C),
   );
 
   /// Gradien tombol utama.
@@ -283,6 +282,28 @@ final class AppColors extends ThemeExtension<AppColors> {
 extension AppColorsContext on BuildContext {
   AppColors get colors =>
       Theme.of(this).extension<AppColors>() ?? AppColors.light;
+}
+
+/// Gerak: satu skala durasi dan satu kurva untuk seluruh aplikasi. Semua
+/// animasi UI di bawah 300 ms kecuali momen langka (hasil punch).
+abstract final class AppMotion {
+  /// Umpan balik tekan (tile, kartu, tombol).
+  static const press = Duration(milliseconds: 120);
+
+  /// Perubahan status/konten (chip status, jam masuk/keluar, muat -> isi).
+  static const state = Duration(milliseconds: 200);
+
+  /// Masuk layar dan momen hasil.
+  static const enter = Duration(milliseconds: 320);
+
+  /// Ease-out kuat: cepat merespons, mendarat halus.
+  static const easeOut = Cubic(0.23, 1, 0.32, 1);
+
+  static const pressScale = .97;
+
+  /// [d], atau nol bila pengguna memilih mengurangi animasi.
+  static Duration of(BuildContext context, Duration d) =>
+      MediaQuery.disableAnimationsOf(context) ? Duration.zero : d;
 }
 
 /// Radius (logical px).
