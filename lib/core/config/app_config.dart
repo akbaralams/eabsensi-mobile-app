@@ -21,6 +21,13 @@ class AppConfig {
     defaultValue: kDebugMode,
   );
 
+  /// Manifes pembaruan aplikasi (`version.json` di aset rilis GitHub). Kosong
+  /// mematikan fitur pembaruan. Wajib HTTPS; APK harus di host yang sama.
+  static const updateManifestUrl = String.fromEnvironment(
+    'UPDATE_MANIFEST_URL',
+    defaultValue: 'https://github.com/akbaralams/eabsensi-mobile-app/releases/latest/download/version.json',
+  );
+
   /// Alat uji (galeri komponen, panel skenario): hanya di build debug, atau bila
   /// diminta lewat `--dart-define=DEBUG_TOOLS=true` (mis. APK uji data dummy).
   static const debugTools = bool.fromEnvironment(

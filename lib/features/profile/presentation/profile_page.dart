@@ -7,6 +7,9 @@ import '../../../core/design/design.dart';
 import '../../../core/design/theme_mode_controller.dart';
 import '../../auth/domain/user_profile.dart';
 import '../../auth/presentation/session_controller.dart';
+import '../../update/domain/app_update.dart';
+import '../../update/presentation/update_providers.dart';
+import '../../update/presentation/update_sheet.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -87,6 +90,7 @@ class ProfilePage extends ConsumerWidget {
                 label: 'Notifikasi',
                 onTap: () => context.push('/notifications'),
               ),
+              _UpdateRow(onTap: () => _checkUpdate(context, ref)),
               _MenuRow(
                 icon: PhosphorIconsRegular.moon,
                 label: 'Tampilan',
@@ -118,6 +122,22 @@ class ProfilePage extends ConsumerWidget {
         _LogoutButton(onTap: () => _confirmLogout(context, ref)),
       ],
     );
+  }
+
+  /// Periksa pembaruan sekarang; bila ada, buka lembar pembaruan.
+  Future<void> _checkUpdate(BuildContext context, WidgetRef ref) async {
+    ref.invalidate(availableUpdateProvider);
+    try {
+      final info = await ref.read(availableUpdateProvider.future);
+      if (!context.mounted) return;
+      if (info == null) {
+        AppToast.show(context, 'Aplikasi sudah versi terbaru');
+      } else {
+        await showUpdateSheet(context, info);
+      }
+    } on UpdateCheckFailure catch (e) {
+      if (context.mounted) AppToast.show(context, e.message);
+    }
   }
 
   static void _soon(BuildContext context, String label) =>
@@ -365,6 +385,30 @@ class _LogoutButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Baris "Pembaruan aplikasi": versi terpasang, atau "Tersedia x.y.z" (teks,
+/// tidak hanya warna) bila ada rilis lebih baru.
+class _UpdateRow extends ConsumerWidget {
+  const _UpdateRow({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final version = ref.watch(appVersionProvider).value;
+    final available = ref.watch(availableUpdateProvider).value;
+    return _MenuRow(
+      icon: PhosphorIconsRegular.arrowClockwise,
+      label: 'Pembaruan aplikasi',
+      trailing: available != null
+          ? 'Tersedia ${available.versionName}'
+          : version == null
+          ? ''
+          : 'Versi ${version.name}',
+      onTap: onTap,
     );
   }
 }

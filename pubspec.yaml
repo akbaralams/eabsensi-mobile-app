@@ -50,6 +50,8 @@ dependencies:
   timezone: ^0.11.2
   eabsensi_api:
     path: packages/eabsensi_api
+  package_info_plus: ^10.2.2
+  ota_update: ^7.1.0
 
 dev_dependencies:
   flutter_test:

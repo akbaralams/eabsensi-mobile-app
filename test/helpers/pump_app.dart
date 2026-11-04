@@ -1,4 +1,5 @@
 import 'package:eabsensi/app.dart';
+import 'package:eabsensi/core/api/no_retry.dart';
 import 'package:eabsensi/core/clock/clock.dart';
 import 'package:eabsensi/core/mock/mock_env.dart';
 import 'package:eabsensi/core/storage/preferences.dart';
@@ -7,6 +8,9 @@ import 'package:eabsensi/features/punch/data/fake_camera_service.dart';
 import 'package:eabsensi/features/punch/domain/camera.dart';
 import 'package:eabsensi/features/punch/presentation/location_map.dart';
 import 'package:eabsensi/features/punch/presentation/punch_providers.dart';
+import 'package:eabsensi/features/update/data/http_update_repository.dart';
+import 'package:eabsensi/features/update/domain/app_update.dart';
+import 'package:eabsensi/features/update/presentation/update_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -38,6 +42,8 @@ Future<ProviderContainer> pumpApp(
   CameraService camera = const FakeCameraService(),
   List<Override> overrides = const [],
   TokenStore? tokens,
+  UpdateRepository updates = const DisabledUpdateRepository(),
+  ApkInstaller? installer,
 }) async {
   SharedPreferences.setMockInitialValues(prefs);
   final sp = await SharedPreferences.getInstance();
@@ -58,6 +64,7 @@ Future<ProviderContainer> pumpApp(
   });
 
   final container = ProviderContainer(
+    retry: noAutomaticRetry,
     overrides: [
       sharedPreferencesProvider.overrideWithValue(sp),
       tokenStoreProvider.overrideWithValue(
@@ -76,6 +83,12 @@ Future<ProviderContainer> pumpApp(
           latency: Duration.zero,
         ),
       ),
+      // Tanpa channel platform dan tanpa jaringan: versi tetap, tidak ada rilis.
+      appVersionProvider.overrideWith(
+        (ref) => const AppVersion(name: '1.0.0', code: 10000),
+      ),
+      updateRepositoryProvider.overrideWithValue(updates),
+      if (installer != null) apkInstallerProvider.overrideWithValue(installer),
       ...overrides,
     ],
   );

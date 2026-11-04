@@ -51,6 +51,9 @@ void main() {
         200,
         scrollable: find.byType(Scrollable).first,
       );
+      // Tombol berhenti digulir saat baru terlihat, tepat di bawah navigasi.
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
+      await settle(tester);
 
       await tester.tap(find.text('Keluar'));
       await settle(tester);

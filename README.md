@@ -73,6 +73,9 @@ Status 30 Oktober 2026 (`api/CONTRACT_VERSION`: `eabsensi-mobile-api` f6853ba).
 
 "live" = `test/live` (repository nyata, tanpa UI). Alur layar mode nyata (login -> beranda -> Check In -> keluar, token dicabut -> login) diuji dengan HTTP palsu di `test/features/real_mode_test.dart`. Belum dijalankan di emulator/HP: di mesin ini tidak ada AVD maupun perangkat terhubung, dan sebagian lisensi Android SDK belum diterima (`flutter doctor --android-licenses`). Staging HTTPS belum diuji.
 
+## Rilis dan pembaruan dalam aplikasi
+Tag `vMAJOR.MINOR.PATCH` memicu CI yang membangun APK bertanda tangan dan menerbitkannya sebagai GitHub Release; aplikasi memeriksa `version.json` dan memasang pembaruan lewat **Profil → Pembaruan aplikasi** (pengguna tetap mengetuk "Pasang"). Persiapan keystore, GitHub Secrets, dan batasannya: [docs/rilis-dan-pembaruan.md](docs/rilis-dan-pembaruan.md).
+
 ## Keputusan teknis
 - **State management: Riverpod** (`flutter_riverpod` 3). Dependensi (repository, layanan lokasi, jam) disuntikkan lewat provider sehingga mock dan implementasi nyata bisa ditukar dan di-override di test tanpa mengubah UI.
 - **Routing: `go_router`**. Redirect berbasis sesi (belum login ke `/login`, token dicabut kembali ke login) dan `StatefulShellRoute` untuk navigasi bawah.
