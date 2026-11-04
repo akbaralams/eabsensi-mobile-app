@@ -136,12 +136,14 @@ class ProfilePage extends ConsumerWidget {
         await showUpdateSheet(context, info);
       }
     } on UpdateCheckFailure catch (e) {
-      if (context.mounted) AppToast.show(context, e.message);
+      if (context.mounted) {
+        AppToast.show(context, e.message, kind: ToastKind.error);
+      }
     }
   }
 
   static void _soon(BuildContext context, String label) =>
-      AppToast.show(context, '$label segera tersedia');
+      AppToast.show(context, '$label segera tersedia', kind: ToastKind.info);
 
   Future<void> _pickTheme(
     BuildContext context,

@@ -84,7 +84,11 @@ class _GalleryPageState extends State<GalleryPage> {
                 PrimaryButton(
                   label: 'Masuk',
                   icon: PhosphorIconsBold.arrowRight,
-                  onPressed: () => AppToast.show(context, 'Tombol ditekan'),
+                  onPressed: () => AppToast.show(
+                    context,
+                    'Tombol ditekan',
+                    kind: ToastKind.info,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 const PrimaryButton(label: 'Menunggu lokasi…', onPressed: null),

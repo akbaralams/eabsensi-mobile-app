@@ -50,6 +50,8 @@ final class AppColors extends ThemeExtension<AppColors> {
     required this.shadow,
     required this.toastBackground,
     required this.toastText,
+    required this.toastAccent,
+    required this.toastError,
   });
 
   final bool isDark;
@@ -105,6 +107,11 @@ final class AppColors extends ThemeExtension<AppColors> {
   final Color toastBackground;
   final Color toastText;
 
+  /// Ikon sukses dan tombol aksi toast; ikon gagal toast. Latar toast
+  /// berkebalikan dengan mode, jadi warnanya ikut dibalik.
+  final Color toastAccent;
+  final Color toastError;
+
   static const light = AppColors(
     isDark: false,
     backgroundTop: Color(0xFFF0FDF4),
@@ -147,6 +154,8 @@ final class AppColors extends ThemeExtension<AppColors> {
     shadow: Color(0xFF064E3B),
     toastBackground: Color(0xFF053B2C),
     toastText: Color(0xFFFFFFFF),
+    toastAccent: Color(0xFF34D399),
+    toastError: Color(0xFFFCA5A5),
   );
 
   static const dark = AppColors(
@@ -191,6 +200,8 @@ final class AppColors extends ThemeExtension<AppColors> {
     shadow: Color(0xFF000000),
     toastBackground: Color(0xFFF8FAFC),
     toastText: Color(0xFF0F172A),
+    toastAccent: Color(0xFF047857),
+    toastError: Color(0xFFB91C1C),
   );
 
   /// Gradien tombol utama.

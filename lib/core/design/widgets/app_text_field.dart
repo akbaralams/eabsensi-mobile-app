@@ -1,3 +1,5 @@
+import 'dart:ui' show SemanticsValidationResult;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -142,30 +144,40 @@ class _AppTextFieldState extends State<AppTextField> {
           ),
           const SizedBox(height: 6),
         ],
+        // Galat ikut dibacakan saat field difokus (seperti errorText bawaan
+        // InputDecoration), dan diumumkan sekali saat muncul.
         Semantics(
           label: widget.label ?? widget.hint,
+          hint: widget.errorText,
+          validationResult: hasError
+              ? SemanticsValidationResult.invalid
+              : SemanticsValidationResult.none,
           textField: true,
           child: field,
         ),
         if (hasError)
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 2),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PhosphorIcon(
-                  PhosphorIconsFill.warningCircle,
-                  size: 14,
-                  color: c.errorText,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    widget.errorText!,
-                    style: AppType.caption.copyWith(color: c.errorText),
+          Semantics(
+            container: true,
+            liveRegion: true,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6, left: 2),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PhosphorIcon(
+                    PhosphorIconsFill.warningCircle,
+                    size: 14,
+                    color: c.errorText,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      widget.errorText!,
+                      style: AppType.caption.copyWith(color: c.errorText),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
       ],

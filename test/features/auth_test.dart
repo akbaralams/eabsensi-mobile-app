@@ -70,7 +70,9 @@ void main() {
       scenario: const MockScenario(offline: true),
     );
     await _login(tester, 'kontrak', mockPassword);
-    expect(find.textContaining('membutuhkan jaringan'), findsOneWidget);
+    // Pesan umum, bukan alasan khusus absen.
+    expect(find.textContaining('Tidak ada koneksi internet'), findsOneWidget);
+    expect(find.textContaining('membutuhkan jaringan'), findsNothing);
   });
 
   testWidgets('token dicabut (401) membawa kembali ke layar login', (

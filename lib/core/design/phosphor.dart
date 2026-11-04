@@ -373,6 +373,12 @@ abstract final class PhosphorIconsFill {
     fontPackage: 'phosphor_flutter',
     matchTextDirection: true,
   );
+  static const info = IconData(
+    0xe2ce,
+    fontFamily: 'PhosphorFill',
+    fontPackage: 'phosphor_flutter',
+    matchTextDirection: true,
+  );
   static const lock = IconData(
     0xe2fa,
     fontFamily: 'PhosphorFill',

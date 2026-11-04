@@ -26,7 +26,7 @@ class PunchErrorPage extends ConsumerWidget {
       ),
       OfflineFailure() => (
         'Tidak ada koneksi',
-        failure.message,
+        OfflineFailure.punchMessage,
         PhosphorIconsFill.wifiSlash,
       ),
       ValidationFailure(:final errors, :final message) => (

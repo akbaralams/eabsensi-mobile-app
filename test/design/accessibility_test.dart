@@ -1,3 +1,5 @@
+import 'dart:ui' show SemanticsValidationResult;
+
 import 'package:eabsensi/core/design/design.dart';
 import 'package:eabsensi/core/design/gallery_page.dart';
 import 'package:flutter/material.dart';
@@ -95,5 +97,26 @@ void main() {
     expect(find.text('Terlambat'), findsOneWidget);
     expect(find.text('Tidak hadir'), findsOneWidget);
     expect(find.byType(PhosphorIcon), findsNWidgets(2));
+  });
+
+  testWidgets('galat field ikut dibacakan saat field difokus', (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: const Scaffold(
+          body: AppTextField(
+            label: 'Password',
+            hint: 'Masukkan password',
+            errorText: 'Password wajib diisi.',
+          ),
+        ),
+      ),
+    );
+    final node = tester.getSemantics(find.byType(TextField));
+    final data = node.getSemanticsData();
+    expect(data.hint, contains('Password wajib diisi.'));
+    expect(data.validationResult, SemanticsValidationResult.invalid);
+    handle.dispose();
   });
 }

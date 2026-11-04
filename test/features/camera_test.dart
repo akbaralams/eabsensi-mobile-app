@@ -184,6 +184,19 @@ void main() {
     expect(find.text('LANGKAH 2 DARI 3'), findsOneWidget);
   });
 
+  testWidgets('status wajah dibacakan setelah stabil, bukan huruf kapital', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pumpApp(tester, camera: const FakeCameraService(faces: []));
+    await _toPhotoPage(tester);
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('WAJAH TIDAK TERDETEKSI'), findsOneWidget);
+    expect(find.bySemanticsLabel('Wajah tidak terdeteksi'), findsOneWidget);
+    expect(find.bySemanticsLabel('WAJAH TIDAK TERDETEKSI'), findsNothing);
+    handle.dispose();
+  });
+
   testWidgets('wajah di luar bingkai: minta disejajarkan', (tester) async {
     await pumpApp(
       tester,
