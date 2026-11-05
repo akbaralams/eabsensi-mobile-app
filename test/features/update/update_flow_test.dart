@@ -179,6 +179,40 @@ void main() {
     });
   });
 
+  testWidgets(
+    'APK per-ABI: lembar menampilkan ukurannya dan itu yang diunduh',
+    (t) async {
+      final arm64 = ApkPackage(
+        url: Uri.parse(
+          'https://github.com/x/y/releases/download/v1.0.3/a-arm64.apk',
+        ),
+        sha256: 'b' * 64,
+        size: 33000000,
+      );
+      final info = UpdateInfo(
+        versionName: _info.versionName,
+        versionCode: _info.versionCode,
+        apkUrl: _info.apkUrl,
+        sha256: _info.sha256,
+        size: 91130636,
+        variants: {'arm64-v8a': arm64},
+      );
+      final installer = _FakeInstaller();
+      addTearDown(installer.dispose);
+      // pumpApp menyetel ABI perangkat ke arm64-v8a.
+      await pumpApp(t, updates: _FakeRepo(info), installer: installer);
+      await _openProfile(t);
+      await t.tap(find.text('Pembaruan aplikasi'));
+      await settle(t);
+
+      expect(find.text('Ukuran unduhan 31,5 MB'), findsOneWidget);
+      await t.tap(find.byKey(const Key('update-start')));
+      await t.pump(); // progres tak tentu beranimasi terus: jangan settle
+      expect(installer.installed!.apkUrl, arm64.url);
+      expect(installer.installed!.sha256, arm64.sha256);
+    },
+  );
+
   group('pemetaan status plugin ota_update', () {
     OtaEvent e(OtaStatus s, [String? v]) => OtaEvent(s, v);
 

@@ -88,6 +88,7 @@ Future<ProviderContainer> pumpApp(
         (ref) => const AppVersion(name: '1.0.0', code: 10000),
       ),
       updateRepositoryProvider.overrideWithValue(updates),
+      supportedAbisProvider.overrideWith((ref) async => const ['arm64-v8a']),
       if (installer != null) apkInstallerProvider.overrideWithValue(installer),
       ...overrides,
     ],

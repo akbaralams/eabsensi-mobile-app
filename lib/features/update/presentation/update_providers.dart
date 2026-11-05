@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -41,7 +43,19 @@ final apkInstallerProvider = Provider<ApkInstaller>(
 final availableUpdateProvider = FutureProvider<UpdateInfo?>((ref) async {
   final current = await ref.watch(appVersionProvider.future);
   final latest = await ref.watch(updateRepositoryProvider).latest();
-  return latest != null && latest.isNewerThan(current) ? latest : null;
+  if (latest == null || !latest.isNewerThan(current)) return null;
+  return latest.forDevice(await ref.watch(supportedAbisProvider.future));
+});
+
+/// ABI yang didukung perangkat, urut preferensi (`Build.SUPPORTED_ABIS`).
+/// Galat atau bukan Android: daftar kosong, sehingga APK universal dipakai.
+final supportedAbisProvider = FutureProvider<List<String>>((ref) async {
+  try {
+    if (!Platform.isAndroid) return const [];
+    return (await DeviceInfoPlugin().androidInfo).supportedAbis;
+  } on Object {
+    return const [];
+  }
 });
 
 sealed class UpdateState {

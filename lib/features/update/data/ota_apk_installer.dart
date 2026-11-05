@@ -13,7 +13,9 @@ class OtaApkInstaller implements ApkInstaller {
     return OtaUpdate()
         .execute(
           info.apkUrl.toString(),
-          destinationFilename: 'eabsensi-${_safe(info.versionName)}.apk',
+          // Per versionCode, agar berkas lama bisa dibersihkan berdasarkan
+          // versi yang sudah terpasang.
+          destinationFilename: 'eabsensi-${info.versionCode}.apk',
           sha256checksum: info.sha256,
         )
         .map(mapOtaEvent);
@@ -21,8 +23,6 @@ class OtaApkInstaller implements ApkInstaller {
 
   @override
   Future<void> cancel() => OtaUpdate().cancel();
-
-  static String _safe(String v) => v.replaceAll(RegExp('[^0-9A-Za-z._-]'), '_');
 }
 
 /// Memetakan status plugin ke peristiwa domain dengan pesan berbahasa

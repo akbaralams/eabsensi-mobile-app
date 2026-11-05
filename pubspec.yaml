@@ -53,6 +53,7 @@ dependencies:
   package_info_plus: ^10.2.2
   ota_update: ^7.1.0
   geocoding: 5.0.1
+  device_info_plus: 13.3.0
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +65,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  # Dipakai tool/release/build_manifest.dart (SHA-256 APK rilis).
+  crypto: ^3.0.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
