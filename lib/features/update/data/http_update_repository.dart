@@ -35,8 +35,13 @@ class HttpUpdateRepository implements UpdateRepository {
       final json = jsonDecode(res.data ?? '');
       if (json is! Map) throw const FormatException('bukan objek');
       final info = UpdateInfo.fromJson(json.cast<String, Object?>());
-      // APK harus berasal dari host yang sama dengan manifes.
-      if (info.apkUrl.host != manifest.host) {
+      // Semua APK (universal dan per-ABI) harus dari host yang sama dengan
+      // manifes.
+      final hosts = {
+        info.apkUrl.host,
+        for (final v in info.variants.values) v.url.host,
+      };
+      if (hosts.any((h) => h != manifest.host)) {
         throw const FormatException('host apk_url berbeda dari manifes');
       }
       return info;

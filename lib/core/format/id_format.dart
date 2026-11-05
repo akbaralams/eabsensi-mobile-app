@@ -63,6 +63,10 @@ abstract final class IdFormat {
   /// "07.30" (gaya penulisan Indonesia)
   static String timeDot(DateTime d) => time(d).replaceFirst(':', '.');
 
+  /// "31,2 MB" (1 MB = 1024 × 1024 byte, koma desimal).
+  static String megabytes(int bytes) =>
+      '${(bytes / (1024 * 1024)).toStringAsFixed(1).replaceFirst('.', ',')} MB';
+
   /// "yyyy-MM-dd" untuk kontrak API.
   static String apiDate(DateTime d) =>
       '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';

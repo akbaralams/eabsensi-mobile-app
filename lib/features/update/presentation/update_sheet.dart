@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/design/design.dart';
+import '../../../core/format/id_format.dart';
 import '../domain/app_update.dart';
 import 'update_providers.dart';
 
@@ -54,6 +55,14 @@ class UpdateSheet extends ConsumerWidget {
                 key: const Key('update-version'),
                 style: AppType.small.copyWith(color: c.textMuted),
               ),
+              if (info.size case final size?) ...[
+                const SizedBox(height: 2),
+                Text(
+                  'Ukuran unduhan ${IdFormat.megabytes(size)}',
+                  key: const Key('update-size'),
+                  style: AppType.small.copyWith(color: c.textMuted),
+                ),
+              ],
               if (info.notes != null) ...[
                 const SizedBox(height: 14),
                 Text(
