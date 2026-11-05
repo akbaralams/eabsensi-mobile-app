@@ -83,7 +83,14 @@ jobs:
           APK="eabsensi-v${{ steps.ver.outputs.name }}.apk"
           cp build/app/outputs/flutter-apk/app-release.apk "$APK"
           SHA="$(sha256sum "$APK" | cut -d' ' -f1)"
-          NOTES="$(git tag -l --format='%(contents)' "$GITHUB_REF_NAME")"
+          # actions/checkout menjadikan tag anotasi tag ringan, sehingga %(contents) berisi pesan
+          # commit. Ambil ulang objek tag aslinya; tag ringan sungguhan = catatan kosong.
+          git fetch --force --no-tags origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+          NOTES=""
+          if [ "$(git cat-file -t "refs/tags/$GITHUB_REF_NAME")" = tag ]; then
+            # subject + body (tanpa tanda tangan GPG); $(...) membuang baris kosong di akhir.
+            NOTES="$(git tag -l --format='%(contents:subject)%0a%0a%(contents:body)' "$GITHUB_REF_NAME")"
+          fi
           jq -n \
             --arg name "${{ steps.ver.outputs.name }}" \
             --argjson code "${{ steps.ver.outputs.code }}" \
