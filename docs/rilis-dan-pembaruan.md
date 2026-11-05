@@ -5,9 +5,34 @@ Alur untuk masa uji coba (Android saja): CI membangun APK bertanda tangan saat t
 ## Cara kerja
 
 1. Kamu membuat tag `vMAJOR.MINOR.PATCH` (mis. `v1.0.3`).
-2. `.github/workflows/release.yml` menjalankan analisis dan test, membangun APK bertanda tangan, lalu menerbitkan **GitHub Release** berisi `eabsensi-v1.0.3.apk` dan `version.json`.
+2. `.github/workflows/release.yml` menjalankan analisis dan test, membangun APK bertanda tangan, lalu menerbitkan **GitHub Release** berisi:
+   - `eabsensi-v1.0.5.apk`: APK **universal** (semua jenis prosesor, sekitar 90 MB);
+   - `eabsensi-v1.0.5-arm64-v8a.apk`, `-armeabi-v7a.apk`, `-x86_64.apk`: APK **per prosesor (ABI)**, kira-kira sepertiganya;
+   - `version.json`, disusun oleh `tool/release/build_manifest.dart`.
 3. Di HP, aplikasi membaca `https://github.com/akbaralams/eabsensi-mobile-app/releases/latest/download/version.json` (`UPDATE_MANIFEST_URL`). Bila `version_code` lebih besar dari yang terpasang, beranda memberi tahu dan **Profil → Pembaruan aplikasi** menampilkan "Tersedia x.y.z".
-4. Pengguna mengetuk **Perbarui sekarang**. Aplikasi mengunduh APK, memeriksa SHA-256 terhadap `version.json`, lalu membuka pemasang Android. Pengguna mengetuk **Pasang**.
+4. Pengguna mengetuk **Perbarui sekarang**. Lembar pembaruan menampilkan ukuran unduhan. Aplikasi mengunduh APK yang cocok dengan prosesor HP, memeriksa SHA-256 terhadap `version.json`, lalu membuka pemasang Android. Pengguna mengetuk **Pasang**.
+
+### APK per prosesor
+
+`version.json` memuat dua bentuk:
+
+```json
+{
+  "version_name": "1.0.5", "version_code": 10005,
+  "apk_url": ".../eabsensi-v1.0.5.apk", "sha256": "…", "size": 91130636,
+  "notes": "…",
+  "apks": {
+    "arm64-v8a":   {"url": ".../eabsensi-v1.0.5-arm64-v8a.apk",   "sha256": "…", "size": …},
+    "armeabi-v7a": {"url": ".../eabsensi-v1.0.5-armeabi-v7a.apk", "sha256": "…", "size": …},
+    "x86_64":      {"url": ".../eabsensi-v1.0.5-x86_64.apk",      "sha256": "…", "size": …}
+  }
+}
+```
+
+- Aplikasi memilih ABI pertama dari `Build.SUPPORTED_ABIS` yang ada di `apks`. Tidak ada yang cocok, atau entrinya rusak: APK universal.
+- `apk_url`/`sha256` **wajib tetap menunjuk APK universal**: aplikasi versi 1.0.4 ke bawah hanya membaca field ini. Karena itu pembaruan dari 1.0.4 masih mengunduh APK universal satu kali; sejak aplikasi 1.0.5 terpasang, unduhan berikutnya memakai APK per-ABI.
+- APK per-ABI dibangun dengan `-P force-version-code-ignoring-abi=true`, jadi `versionCode`-nya sama dengan APK universal (tanpa tambahan 1000×ABI dari Flutter). CI memeriksa ini dengan `aapt2 dump badging` sebelum rilis terbit.
+- APK universal tetap dipakai untuk pemasangan pertama secara manual (cocok untuk semua HP).
 
 Android tidak mengizinkan aplikasi biasa memasang pembaruan tanpa sentuhan pengguna. Pada pemakaian pertama, Android juga meminta izin "pasang aplikasi dari sumber ini" untuk eAbsensi.
 
@@ -49,7 +74,8 @@ git tag -a v1.0.1 -m "Perbaikan deteksi wajah di layar selfie"
 git push origin v1.0.1
 ```
 
-- Pesan tag anotasi menjadi **catatan rilis** yang tampil di lembar pembaruan (kosong bila tag ringan).
+- Pesan tag anotasi menjadi **catatan rilis** yang tampil di lembar pembaruan (kosong bila tag ringan). CI mengambil ulang objek tag, karena `actions/checkout` mengubah tag anotasi menjadi tag ringan (sebelum diperbaiki, catatan v1.0.4 berisi pesan merge commit).
+- Jangan menjalankan ulang (*re-run*) workflow untuk rilis yang sudah terbit: APK hasil build ulang bisa berbeda byte dan SHA-256-nya.
 - `versionCode` dihitung dari tag: `MAJOR*10000 + MINOR*100 + PATCH` (1.0.3 → 10003, 1.2.0 → 10200). `MINOR` dan `PATCH` harus < 100. Tag harus selalu naik; Android menolak versionCode yang lebih kecil atau sama.
 - Build lokal tanpa `android/key.properties` memakai kunci debug dan versionCode dari `pubspec.yaml`; APK-nya tidak bisa menimpa atau ditimpa APK rilis.
 
