@@ -49,3 +49,10 @@ final class LocationDenied extends LocationResult {
 abstract class LocationService {
   Future<LocationResult> current();
 }
+
+/// Nama jalan dari koordinat (reverse geocoding), hanya untuk tampilan agar
+/// pegawai yakin lokasinya benar. Yang dikirim ke server tetap koordinat.
+/// `null` bila tidak tersedia (tanpa jaringan, geocoder perangkat tidak ada).
+abstract class AddressService {
+  Future<String?> lookup(double latitude, double longitude);
+}

@@ -56,6 +56,10 @@ abstract final class IdFormat {
   static String time(DateTime d) =>
       '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 
+  /// "07:55:09"
+  static String timeSeconds(DateTime d) =>
+      '${time(d)}:${d.second.toString().padLeft(2, '0')}';
+
   /// "07.30" (gaya penulisan Indonesia)
   static String timeDot(DateTime d) => time(d).replaceFirst(':', '.');
 

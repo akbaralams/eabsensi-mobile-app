@@ -146,7 +146,19 @@ void main() {
       await _shootManually(tester);
       expect(find.text('LANGKAH 3 DARI 3'), findsOneWidget);
       expect(find.text('Konfirmasi Check In'), findsOneWidget);
-      expect(find.text('Dicatat oleh server saat dikirim'), findsOneWidget);
+      expect(
+        find.text('Jl. Medan Merdeka Barat No. 12, Gambir, Jakarta Pusat'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Di dalam area kantor · Akurasi 8 m\n-6.20012, 106.81655'),
+        findsOneWidget,
+      );
+      expect(find.text('Senin, 26 Oktober 2026\n09:41:00 WIB'), findsOneWidget);
+      expect(
+        find.text('Jam resmi dicatat server saat dikirim'),
+        findsOneWidget,
+      );
       expect(
         container.read(punchFlowProvider).photoPath,
         startsWith('mock://selfie-'),

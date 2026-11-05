@@ -8,6 +8,7 @@ import '../../../core/format/id_format.dart';
 import '../../auth/presentation/session_controller.dart';
 import 'location_map.dart';
 import 'punch_actions.dart';
+import 'punch_details.dart';
 import 'punch_providers.dart';
 
 /// Layar lokasi untuk Check In / Check Out / check-in event.
@@ -44,7 +45,6 @@ class _PunchLocationPageState extends ConsumerState<PunchLocationPage> {
     final c = context.colors;
     final flow = ref.watch(punchFlowProvider);
     final office = ref.watch(officeAreaProvider);
-    final now = ref.watch(clockProvider)();
     final device = ref.watch(deviceNameProvider).value ?? '-';
     final title = widget.target.title;
 
@@ -209,20 +209,15 @@ class _PunchLocationPageState extends ConsumerState<PunchLocationPage> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      _InfoRow(
-                        icon: PhosphorIconsRegular.calendarBlank,
-                        label: 'Tanggal',
-                        value: IdFormat.longDate(now),
-                      ),
-                      const _InfoRow(
-                        icon: PhosphorIconsRegular.clock,
-                        label: 'Waktu',
-                        value: 'Dicatat oleh server',
-                      ),
+                      const _LiveDateTimeRows(),
                       _InfoRow(
                         icon: PhosphorIconsRegular.mapPin,
                         label: 'Lokasi',
-                        value: office?.name ?? 'Lokasi perangkat',
+                        value: PunchDetails.place(flow),
+                        note: [
+                          ?office?.name,
+                          ?PunchDetails.coordinates(flow),
+                        ].join(' · '),
                       ),
                       _InfoRow(
                         icon: PhosphorIconsRegular.deviceMobile,
@@ -251,27 +246,62 @@ class _PunchLocationPageState extends ConsumerState<PunchLocationPage> {
   }
 }
 
+/// Tanggal dan jam yang berdetak tiap detik (zona bisnis). Dipisah agar
+/// detik berjalan tidak membangun ulang peta.
+class _LiveDateTimeRows extends ConsumerWidget {
+  const _LiveDateTimeRows();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final now =
+        ref.watch(tickingClockProvider).value ?? ref.watch(clockProvider)();
+    final zone = ref.watch(businessTimezoneProvider);
+    return Column(
+      children: [
+        _InfoRow(
+          icon: PhosphorIconsRegular.calendarBlank,
+          label: 'Tanggal',
+          value: IdFormat.longDate(now),
+        ),
+        _InfoRow(
+          icon: PhosphorIconsRegular.clock,
+          label: 'Waktu',
+          value: PunchDetails.time(now, zone),
+          note: PunchDetails.serverTimeNote,
+        ),
+      ],
+    );
+  }
+}
+
 class _InfoRow extends StatelessWidget {
   const _InfoRow({
     required this.icon,
     required this.label,
     required this.value,
+    this.note,
     this.last = false,
   });
 
   final IconData icon;
   final String label;
   final String value;
+
+  /// Keterangan kecil di bawah nilai (mis. koordinat); kosong = tidak ada.
+  final String? note;
   final bool last;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final note = this.note;
+    final hasNote = note != null && note.isNotEmpty;
     return Semantics(
-      label: '$label: $value',
+      label: hasNote ? '$label: $value. $note' : '$label: $value',
       excludeSemantics: true,
       child: Container(
         constraints: const BoxConstraints(minHeight: 44),
+        padding: hasNote ? const EdgeInsets.symmetric(vertical: 8) : null,
         decoration: BoxDecoration(
           border: last ? null : Border(bottom: BorderSide(color: c.rowDivider)),
         ),
@@ -282,10 +312,23 @@ class _InfoRow extends StatelessWidget {
             Text(label, style: AppType.small.copyWith(color: c.textMuted)),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                value,
-                textAlign: TextAlign.right,
-                style: AppType.smallBold.copyWith(color: c.textPrimary),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    value,
+                    textAlign: TextAlign.right,
+                    style: AppType.smallBold.copyWith(color: c.textPrimary),
+                  ),
+                  if (hasNote) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      note,
+                      textAlign: TextAlign.right,
+                      style: AppType.caption.copyWith(color: c.textMuted),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],
