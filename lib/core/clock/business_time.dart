@@ -33,3 +33,12 @@ DateTime serverWallClock(DateTime t, {String? zone}) {
 
 DateTime _naive(DateTime t) =>
     DateTime(t.year, t.month, t.day, t.hour, t.minute, t.second, t.millisecond);
+
+/// Singkatan zona Indonesia (WIB/WITA/WIT) untuk zona IANA [zone]; `null`
+/// untuk zona lain atau bila zona tidak diketahui.
+String? zoneAbbreviation(String? zone) => switch (zone) {
+  'Asia/Jakarta' || 'Asia/Pontianak' => 'WIB',
+  'Asia/Makassar' => 'WITA',
+  'Asia/Jayapura' => 'WIT',
+  _ => null,
+};

@@ -7,10 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/clock/clock.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/design/design.dart';
+import '../../../core/format/id_format.dart';
 import '../domain/camera.dart';
 import 'punch_actions.dart';
+import 'punch_details.dart';
 import 'punch_providers.dart';
 
 enum _CameraUi { opening, ready, denied, unavailable }
@@ -434,15 +437,18 @@ class _PunchPhotoPageState extends ConsumerState<PunchPhotoPage>
     final flow = ref.watch(punchFlowProvider);
     final title = flow.target.title;
     final accuracy = flow.fix == null
-        ? ''
-        : ' · akurasi ${flow.fix!.accuracyMeters} m';
-    final location = switch (flow.phase) {
-      LocationPhase.locating => 'Mencari lokasi…',
-      LocationPhase.inside => 'Di dalam area kantor$accuracy',
-      LocationPhase.outside => 'Di luar area kantor$accuracy',
-      LocationPhase.located => 'Lokasi ditemukan$accuracy',
-      LocationPhase.denied => 'Lokasi tidak tersedia',
+        ? null
+        : 'Akurasi ${flow.fix!.accuracyMeters} m';
+    final area = switch (flow.phase) {
+      LocationPhase.inside => 'Di dalam area kantor',
+      LocationPhase.outside => 'Di luar area kantor',
+      LocationPhase.denied => 'Izin lokasi tidak diberikan',
+      LocationPhase.locating || LocationPhase.located => null,
     };
+    final locationNote = [
+      [?area, ?accuracy].join(' · '),
+      ?PunchDetails.coordinates(flow),
+    ].where((s) => s.isNotEmpty).join('\n');
 
     return AppScaffold(
       body: Column(
@@ -508,14 +514,10 @@ class _PunchPhotoPageState extends ConsumerState<PunchPhotoPage>
                       _DetailRow(
                         icon: PhosphorIconsRegular.mapPin,
                         label: 'Lokasi',
-                        value: location,
+                        value: PunchDetails.place(flow),
+                        note: locationNote,
                       ),
-                      const _DetailRow(
-                        icon: PhosphorIconsRegular.clock,
-                        label: 'Waktu',
-                        value: 'Dicatat oleh server saat dikirim',
-                        last: true,
-                      ),
+                      const _LiveTimeRow(),
                     ],
                   ),
                 ),
@@ -1072,7 +1074,7 @@ class _PhotoCard extends StatelessWidget {
         : Image.file(File(p), fit: BoxFit.cover, gaplessPlayback: true);
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 340),
+        constraints: const BoxConstraints(maxHeight: 260),
         child: AspectRatio(
           aspectRatio: 3 / 4,
           child: Semantics(
@@ -1089,11 +1091,32 @@ class _PhotoCard extends StatelessWidget {
   }
 }
 
+/// Tanggal dan jam berdetak (zona bisnis) sebagai pratinjau; jam resmi tetap
+/// dari server saat dikirim.
+class _LiveTimeRow extends ConsumerWidget {
+  const _LiveTimeRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final now =
+        ref.watch(tickingClockProvider).value ?? ref.watch(clockProvider)();
+    final zone = ref.watch(businessTimezoneProvider);
+    return _DetailRow(
+      icon: PhosphorIconsRegular.clock,
+      label: 'Waktu',
+      value: '${IdFormat.longDate(now)}\n${PunchDetails.time(now, zone)}',
+      note: PunchDetails.serverTimeNote,
+      last: true,
+    );
+  }
+}
+
 class _DetailRow extends StatelessWidget {
   const _DetailRow({
     required this.icon,
     required this.label,
     this.value,
+    this.note,
     this.child,
     this.last = false,
   });
@@ -1101,6 +1124,9 @@ class _DetailRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String? value;
+
+  /// Keterangan kecil di bawah nilai; kosong = tidak ada.
+  final String? note;
   final Widget? child;
   final bool last;
 
@@ -1128,9 +1154,21 @@ class _DetailRow extends StatelessWidget {
           Expanded(
             child:
                 child ??
-                Text(
-                  value ?? '',
-                  style: AppType.smallBold.copyWith(color: c.textPrimary),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      value ?? '',
+                      style: AppType.smallBold.copyWith(color: c.textPrimary),
+                    ),
+                    if (note case final note? when note.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        note,
+                        style: AppType.caption.copyWith(color: c.textMuted),
+                      ),
+                    ],
+                  ],
                 ),
           ),
         ],

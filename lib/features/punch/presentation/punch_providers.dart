@@ -12,9 +12,11 @@ import '../../auth/presentation/session_controller.dart';
 import '../../events/domain/event_item.dart';
 import '../../events/presentation/event_providers.dart';
 import '../data/api_punch_repository.dart';
+import '../data/fake_address_service.dart';
 import '../data/fake_location_service.dart';
-import '../data/real_camera_service.dart';
+import '../data/geocoding_address_service.dart';
 import '../data/geolocator_location_service.dart';
+import '../data/real_camera_service.dart';
 import '../data/mock_punch_repository.dart';
 import '../domain/camera.dart';
 import '../domain/location.dart';
@@ -30,6 +32,11 @@ final locationServiceProvider = Provider<LocationService>((ref) {
     return FakeLocationService(ref.watch(mockEnvProvider));
   }
   return const GeolocatorLocationService();
+});
+
+final addressServiceProvider = Provider<AddressService>((ref) {
+  if (AppConfig.useMock) return FakeAddressService(ref.watch(mockEnvProvider));
+  return const GeocodingAddressService();
 });
 
 /// Kamera perangkat sungguhan; test meng-override dengan `FakeCameraService`.
@@ -95,6 +102,8 @@ class PunchFlowState {
     required this.target,
     this.phase = LocationPhase.locating,
     this.fix,
+    this.address,
+    this.addressPending = false,
     this.photoPath,
     this.submitting = false,
     this.result,
@@ -104,6 +113,12 @@ class PunchFlowState {
   final FlowTarget target;
   final LocationPhase phase;
   final LocationFix? fix;
+
+  /// Nama jalan dari [fix] (hanya tampilan); `null` bila belum/tidak ada.
+  final String? address;
+
+  /// Nama jalan sedang dicari.
+  final bool addressPending;
   final String? photoPath;
   final bool submitting;
   final FlowResult? result;
@@ -114,6 +129,8 @@ class PunchFlowState {
   PunchFlowState copyWith({
     LocationPhase? phase,
     LocationFix? fix,
+    String? address,
+    bool? addressPending,
     String? photoPath,
     bool? submitting,
     FlowResult? result,
@@ -124,6 +141,8 @@ class PunchFlowState {
     target: target,
     phase: phase ?? this.phase,
     fix: fix ?? this.fix,
+    address: address ?? this.address,
+    addressPending: addressPending ?? this.addressPending,
     photoPath: clearPhoto ? null : photoPath ?? this.photoPath,
     submitting: submitting ?? this.submitting,
     result: result ?? this.result,
@@ -160,7 +179,12 @@ class PunchFlowController extends Notifier<PunchFlowState> {
                   office.radiusMeters
             ? LocationPhase.inside
             : LocationPhase.outside;
-        state = state.copyWith(phase: phase, fix: fix);
+        state = state.copyWith(phase: phase, fix: fix, addressPending: true);
+        final address = await ref
+            .read(addressServiceProvider)
+            .lookup(fix.latitude, fix.longitude);
+        if (run != _run) return;
+        state = state.copyWith(address: address, addressPending: false);
     }
   }
 
