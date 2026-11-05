@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/clock/clock.dart';
 import '../../../core/design/design.dart';
+import '../../../core/device/device_label.dart';
 import '../../../core/format/id_format.dart';
 import '../../auth/presentation/session_controller.dart';
 import 'location_map.dart';
@@ -46,6 +47,7 @@ class _PunchLocationPageState extends ConsumerState<PunchLocationPage> {
     final flow = ref.watch(punchFlowProvider);
     final office = ref.watch(officeAreaProvider);
     final device = ref.watch(deviceNameProvider).value ?? '-';
+    final deviceLabel = ref.watch(deviceLabelProvider).value;
     final title = widget.target.title;
 
     final (statusText, statusColor, iconBg, icon) = switch (flow.phase) {
@@ -222,7 +224,8 @@ class _PunchLocationPageState extends ConsumerState<PunchLocationPage> {
                       _InfoRow(
                         icon: PhosphorIconsRegular.deviceMobile,
                         label: 'Perangkat',
-                        value: device,
+                        value: deviceLabel ?? device,
+                        note: deviceLabel == null ? null : device,
                         last: true,
                       ),
                     ],
