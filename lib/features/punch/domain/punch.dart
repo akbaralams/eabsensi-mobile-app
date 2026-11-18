@@ -11,6 +11,7 @@ class Punch {
     required this.status,
     required this.statusLabel,
     required this.hasPhoto,
+    this.locationFlags = const [],
   });
 
   final int id;
@@ -21,10 +22,13 @@ class Punch {
   final PunchStatus status;
   final String statusLabel;
   final bool hasPhoto;
+
+  /// Tanda lokasi dari server untuk ditinjau, mis. `outside_radius`.
+  final List<String> locationFlags;
 }
 
-/// Bukti punch/check-in: foto (bila `requires_photo`) dan lokasi (bila izin).
-/// `latitude` dan `longitude` selalu berpasangan.
+/// Bukti punch/check-in: foto (bila `requires_photo`), lokasi (bila izin), dan
+/// sinyal keutuhan lokasi. `latitude` dan `longitude` selalu berpasangan.
 @immutable
 class EvidenceSubmission {
   const EvidenceSubmission({
@@ -32,6 +36,9 @@ class EvidenceSubmission {
     this.latitude,
     this.longitude,
     this.accuracy,
+    this.isMocked,
+    this.locationAgeSeconds,
+    this.deviceRooted,
   });
 
   final String? photoPath;
@@ -40,6 +47,15 @@ class EvidenceSubmission {
 
   /// Meter, bilangan bulat.
   final int? accuracy;
+
+  /// Sistem operasi melaporkan lokasi palsu.
+  final bool? isMocked;
+
+  /// Umur data GPS saat dikirim, detik.
+  final int? locationAgeSeconds;
+
+  /// Perangkat terdeteksi root.
+  final bool? deviceRooted;
 }
 
 abstract class PunchRepository {

@@ -2,10 +2,12 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
-import 'dart:convert' as _i5;
+import 'dart:convert' as _i6;
 import 'dart:core' as _i3;
 
 import 'package:eabsensi_api/src/model/me_employee_one_of_model.dart' as _i4;
+import 'package:eabsensi_api/src/model/me_work_location_one_of_model.dart'
+    as _i5;
 import 'package:meta/meta.dart' as _i2;
 import 'package:tonik_util/tonik_util.dart' as _i1;
 
@@ -19,6 +21,7 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     required this.timezone,
     required this.requiresPhoto,
     required this.requiresApproval,
+    this.workLocation,
   });
 
   factory Me.fromSimple(
@@ -49,6 +52,9 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       requiresApproval: _$map[r'requires_approval'].decodeJsonBool(
         context: r'Me.requires_approval',
       ),
+      workLocation: _$map[r'work_location'] == null
+          ? null
+          : _i5.MeWorkLocationOneOfModel.fromJson(_$map[r'work_location']),
     );
   }
 
@@ -79,6 +85,9 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
   /// Punch berstatus pending sampai disetujui
   final _i3.bool requiresApproval;
 
+  /// Lokasi yang berlaku untuk punch; `null` bila absen tidak dibatasi radius.
+  final _i5.MeWorkLocationOneOfModel? workLocation;
+
   @_i3.override
   _i3.Object? toJson() => {
     r'id': this.id,
@@ -88,6 +97,8 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     r'timezone': this.timezone,
     r'requires_photo': this.requiresPhoto,
     r'requires_approval': this.requiresApproval,
+    if (this.workLocation != null)
+      r'work_location': this.workLocation?.toJson(),
   };
 
   Me Function({
@@ -98,6 +109,7 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     _i3.String? timezone,
     _i3.bool? requiresPhoto,
     _i3.bool? requiresApproval,
+    _i5.MeWorkLocationOneOfModel? workLocation,
   })
   get copyWith {
     const _i3.Object _sentinel = _i3.Object();
@@ -109,6 +121,7 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       _i3.String? timezone,
       _i3.bool? requiresPhoto,
       _i3.bool? requiresApproval,
+      _i3.Object? workLocation = _sentinel,
     }) => Me(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -121,6 +134,9 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       timezone: timezone ?? this.timezone,
       requiresPhoto: requiresPhoto ?? this.requiresPhoto,
       requiresApproval: requiresApproval ?? this.requiresApproval,
+      workLocation: _i3.identical(workLocation, _sentinel)
+          ? this.workLocation
+          : (workLocation as _i5.MeWorkLocationOneOfModel?),
     );
   }
 
@@ -134,7 +150,8 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
         other.employee == this.employee &&
         other.timezone == this.timezone &&
         other.requiresPhoto == this.requiresPhoto &&
-        other.requiresApproval == this.requiresApproval;
+        other.requiresApproval == this.requiresApproval &&
+        other.workLocation == this.workLocation;
   }
 
   @_i3.override
@@ -147,6 +164,7 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       this.timezone,
       this.requiresPhoto,
       this.requiresApproval,
+      this.workLocation,
     ]);
   }
 
@@ -175,13 +193,19 @@ class Me extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     _$result[r'requires_approval'] = _i1.PropertyValue.scalar(
       this.requiresApproval.toString(),
     );
+    if (this.workLocation != null) {
+      _$result[r'work_location'] = _i1.encodeAnyValueToPropertyValue(
+        this.workLocation!.toJson(),
+        allowEmpty: allowEmpty,
+      );
+    }
     return _$result;
   }
 
   @_i3.override
   _i3.String uriEncode({
     required _i3.bool allowEmpty,
-    required _i5.Encoding textEncoding,
+    required _i6.Encoding textEncoding,
     _i3.bool useQueryComponent = false,
     _i3.bool allowReserved = false,
   }) {

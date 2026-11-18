@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../../punch/domain/location.dart';
+
 @immutable
 class EmployeeSummary {
   const EmployeeSummary({
@@ -27,6 +29,7 @@ class UserProfile {
     required this.timezone,
     required this.requiresPhoto,
     required this.requiresApproval,
+    this.workLocation,
     this.isSupervisor = false,
   });
 
@@ -37,6 +40,9 @@ class UserProfile {
   final String timezone;
   final bool requiresPhoto;
   final bool requiresApproval;
+
+  /// Lokasi yang berlaku untuk punch; `null` bila tidak dibatasi radius.
+  final OfficeArea? workLocation;
 
   /// Belum ada di kontrak API. Selalu `false` pada implementasi nyata sampai
   /// kontrak menyediakan peran atasan; hanya mock yang mengisinya.

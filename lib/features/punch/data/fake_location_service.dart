@@ -45,4 +45,7 @@ class FakeLocationService implements LocationService {
         return Completer<LocationResult>().future;
     }
   }
+
+  @override
+  Future<void> openSettings() async {}
 }

@@ -16,6 +16,9 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
     this.latitude,
     this.longitude,
     this.accuracy,
+    this.isMocked,
+    this.locationAgeSeconds,
+    this.deviceRooted,
   });
 
   factory EvidenceForm.fromSimple(
@@ -26,7 +29,15 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
     final _$values = value.decodeObject(
       explode: explode,
       explodeSeparator: ',',
-      expectedKeys: {r'photo', r'latitude', r'longitude', r'accuracy'},
+      expectedKeys: {
+        r'photo',
+        r'latitude',
+        r'longitude',
+        r'accuracy',
+        r'is_mocked',
+        r'location_age_seconds',
+        r'device_rooted',
+      },
       listKeys: {},
       context: r'EvidenceForm',
       isHeader: isHeader,
@@ -49,6 +60,16 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
       accuracy: _$values[r'accuracy'].decodeSimpleNullableInt(
         context: r'EvidenceForm.accuracy',
       ),
+      isMocked: _$values[r'is_mocked'].decodeSimpleNullableInt(
+        context: r'EvidenceForm.is_mocked',
+      ),
+      locationAgeSeconds: _$values[r'location_age_seconds']
+          .decodeSimpleNullableInt(
+            context: r'EvidenceForm.location_age_seconds',
+          ),
+      deviceRooted: _$values[r'device_rooted'].decodeSimpleNullableInt(
+        context: r'EvidenceForm.device_rooted',
+      ),
     );
   }
 
@@ -69,6 +90,15 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
       accuracy: _$map[r'accuracy'].decodeJsonNullableInt(
         context: r'EvidenceForm.accuracy',
       ),
+      isMocked: _$map[r'is_mocked'].decodeJsonNullableInt(
+        context: r'EvidenceForm.is_mocked',
+      ),
+      locationAgeSeconds: _$map[r'location_age_seconds'].decodeJsonNullableInt(
+        context: r'EvidenceForm.location_age_seconds',
+      ),
+      deviceRooted: _$map[r'device_rooted'].decodeJsonNullableInt(
+        context: r'EvidenceForm.device_rooted',
+      ),
     );
   }
 
@@ -79,7 +109,15 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
     final _$values = value.decodeObject(
       explode: explode,
       explodeSeparator: '&',
-      expectedKeys: {r'photo', r'latitude', r'longitude', r'accuracy'},
+      expectedKeys: {
+        r'photo',
+        r'latitude',
+        r'longitude',
+        r'accuracy',
+        r'is_mocked',
+        r'location_age_seconds',
+        r'device_rooted',
+      },
       listKeys: {},
       context: r'EvidenceForm',
     );
@@ -100,6 +138,14 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
       accuracy: _$values[r'accuracy'].decodeFormNullableInt(
         context: r'EvidenceForm.accuracy',
       ),
+      isMocked: _$values[r'is_mocked'].decodeFormNullableInt(
+        context: r'EvidenceForm.is_mocked',
+      ),
+      locationAgeSeconds: _$values[r'location_age_seconds']
+          .decodeFormNullableInt(context: r'EvidenceForm.location_age_seconds'),
+      deviceRooted: _$values[r'device_rooted'].decodeFormNullableInt(
+        context: r'EvidenceForm.device_rooted',
+      ),
     );
   }
 
@@ -115,12 +161,25 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
   /// Akurasi lokasi dalam meter
   final _i3.int? accuracy;
 
+  /// 1 bila sistem operasi melaporkan lokasi palsu
+  final _i3.int? isMocked;
+
+  /// Umur data GPS saat dikirim
+  final _i3.int? locationAgeSeconds;
+
+  /// 1 bila perangkat terdeteksi root
+  final _i3.int? deviceRooted;
+
   @_i3.override
   _i3.Object? toJson() => {
     if (this.photo != null) r'photo': this.photo?.toBytes().decodeToString(),
     if (this.latitude != null) r'latitude': this.latitude,
     if (this.longitude != null) r'longitude': this.longitude,
     if (this.accuracy != null) r'accuracy': this.accuracy,
+    if (this.isMocked != null) r'is_mocked': this.isMocked,
+    if (this.locationAgeSeconds != null)
+      r'location_age_seconds': this.locationAgeSeconds,
+    if (this.deviceRooted != null) r'device_rooted': this.deviceRooted,
   };
 
   EvidenceForm Function({
@@ -128,6 +187,9 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
     _i3.num? latitude,
     _i3.num? longitude,
     _i3.int? accuracy,
+    _i3.int? isMocked,
+    _i3.int? locationAgeSeconds,
+    _i3.int? deviceRooted,
   })
   get copyWith {
     const _i3.Object _sentinel = _i3.Object();
@@ -136,6 +198,9 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
       _i3.Object? latitude = _sentinel,
       _i3.Object? longitude = _sentinel,
       _i3.Object? accuracy = _sentinel,
+      _i3.Object? isMocked = _sentinel,
+      _i3.Object? locationAgeSeconds = _sentinel,
+      _i3.Object? deviceRooted = _sentinel,
     }) => EvidenceForm(
       photo: _i3.identical(photo, _sentinel)
           ? this.photo
@@ -149,6 +214,15 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
       accuracy: _i3.identical(accuracy, _sentinel)
           ? this.accuracy
           : (accuracy as _i3.int?),
+      isMocked: _i3.identical(isMocked, _sentinel)
+          ? this.isMocked
+          : (isMocked as _i3.int?),
+      locationAgeSeconds: _i3.identical(locationAgeSeconds, _sentinel)
+          ? this.locationAgeSeconds
+          : (locationAgeSeconds as _i3.int?),
+      deviceRooted: _i3.identical(deviceRooted, _sentinel)
+          ? this.deviceRooted
+          : (deviceRooted as _i3.int?),
     );
   }
 
@@ -159,7 +233,10 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
         other.photo == this.photo &&
         other.latitude == this.latitude &&
         other.longitude == this.longitude &&
-        other.accuracy == this.accuracy;
+        other.accuracy == this.accuracy &&
+        other.isMocked == this.isMocked &&
+        other.locationAgeSeconds == this.locationAgeSeconds &&
+        other.deviceRooted == this.deviceRooted;
   }
 
   @_i3.override
@@ -169,6 +246,9 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
       this.latitude,
       this.longitude,
       this.accuracy,
+      this.isMocked,
+      this.locationAgeSeconds,
+      this.deviceRooted,
     ]);
   }
 
@@ -197,6 +277,21 @@ class EvidenceForm extends _i1.ObjectParameterEncodable
     if (this.accuracy != null) {
       _$result[r'accuracy'] = _i1.PropertyValue.scalar(
         this.accuracy!.toString(),
+      );
+    }
+    if (this.isMocked != null) {
+      _$result[r'is_mocked'] = _i1.PropertyValue.scalar(
+        this.isMocked!.toString(),
+      );
+    }
+    if (this.locationAgeSeconds != null) {
+      _$result[r'location_age_seconds'] = _i1.PropertyValue.scalar(
+        this.locationAgeSeconds!.toString(),
+      );
+    }
+    if (this.deviceRooted != null) {
+      _$result[r'device_rooted'] = _i1.PropertyValue.scalar(
+        this.deviceRooted!.toString(),
       );
     }
     return _$result;

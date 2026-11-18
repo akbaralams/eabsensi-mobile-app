@@ -58,6 +58,15 @@ class PunchApi {
   /// - `Tunggu {n} detik sebelum melakukan punch lagi.` (n = `ATTENDANCE_MOBILE_MIN_INTERVAL`, default 60)
   /// - `Periode bulan ini sudah ditutup.`
   ///
+  /// Bila pegawai punya lokasi kerja yang berlaku (`work_location` di profil), ditambah:
+  /// - `Lokasi wajib diaktifkan untuk melakukan absen.`
+  /// - `Perbarui aplikasi ke versi terbaru untuk melakukan absen.`
+  /// - `Lokasi palsu terdeteksi. Matikan aplikasi pengubah lokasi lalu coba lagi.`
+  /// - `Lokasi sudah kedaluwarsa. Silakan coba lagi.`
+  /// - `Sinyal GPS lemah. Pindah ke area terbuka lalu coba lagi.`
+  ///
+  /// Di luar radius tetap tercatat dengan status normal dan tanda `outside_radius` di `location_flags`.
+  ///
   ///
   /// Response 401 (application/json):
   /// **Example**:

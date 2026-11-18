@@ -57,6 +57,8 @@ class EventApi {
   /// - `Check-in dibuka pukul {mulai} sampai {selesai}.`
   /// - `Anda sudah check-in di event ini.`
   ///
+  /// Bila event punya lokasi yang berlaku (`work_location` pada event), penolakan lokasi sama dengan punch.
+  ///
   ///
   /// Response 401 (application/json):
   /// **Example**:
