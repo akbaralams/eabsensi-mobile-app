@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:geolocator/geolocator.dart';
 
 import '../domain/location.dart';
 
-/// Lokasi nyata dari perangkat. Izin ditolak -> [LocationDenied].
+/// Lokasi nyata dari perangkat. Izin ditolak -> [LocationDenied], GPS tidak
+/// mendapat posisi dalam batas waktu -> [LocationUnavailable].
 class GeolocatorLocationService implements LocationService {
   const GeolocatorLocationService();
 
@@ -19,18 +22,39 @@ class GeolocatorLocationService implements LocationService {
         permission == LocationPermission.deniedForever) {
       return const LocationDenied();
     }
-    final p = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 20),
-      ),
-    );
-    return LocationFound(
-      LocationFix(
-        latitude: p.latitude,
-        longitude: p.longitude,
-        accuracyMeters: p.accuracy.round(),
-      ),
-    );
+    try {
+      final p = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 20),
+        ),
+      );
+      final precision = await Geolocator.getLocationAccuracy();
+      return LocationFound(
+        LocationFix(
+          latitude: p.latitude,
+          longitude: p.longitude,
+          accuracyMeters: p.accuracy.round(),
+          isMocked: p.isMocked,
+          isApproximate: precision == LocationAccuracyStatus.reduced,
+          capturedAt: p.timestamp.toLocal(),
+        ),
+      );
+    } on TimeoutException {
+      return const LocationUnavailable();
+    } on LocationServiceDisabledException {
+      return const LocationDenied();
+    } on PermissionDeniedException {
+      return const LocationDenied();
+    }
+  }
+
+  @override
+  Future<void> openSettings() async {
+    if (await Geolocator.isLocationServiceEnabled()) {
+      await Geolocator.openAppSettings();
+    } else {
+      await Geolocator.openLocationSettings();
+    }
   }
 }

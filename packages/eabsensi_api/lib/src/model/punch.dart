@@ -2,9 +2,11 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
-import 'dart:convert' as _i6;
+import 'dart:convert' as _i8;
 import 'dart:core' as _i3;
 
+import 'package:collection/collection.dart' as _i7;
+import 'package:eabsensi_api/src/model/location_flags.dart' as _i6;
 import 'package:eabsensi_api/src/model/punch_source_model.dart' as _i4;
 import 'package:eabsensi_api/src/model/punch_status_model.dart' as _i5;
 import 'package:meta/meta.dart' as _i2;
@@ -19,6 +21,7 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     required this.status,
     required this.statusLabel,
     required this.hasPhoto,
+    this.locationFlags,
   });
 
   factory Punch.fromSimple(
@@ -36,8 +39,9 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
         r'status',
         r'status_label',
         r'has_photo',
+        r'location_flags',
       },
-      listKeys: {},
+      listKeys: {r'location_flags'},
       context: r'Punch',
       isHeader: isHeader,
       percentDecodeKeys: false,
@@ -61,6 +65,10 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       hasPhoto: _$values[r'has_photo'].decodeSimpleBool(
         context: r'Punch.has_photo',
       ),
+      locationFlags: _$values[r'location_flags'].decodeSimpleNullableStringList(
+        context: r'Punch.location_flags',
+        isHeader: isHeader,
+      ),
     );
   }
 
@@ -77,6 +85,8 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
         context: r'Punch.status_label',
       ),
       hasPhoto: _$map[r'has_photo'].decodeJsonBool(context: r'Punch.has_photo'),
+      locationFlags: _$map[r'location_flags']
+          .decodeJsonNullableList<_i3.String>(context: r'Punch.location_flags'),
     );
   }
 
@@ -91,8 +101,9 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
         r'status',
         r'status_label',
         r'has_photo',
+        r'location_flags',
       },
-      listKeys: {},
+      listKeys: {r'location_flags'},
       context: r'Punch',
     );
     return Punch(
@@ -113,6 +124,9 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       ),
       hasPhoto: _$values[r'has_photo'].decodeFormBool(
         context: r'Punch.has_photo',
+      ),
+      locationFlags: _$values[r'location_flags'].decodeFormNullableStringList(
+        context: r'Punch.location_flags',
       ),
     );
   }
@@ -138,6 +152,8 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
 
   final _i3.bool hasPhoto;
 
+  final _i6.LocationFlags? locationFlags;
+
   @_i3.override
   _i3.Object? toJson() => {
     r'id': this.id,
@@ -146,6 +162,7 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     r'status': this.status.toJson(),
     r'status_label': this.statusLabel,
     r'has_photo': this.hasPhoto,
+    if (this.locationFlags != null) r'location_flags': this.locationFlags,
   };
 
   Punch Function({
@@ -155,8 +172,10 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     _i5.PunchStatusModel? status,
     _i3.String? statusLabel,
     _i3.bool? hasPhoto,
+    _i6.LocationFlags? locationFlags,
   })
   get copyWith {
+    const _i3.Object _sentinel = _i3.Object();
     return ({
       _i3.int? id,
       _i3.DateTime? punchedAt,
@@ -164,6 +183,7 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       _i5.PunchStatusModel? status,
       _i3.String? statusLabel,
       _i3.bool? hasPhoto,
+      _i3.Object? locationFlags = _sentinel,
     }) => Punch(
       id: id ?? this.id,
       punchedAt: punchedAt ?? this.punchedAt,
@@ -171,23 +191,29 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       status: status ?? this.status,
       statusLabel: statusLabel ?? this.statusLabel,
       hasPhoto: hasPhoto ?? this.hasPhoto,
+      locationFlags: _i3.identical(locationFlags, _sentinel)
+          ? this.locationFlags
+          : (locationFlags as _i6.LocationFlags?),
     );
   }
 
   @_i3.override
   _i3.bool operator ==(_i3.Object other) {
     if (_i3.identical(this, other)) return true;
+    const _$deepEquals = _i7.DeepCollectionEquality();
     return other is Punch &&
         other.id == this.id &&
         other.punchedAt == this.punchedAt &&
         other.source == this.source &&
         other.status == this.status &&
         other.statusLabel == this.statusLabel &&
-        other.hasPhoto == this.hasPhoto;
+        other.hasPhoto == this.hasPhoto &&
+        _$deepEquals.equals(other.locationFlags, this.locationFlags);
   }
 
   @_i3.override
   _i3.int get hashCode {
+    const deepEquals = _i7.DeepCollectionEquality();
     return _i3.Object.hashAll([
       this.id,
       this.punchedAt,
@@ -195,6 +221,7 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       this.status,
       this.statusLabel,
       this.hasPhoto,
+      deepEquals.hash(this.locationFlags),
     ]);
   }
 
@@ -213,13 +240,18 @@ class Punch extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     _$result[r'status'] = _i1.PropertyValue.scalar(this.status.toJson());
     _$result[r'status_label'] = _i1.PropertyValue.scalar(this.statusLabel);
     _$result[r'has_photo'] = _i1.PropertyValue.scalar(this.hasPhoto.toString());
+    if (this.locationFlags != null) {
+      _$result[r'location_flags'] = _i1.PropertyValue.array(
+        this.locationFlags!,
+      );
+    }
     return _$result;
   }
 
   @_i3.override
   _i3.String uriEncode({
     required _i3.bool allowEmpty,
-    required _i6.Encoding textEncoding,
+    required _i8.Encoding textEncoding,
     _i3.bool useQueryComponent = false,
     _i3.bool allowReserved = false,
   }) {

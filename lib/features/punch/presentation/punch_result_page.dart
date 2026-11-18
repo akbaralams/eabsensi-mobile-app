@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/design/design.dart';
 import '../../../core/format/id_format.dart';
 import '../domain/punch.dart';
+import 'punch_details.dart';
 import 'punch_providers.dart';
 
 /// Hasil: waktu dari respons server dan status (`approved` / `pending`).
@@ -125,6 +126,39 @@ class PunchResultPage extends ConsumerWidget {
                     textAlign: TextAlign.center,
                     style: AppType.body.copyWith(color: c.textSecondary),
                   ),
+                  if (result.locationFlags.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      key: const Key('result-location-flags'),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: c.amberTint,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          PhosphorIcon(
+                            PhosphorIconsFill.warning,
+                            size: 18,
+                            color: c.amberText,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Ditandai untuk ditinjau: '
+                              '${result.locationFlags.map(PunchDetails.flagLabel).join(', ')}.',
+                              style: AppType.caption.copyWith(
+                                color: c.amberText,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

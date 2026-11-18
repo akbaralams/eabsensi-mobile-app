@@ -214,6 +214,15 @@ paths:
         - `Pegawai tidak aktif.`
         - `Tunggu {n} detik sebelum melakukan punch lagi.` (n = `ATTENDANCE_MOBILE_MIN_INTERVAL`, default 60)
         - `Periode bulan ini sudah ditutup.`
+
+        Bila pegawai punya lokasi kerja yang berlaku (`work_location` di profil), ditambah:
+        - `Lokasi wajib diaktifkan untuk melakukan absen.`
+        - `Perbarui aplikasi ke versi terbaru untuk melakukan absen.`
+        - `Lokasi palsu terdeteksi. Matikan aplikasi pengubah lokasi lalu coba lagi.`
+        - `Lokasi sudah kedaluwarsa. Silakan coba lagi.`
+        - `Sinyal GPS lemah. Pindah ke area terbuka lalu coba lagi.`
+
+        Di luar radius tetap tercatat dengan status normal dan tanda `outside_radius` di `location_flags`.
       requestBody:
         required: true
         content:
@@ -271,6 +280,8 @@ paths:
         - `Check-in hanya bisa dilakukan pada tanggal event.`
         - `Check-in dibuka pukul {mulai} sampai {selesai}.`
         - `Anda sudah check-in di event ini.`
+
+        Bila event punya lokasi yang berlaku (`work_location` pada event), penolakan lokasi sama dengan punch.
       parameters:
         - name: event
           in: path
@@ -412,6 +423,25 @@ components:
         timezone: { type: string, example: Asia/Jakarta }
         requires_photo: { type: boolean, description: Foto wajib pada punch dan check-in }
         requires_approval: { type: boolean, description: Punch berstatus pending sampai disetujui }
+        work_location:
+          description: Lokasi yang berlaku untuk punch; `null` bila absen tidak dibatasi radius.
+          oneOf:
+            - $ref: '#/components/schemas/WorkLocation'
+            - type: 'null'
+
+    WorkLocation:
+      type: object
+      required: [name, latitude, longitude, radius_meters]
+      properties:
+        name: { type: string, example: Kantor Pusat }
+        latitude: { type: number, minimum: -90, maximum: 90 }
+        longitude: { type: number, minimum: -180, maximum: 180 }
+        radius_meters: { type: integer, minimum: 10, maximum: 5000 }
+
+    LocationFlags:
+      type: array
+      description: 'Tanda untuk ditinjau: `outside_radius`, `impossible_travel`, `rooted_device`, `mock_location`. Klien harus menerima nilai baru.'
+      items: { type: string }
 
     EmployeeSummary:
       type: object
@@ -432,6 +462,9 @@ components:
         latitude: { type: number, minimum: -90, maximum: 90, description: Wajib bersama longitude }
         longitude: { type: number, minimum: -180, maximum: 180, description: Wajib bersama latitude }
         accuracy: { type: integer, minimum: 0, maximum: 65535, description: Akurasi lokasi dalam meter }
+        is_mocked: { type: integer, minimum: 0, maximum: 1, description: '1 bila sistem operasi melaporkan lokasi palsu' }
+        location_age_seconds: { type: integer, minimum: 0, maximum: 86400, description: Umur data GPS saat dikirim }
+        device_rooted: { type: integer, minimum: 0, maximum: 1, description: '1 bila perangkat terdeteksi root' }
 
     Punch:
       type: object
@@ -443,6 +476,7 @@ components:
         status: { type: string, enum: [pending, approved, rejected] }
         status_label: { type: string, example: Menunggu persetujuan }
         has_photo: { type: boolean }
+        location_flags: { $ref: '#/components/schemas/LocationFlags' }
 
     Event:
       type: object
@@ -454,6 +488,11 @@ components:
         starts_at: { type: string, pattern: '^\d{2}:\d{2}$', example: '07:00' }
         ends_at: { type: string, pattern: '^\d{2}:\d{2}$', example: '09:00' }
         checked_in: { type: boolean }
+        work_location:
+          description: Lokasi yang berlaku untuk check-in; `null` bila tidak dibatasi radius.
+          oneOf:
+            - $ref: '#/components/schemas/WorkLocation'
+            - type: 'null'
 
     EventCheckIn:
       type: object
@@ -461,6 +500,7 @@ components:
       properties:
         event_id: { type: integer }
         checked_in_at: { type: string, format: date-time }
+        location_flags: { $ref: '#/components/schemas/LocationFlags' }
 
     LeaveRequest:
       type: object

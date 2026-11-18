@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../punch/domain/location.dart';
 import '../../punch/domain/punch.dart';
 
 @immutable
@@ -11,6 +12,7 @@ class EventItem {
     required this.startsAt,
     required this.endsAt,
     required this.checkedIn,
+    this.workLocation,
   });
 
   final int id;
@@ -22,6 +24,9 @@ class EventItem {
   final String endsAt;
   final bool checkedIn;
 
+  /// Lokasi yang berlaku untuk check-in; `null` bila tidak dibatasi radius.
+  final OfficeArea? workLocation;
+
   EventItem copyWith({bool? checkedIn}) => EventItem(
     id: id,
     name: name,
@@ -29,15 +34,23 @@ class EventItem {
     startsAt: startsAt,
     endsAt: endsAt,
     checkedIn: checkedIn ?? this.checkedIn,
+    workLocation: workLocation,
   );
 }
 
 @immutable
 class EventCheckIn {
-  const EventCheckIn({required this.eventId, required this.checkedInAt});
+  const EventCheckIn({
+    required this.eventId,
+    required this.checkedInAt,
+    this.locationFlags = const [],
+  });
 
   final int eventId;
   final DateTime checkedInAt;
+
+  /// Tanda lokasi dari server untuk ditinjau.
+  final List<String> locationFlags;
 }
 
 abstract class EventRepository {

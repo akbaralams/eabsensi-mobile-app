@@ -109,6 +109,39 @@ final class CheckInEvent extends _i1.DioOperation<_i2.CheckInEventResponse> {
         ),
       );
     }
+    if (body.isMocked != null) {
+      _$formData.files.add(
+        _i3.MapEntry(
+          (r'is_mocked').replaceAll(r'\', r'\\'),
+          _i5.MultipartFile.fromString(
+            body.isMocked!.toString(),
+            contentType: _i5.DioMediaType.parse(r'text/plain'),
+          ),
+        ),
+      );
+    }
+    if (body.locationAgeSeconds != null) {
+      _$formData.files.add(
+        _i3.MapEntry(
+          (r'location_age_seconds').replaceAll(r'\', r'\\'),
+          _i5.MultipartFile.fromString(
+            body.locationAgeSeconds!.toString(),
+            contentType: _i5.DioMediaType.parse(r'text/plain'),
+          ),
+        ),
+      );
+    }
+    if (body.deviceRooted != null) {
+      _$formData.files.add(
+        _i3.MapEntry(
+          (r'device_rooted').replaceAll(r'\', r'\\'),
+          _i5.MultipartFile.fromString(
+            body.deviceRooted!.toString(),
+            contentType: _i5.DioMediaType.parse(r'text/plain'),
+          ),
+        ),
+      );
+    }
     if (_$formData.fields.isEmpty && _$formData.files.isEmpty) {
       throw _i4.EncodingException(
         r'Multipart request body must contain at least one part.',

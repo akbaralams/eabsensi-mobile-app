@@ -443,6 +443,7 @@ class _PunchPhotoPageState extends ConsumerState<PunchPhotoPage>
       LocationPhase.inside => 'Di dalam area kantor',
       LocationPhase.outside => 'Di luar area kantor',
       LocationPhase.denied => 'Izin lokasi tidak diberikan',
+      LocationPhase.unavailable => 'Lokasi belum didapat',
       LocationPhase.locating || LocationPhase.located => null,
     };
     final locationNote = [

@@ -2,9 +2,11 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
-import 'dart:convert' as _i4;
+import 'dart:convert' as _i5;
 import 'dart:core' as _i3;
 
+import 'package:eabsensi_api/src/model/event_work_location_one_of_model.dart'
+    as _i4;
 import 'package:meta/meta.dart' as _i2;
 import 'package:tonik_util/tonik_util.dart' as _i1;
 
@@ -17,6 +19,7 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     required this.startsAt,
     required this.endsAt,
     required this.checkedIn,
+    this.workLocation,
   });
 
   factory Event.fromSimple(
@@ -24,37 +27,8 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     required _i3.bool explode,
     _i3.bool isHeader = false,
   }) {
-    final _$values = value.decodeObject(
-      explode: explode,
-      explodeSeparator: ',',
-      expectedKeys: {
-        r'id',
-        r'name',
-        r'event_date',
-        r'starts_at',
-        r'ends_at',
-        r'checked_in',
-      },
-      listKeys: {},
-      context: r'Event',
-      isHeader: isHeader,
-      percentDecodeKeys: false,
-    );
-    return Event(
-      id: _$values[r'id'].decodeSimpleInt(context: r'Event.id'),
-      name: _$values[r'name'].decodeSimpleString(context: r'Event.name'),
-      eventDate: _$values[r'event_date'].decodeSimpleDate(
-        context: r'Event.event_date',
-      ),
-      startsAt: _$values[r'starts_at'].decodeSimpleString(
-        context: r'Event.starts_at',
-      ),
-      endsAt: _$values[r'ends_at'].decodeSimpleString(
-        context: r'Event.ends_at',
-      ),
-      checkedIn: _$values[r'checked_in'].decodeSimpleBool(
-        context: r'Event.checked_in',
-      ),
+    throw _i1.SimpleDecodingException(
+      r'Simple encoding not supported for Event: contains complex types',
     );
   }
 
@@ -73,37 +47,15 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       checkedIn: _$map[r'checked_in'].decodeJsonBool(
         context: r'Event.checked_in',
       ),
+      workLocation: _$map[r'work_location'] == null
+          ? null
+          : _i4.EventWorkLocationOneOfModel.fromJson(_$map[r'work_location']),
     );
   }
 
   factory Event.fromForm(_i3.String? value, {required _i3.bool explode}) {
-    final _$values = value.decodeObject(
-      explode: explode,
-      explodeSeparator: '&',
-      expectedKeys: {
-        r'id',
-        r'name',
-        r'event_date',
-        r'starts_at',
-        r'ends_at',
-        r'checked_in',
-      },
-      listKeys: {},
-      context: r'Event',
-    );
-    return Event(
-      id: _$values[r'id'].decodeFormInt(context: r'Event.id'),
-      name: _$values[r'name'].decodeFormString(context: r'Event.name'),
-      eventDate: _$values[r'event_date'].decodeFormDate(
-        context: r'Event.event_date',
-      ),
-      startsAt: _$values[r'starts_at'].decodeFormString(
-        context: r'Event.starts_at',
-      ),
-      endsAt: _$values[r'ends_at'].decodeFormString(context: r'Event.ends_at'),
-      checkedIn: _$values[r'checked_in'].decodeFormBool(
-        context: r'Event.checked_in',
-      ),
+    throw _i1.FormDecodingException(
+      r'Form encoding not supported for Event: contains complex types',
     );
   }
 
@@ -127,6 +79,9 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
 
   final _i3.bool checkedIn;
 
+  /// Lokasi yang berlaku untuk check-in; `null` bila tidak dibatasi radius.
+  final _i4.EventWorkLocationOneOfModel? workLocation;
+
   @_i3.override
   _i3.Object? toJson() => {
     r'id': this.id,
@@ -135,6 +90,8 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     r'starts_at': this.startsAt,
     r'ends_at': this.endsAt,
     r'checked_in': this.checkedIn,
+    if (this.workLocation != null)
+      r'work_location': this.workLocation?.toJson(),
   };
 
   Event Function({
@@ -144,8 +101,10 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     _i3.String? startsAt,
     _i3.String? endsAt,
     _i3.bool? checkedIn,
+    _i4.EventWorkLocationOneOfModel? workLocation,
   })
   get copyWith {
+    const _i3.Object _sentinel = _i3.Object();
     return ({
       _i3.int? id,
       _i3.String? name,
@@ -153,6 +112,7 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       _i3.String? startsAt,
       _i3.String? endsAt,
       _i3.bool? checkedIn,
+      _i3.Object? workLocation = _sentinel,
     }) => Event(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -160,6 +120,9 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       startsAt: startsAt ?? this.startsAt,
       endsAt: endsAt ?? this.endsAt,
       checkedIn: checkedIn ?? this.checkedIn,
+      workLocation: _i3.identical(workLocation, _sentinel)
+          ? this.workLocation
+          : (workLocation as _i4.EventWorkLocationOneOfModel?),
     );
   }
 
@@ -172,7 +135,8 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
         other.eventDate == this.eventDate &&
         other.startsAt == this.startsAt &&
         other.endsAt == this.endsAt &&
-        other.checkedIn == this.checkedIn;
+        other.checkedIn == this.checkedIn &&
+        other.workLocation == this.workLocation;
   }
 
   @_i3.override
@@ -184,6 +148,7 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
       this.startsAt,
       this.endsAt,
       this.checkedIn,
+      this.workLocation,
     ]);
   }
 
@@ -204,13 +169,19 @@ class Event extends _i1.ObjectParameterEncodable implements _i1.UriEncodable {
     _$result[r'checked_in'] = _i1.PropertyValue.scalar(
       this.checkedIn.toString(),
     );
+    if (this.workLocation != null) {
+      _$result[r'work_location'] = _i1.encodeAnyValueToPropertyValue(
+        this.workLocation!.toJson(),
+        allowEmpty: allowEmpty,
+      );
+    }
     return _$result;
   }
 
   @_i3.override
   _i3.String uriEncode({
     required _i3.bool allowEmpty,
-    required _i4.Encoding textEncoding,
+    required _i5.Encoding textEncoding,
     _i3.bool useQueryComponent = false,
     _i3.bool allowReserved = false,
   }) {

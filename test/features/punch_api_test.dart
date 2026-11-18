@@ -18,6 +18,14 @@ Map<String, Object?> _punch(int id, String at, {String status = 'pending'}) => {
   'has_photo': true,
 };
 
+/// Nilai satu field teks dari badan multipart.
+String? _field(String body, String name) {
+  final start = body.indexOf('name="$name"');
+  if (start < 0) return null;
+  final valueStart = body.indexOf('\r\n\r\n', start) + 4;
+  return body.substring(valueStart, body.indexOf('\r\n', valueStart));
+}
+
 void main() {
   late FakeAdapter http;
   late ApiPunchRepository repo;
@@ -84,6 +92,49 @@ void main() {
       expect(body, isNot(contains('punched_at')));
     },
   );
+
+  test('sinyal lokasi dikirim sebagai 0/1 dan tanda server dibaca', () async {
+    final photo = File('${tmp.path}/foto.jpg')..writeAsBytesSync([1, 2, 3]);
+    http.handler = (r, i) => jsonBody(201, {
+      'data': {
+        ..._punch(9, '2026-10-30T07:58:12+07:00'),
+        'location_flags': ['outside_radius'],
+      },
+    });
+
+    final punch = await repo.create(
+      EvidenceSubmission(
+        photoPath: photo.path,
+        latitude: -6.2,
+        longitude: 106.8,
+        accuracy: 12,
+        isMocked: true,
+        locationAgeSeconds: 7,
+        deviceRooted: false,
+      ),
+    );
+
+    expect(punch.locationFlags, ['outside_radius']);
+    final body = http.requests.single.bodyText;
+    expect(_field(body, 'is_mocked'), '1');
+    expect(_field(body, 'location_age_seconds'), '7');
+    expect(_field(body, 'device_rooted'), '0');
+  });
+
+  test('tanpa lokasi: hanya sinyal perangkat yang dikirim', () async {
+    http.handler = (r, i) =>
+        jsonBody(201, {'data': _punch(9, '2026-10-30T07:58:12+07:00')});
+
+    final punch = await repo.create(
+      const EvidenceSubmission(deviceRooted: true),
+    );
+
+    expect(punch.locationFlags, isEmpty);
+    final body = http.requests.single.bodyText;
+    expect(_field(body, 'device_rooted'), '1');
+    expect(body, isNot(contains('is_mocked')));
+    expect(body, isNot(contains('location_age_seconds')));
+  });
 
   test('lokasi tidak lengkap tidak dikirim (harus berpasangan)', () async {
     final photo = File('${tmp.path}/foto.jpg')..writeAsBytesSync([1, 2, 3]);

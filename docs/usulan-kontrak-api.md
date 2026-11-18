@@ -22,7 +22,6 @@ Refresh token (`/api/v2/auth/login`, `/refresh`, `/logout`) sudah ada di kontrak
 
 | Kebutuhan | Layar | Usulan |
 |---|---|---|
-| Lokasi kantor / geofence dan nama lokasi | Check In, Beranda | Field `work_location: { name, latitude, longitude, radius_m }` di `/me` |
 | Jadwal/shift hari ini | Beranda ("Jam Kerja"), klasifikasi terlambat hari ini | Field `today_schedule` di `/me` atau endpoint tersendiri. Rekap bulanan v2 punya `shift` per hari, tetapi bukan jam kerja untuk kartu beranda |
 | Kategori jenis cuti | Cuti | Field `category` di `types[]` pada `GET /leaves`. Sementara aplikasi memetakan kode bawaan (`CUTI`, `IZIN`, `SAKIT`, `DINAS`) di `LeaveCategory` |
 | Status harian (Terlambat, Tidak Hadir) di kartu Status Kehadiran | Beranda | Field `attendance_flag` (`late`/`absent`/null) di `/me` atau `GET /api/v2/attendance/today`. Tanpa ini klien tidak menampilkan Terlambat/Tidak Hadir (kartu sudah siap lewat `AttendanceSummary.flag`) |

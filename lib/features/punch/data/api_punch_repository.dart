@@ -40,12 +40,18 @@ class ApiPunchRepository implements PunchRepository {
   }
 }
 
-/// Tanpa foto dan tanpa lokasi berpasangan: tidak ada bagian multipart.
+/// Tanpa foto, lokasi berpasangan, dan sinyal perangkat: tidak ada bagian
+/// multipart.
 bool isEmptyEvidence(EvidenceSubmission e) =>
-    e.photoPath == null && (e.latitude == null || e.longitude == null);
+    e.photoPath == null &&
+    (e.latitude == null || e.longitude == null) &&
+    e.deviceRooted == null;
+
+int? _flag(bool? value) => value == null ? null : (value ? 1 : 0);
 
 /// Bukti punch/check-in sebagai form multipart kontrak (`EvidenceForm`):
-/// `photo` berkas JPEG, `latitude`/`longitude` berpasangan, `accuracy` meter.
+/// `photo` berkas JPEG, `latitude`/`longitude` berpasangan, `accuracy` meter,
+/// serta sinyal `is_mocked`, `location_age_seconds`, `device_rooted` (0/1).
 api.EvidenceForm evidenceForm(EvidenceSubmission e) {
   final paired = e.latitude != null && e.longitude != null;
   final path = e.photoPath;
@@ -62,5 +68,8 @@ api.EvidenceForm evidenceForm(EvidenceSubmission e) {
     latitude: paired ? e.latitude : null,
     longitude: paired ? e.longitude : null,
     accuracy: paired ? e.accuracy : null,
+    isMocked: paired ? _flag(e.isMocked) : null,
+    locationAgeSeconds: paired ? e.locationAgeSeconds : null,
+    deviceRooted: _flag(e.deviceRooted),
   );
 }

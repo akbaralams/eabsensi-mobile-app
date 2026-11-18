@@ -8,8 +8,16 @@ import 'package:tonik_util/tonik_util.dart' show Date;
 import '../../features/auth/domain/user_profile.dart';
 import '../../features/events/domain/event_item.dart';
 import '../../features/leaves/domain/leave.dart';
+import '../../features/punch/domain/location.dart';
 import '../../features/punch/domain/punch.dart';
 import '../clock/business_time.dart';
+
+OfficeArea officeAreaFromApi(api.WorkLocation location) => OfficeArea(
+  name: location.name,
+  latitude: location.latitude.toDouble(),
+  longitude: location.longitude.toDouble(),
+  radiusMeters: location.radiusMeters.toDouble(),
+);
 
 UserProfile profileFromApi(api.Me me) {
   final employee = switch (me.employee) {
@@ -33,6 +41,11 @@ UserProfile profileFromApi(api.Me me) {
     timezone: me.timezone,
     requiresPhoto: me.requiresPhoto,
     requiresApproval: me.requiresApproval,
+    workLocation: switch (me.workLocation) {
+      api.$RawMeWorkLocationOneOfModelWorkLocation(:final value) =>
+        officeAreaFromApi(value),
+      null => null,
+    },
   );
 }
 
@@ -47,6 +60,7 @@ Punch punchFromApi(api.Punch p) => Punch(
   },
   statusLabel: p.statusLabel,
   hasPhoto: p.hasPhoto,
+  locationFlags: p.locationFlags ?? const [],
 );
 
 EventItem eventFromApi(api.Event e) => EventItem(
@@ -56,11 +70,17 @@ EventItem eventFromApi(api.Event e) => EventItem(
   startsAt: e.startsAt,
   endsAt: e.endsAt,
   checkedIn: e.checkedIn,
+  workLocation: switch (e.workLocation) {
+    api.$RawEventWorkLocationOneOfModelWorkLocation(:final value) =>
+      officeAreaFromApi(value),
+    null => null,
+  },
 );
 
 EventCheckIn checkInFromApi(api.EventCheckIn c) => EventCheckIn(
   eventId: c.eventId,
   checkedInAt: serverWallClock(c.checkedInAt),
+  locationFlags: c.locationFlags ?? const [],
 );
 
 Leave leaveFromApi(api.Leave l) => Leave(

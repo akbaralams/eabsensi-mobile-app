@@ -75,7 +75,7 @@ class _PunchLocationPageState extends ConsumerState<PunchLocationPage> {
         c.successTint,
         PhosphorIconsBold.check,
       ),
-      LocationPhase.denied => (
+      LocationPhase.denied || LocationPhase.unavailable => (
         'Lokasi tidak tersedia',
         c.amberText,
         c.amberTint,
@@ -176,11 +176,7 @@ class _PunchLocationPageState extends ConsumerState<PunchLocationPage> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      flow.phase == LocationPhase.denied
-                                          ? 'Izin lokasi tidak diberikan. Absen tetap bisa dilanjutkan tanpa lokasi.'
-                                          : flow.fix == null
-                                          ? 'Akurasi lokasi: menunggu…'
-                                          : 'Akurasi lokasi: ${flow.fix!.accuracyMeters} meter',
+                                      PunchDetails.locationNote(flow, office),
                                       style: AppType.caption.copyWith(
                                         color: c.textSecondary,
                                       ),
@@ -232,12 +228,28 @@ class _PunchLocationPageState extends ConsumerState<PunchLocationPage> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                PrimaryButton(
-                  label: flow.canConfirm
-                      ? 'Konfirmasi $title'
-                      : 'Menunggu lokasi…',
-                  onPressed: flow.canConfirm ? _confirm : null,
-                ),
+                if (flow.blockReason == null)
+                  PrimaryButton(
+                    label: flow.canConfirm
+                        ? 'Konfirmasi $title'
+                        : 'Menunggu lokasi…',
+                    onPressed: flow.canConfirm ? _confirm : null,
+                  )
+                else ...[
+                  PrimaryButton(
+                    label: 'Coba Lagi',
+                    icon: PhosphorIconsRegular.arrowClockwise,
+                    onPressed: () => ref
+                        .read(punchFlowProvider.notifier)
+                        .start(widget.target),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlineButton(
+                    label: 'Buka Pengaturan',
+                    onPressed: () =>
+                        ref.read(locationServiceProvider).openSettings(),
+                  ),
+                ],
                 const SizedBox(height: 10),
                 OutlineButton(label: 'Batal', onPressed: () => context.pop()),
               ],
